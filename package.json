@@ -4,6 +4,7 @@
   "description": "Intranet Bookshelf Backend",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/jtrpka0912/intranet.bookshelf.nodejs/issues"
   },
-  "homepage": "https://github.com/jtrpka0912/intranet.bookshelf.nodejs#readme"
+  "homepage": "https://github.com/jtrpka0912/intranet.bookshelf.nodejs#readme",
+  "dependencies": {
+    "pdfjs-dist": "^2.3.200"
+  }
 }
