@@ -1,0 +1,19 @@
+{
+  "name": "intranet.bookshelf.nodejs",
+  "version": "1.0.0",
+  "description": "Intranet Bookshelf Backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jtrpka0912/intranet.bookshelf.nodejs.git"
+  },
+  "author": "J. Trpka",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jtrpka0912/intranet.bookshelf.nodejs/issues"
+  },
+  "homepage": "https://github.com/jtrpka0912/intranet.bookshelf.nodejs#readme"
+}
