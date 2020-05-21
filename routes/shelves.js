@@ -33,6 +33,7 @@ router.route('/').post((req, res) => {
     // Not showing directories and using multifile will conflict
     if(!shelfShowDirectories && shelfMultiFile) {
         // TODO: THIS STILL WILL PROCEED WITH REST OF CODE
+        // TODO: For OpenAPI, add the createdAt and updatedAt for the schemas.
         // Send error as response
         res.status(400).json({
             errorCode: 400,
