@@ -4,6 +4,9 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
+// Routes
+const shelvesRouter = require('./routes/shelves');
+
 // Initialize express
 const app = express();
 
@@ -27,6 +30,9 @@ const connection = mongoose.connection;
 connection.once('open', () => {
     console.log('MongoDB database connection established successfully.')
 });
+
+// Express Routes
+app.use('/api/v1/shelves', shelvesRouter);
 
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
