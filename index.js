@@ -19,7 +19,7 @@ app.use(cors());
 // Express will request and receive JSON content
 app.use(express.json());
 
-// Connect to MongoDB
+// Connect to MongoDB with Mongoose
 const uri = process.env.MONGO_URI
 mongoose.connect(uri, {
     useNewUrlParser: true,
