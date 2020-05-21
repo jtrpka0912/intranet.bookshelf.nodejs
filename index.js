@@ -1,35 +1,33 @@
-var http = require('http');
+// Packages
+const express = require('express');
+const cors = require('cors');
+const mongoose = require('mongoose');
+require('dotenv').config();
 
-//===========TESTING FILES===========
-const fs = require('fs');
-const path = require('path');
+// Initialize express
+const app = express();
 
-(async () => {
-    try{
-        const rootPath = 'R:\\';
-        const files = await fs.promises.readdir(rootPath);
+// Assign port number
+const port = process.env.PORT;
 
-        // Loop Through Files and Folders
-        for(const file of files) {
-            const filePath = path.join(rootPath, file);
-            const fileDetails = await fs.promises.stat(filePath);
-            console.log('===========================')
-            console.info('Is Directory?', fileDetails.isDirectory())
-            console.info('Is File?', fileDetails.isFile());
-            console.info('File Path', filePath);
-            console.info('File Extension', path.extname(filePath));
-        }
+// Apply cors to express
+app.use(cors());
 
-    } catch (e) {
-        // Catch anything bad that happens
-        console.error( "We've thrown! Whoops!", e );
-    }
-})();
+// Express will request and receive JSON content
+app.use(express.json());
 
+// Connect to MongoDB
+const uri = process.env.MONGO_URI
+mongoose.connect(uri, {
+    useNewUrlParser: true,
+    useCreateIndex: true
+});
 
-http.createServer(function (req, res) {
-    res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.end('Hello World\n');
-}).listen(1337, "127.0.0.1");
+const connection = mongoose.connection;
+connection.once('open', () => {
+    console.log('MongoDB database connection established successfully.')
+});
 
-console.log('Server running at http://127.0.0.1:3001/');
+app.listen(port, () => {
+    console.log(`Server is running on port: ${port}`);
+});
