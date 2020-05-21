@@ -8,7 +8,7 @@ require('dotenv').config();
 const app = express();
 
 // Assign port number
-const port = process.env.PORT || 3001;
+const port = process.env.PORT;
 
 // Apply cors to express
 app.use(cors());
@@ -17,7 +17,7 @@ app.use(cors());
 app.use(express.json());
 
 // Connect to MongoDB
-const uri = process.env.URI || 'mongodb://localhost:27017/sandbox';
+const uri = process.env.MONGO_URI
 mongoose.connect(uri, {
     useNewUrlParser: true,
     useCreateIndex: true
