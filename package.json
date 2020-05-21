@@ -18,6 +18,13 @@
   },
   "homepage": "https://github.com/jtrpka0912/intranet.bookshelf.nodejs#readme",
   "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.9.15",
     "pdfjs-dist": "^2.3.200"
+  },
+  "devDependencies": {
+    "mocha": "^7.1.2"
   }
 }
