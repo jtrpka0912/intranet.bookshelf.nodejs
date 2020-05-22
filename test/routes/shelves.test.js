@@ -27,14 +27,12 @@ describe('Shelves Router', () => {
         await mongoose.connect(mongoUri, {
             useNewUrlParser: true
         });
-        // done();
     });
 
     after(async () => {
         // Disconnect mongoose and stop the mock server.
         await mongoose.disconnect();
         await mongoServer.stop();
-        // done();
     });
 
     describe('GET - /api/v1/shelves', () => {
@@ -65,13 +63,12 @@ describe('Shelves Router', () => {
             await shelfOne.save();
             await shelfTwo.save();
             await shelfThree.save();
-            // done();
         });
 
         it('Return three shelves', () => {
             chai.request(app).get('/api/v1/shelves').end((err, res) => {
                 const shelfCount = res.body.length;
-                assert.equal(shelfCount, 3);
+                assert.equal(shelfCount, 3, 'Should return only three from mock MongoDB.');
                 assert.isAbove(shelfCount, 2);
                 assert.isBelow(shelfCount, 5);
             });
@@ -85,7 +82,20 @@ describe('Shelves Router', () => {
 
         it('Returns no errors', () => {
             chai.request(app).get('/api/v1/shelves').end((err, res) => {
-                assert.isNull(err, 'No errors returned');
+                assert.isNull(err);
+            });
+        });
+    });
+
+    describe('POST - /api/v1/shelves', () => {
+        it('Fail request because of short name', () => {
+            chai.request(app).post('/api/v1/shelves').send({
+                name: 'Yo', // Need to be three or more
+                root: '/',
+                showDirectories: true,
+                multiFile: false
+            }).end((err, res) => {
+                assert.isNotNull(err, 'Should expect an error.');
             });
         });
     });
