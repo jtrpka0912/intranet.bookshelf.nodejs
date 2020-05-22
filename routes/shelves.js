@@ -22,23 +22,20 @@ router.route('/').get((req, res) => {
  */
 router.route('/').post((req, res) => {
     // Retrieve the request from the front-end
-    console.info('Body', req.body);
     const shelfName             = req.body.name;
     const shelfRoot             = req.body.root;
     const shelfShowDirectories  = req.body.showDirectories;
     const shelfMultiFile        = req.body.multiFile;
 
-    // Might want to add some validation here
+    // Validation
 
     // Not showing directories and using multifile will conflict
     if(!shelfShowDirectories && shelfMultiFile) {
-        // TODO: THIS STILL WILL PROCEED WITH REST OF CODE
-        // TODO: For OpenAPI, add the createdAt and updatedAt for the schemas.
         // Send error as response
-        res.status(400).json({
+        return res.status(400).json({
             errorCode: 400,
             errorCodeMessage: 'Bad Request',
-            errorMessage: 'You can not hide directories while using multi-file enabled.'
+            errorMessage: 'You can not use multi-file directories if you are hiding directories at the same time.'
         });
     }
 
@@ -52,12 +49,13 @@ router.route('/').post((req, res) => {
 
     newShelf.save().then(() => {
         // Maybe return id
-        res.json('Successful'); // Need to do better response.
+        return res.json('Successful'); // Need to do better response.
     }).catch(err => {
-        res.status(400).json({
+        console.error(err);
+        return res.status(400).json({
             errorCode: 400,
             errorCodeMessage: 'Bad Request',
-            errorMessage: 'Invalid input given to create shelf.'
+            errorMessage: err.message
         });
     });
 });
