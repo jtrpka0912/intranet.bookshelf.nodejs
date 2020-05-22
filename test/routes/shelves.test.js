@@ -126,7 +126,38 @@ describe('Shelves Router', () => {
                 assert.isNotNull(res);
                 assert.isNumber(response.errorCode);
                 assert.equal(response.errorCode, 400);
+                assert.isString(response.errorCodeMessage);
                 assert.equal(response.errorCodeMessage, 'Bad Request');
+            });
+        });
+
+        it('Fail request because of conflicts with show directories and multi-files.', () => {
+            request.send({
+                name: 'Sample', // Need to be three or more
+                root: '/',
+                showDirectories: false,
+                multiFile: true
+            }).end((err, res) => {
+                const response = res.body;
+                assert.isNotNull(res);
+                assert.isNumber(response.errorCode);
+                assert.equal(response.errorCode, 400);
+                assert.isString(response.errorCodeMessage);
+                assert.equal(response.errorCodeMessage, 'Bad Request');
+            });
+        });
+
+        it('Successfully create a new shelf', () => {
+            request.send({
+                name: 'From Test',
+                root: '/',
+                showDirectories: true,
+                multiFile: false
+            }).end((err, res) => {
+                const response = res.body;
+                assert.isNotNull(res);
+                assert.isString(response);
+                assert.equal(response, 'Successful');
             });
         });
     });
