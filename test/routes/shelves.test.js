@@ -18,6 +18,7 @@ const Shelf = require('../../models/shelf.model');
 
 // Global Variables
 let mongoServer;
+const endpointURI = '/api/v1/shelves';
 
 describe('Shelves Router', () => {
     before(async () => {
@@ -37,13 +38,10 @@ describe('Shelves Router', () => {
         await mongoServer.stop();
     });
 
-    describe('GET - /api/v1/shelves', () => {
+    describe(`GET - ${endpointURI}`, () => {
         let request;
 
         before(async () => {
-            // Set up request variable
-            request = chai.request(app).get('/api/v1/shelves');
-
             // Create some shelves
             const shelfOne = new Shelf({
                 name: 'Shelf One',
@@ -73,7 +71,7 @@ describe('Shelves Router', () => {
 
         beforeEach(() => {
             // Set up request variable
-            request = chai.request(app).get('/api/v1/shelves');
+            request = chai.request(app).get(endpointURI);
         });
 
         afterEach(() => {
@@ -112,12 +110,12 @@ describe('Shelves Router', () => {
         });
     });
 
-    describe('POST - /api/v1/shelves', () => {
+    describe(`POST - ${endpointURI}`, () => {
         let request;
 
         beforeEach(() => {
             // Set up request variable
-            request = chai.request(app).post('/api/v1/shelves');
+            request = chai.request(app).post(endpointURI);
         });
 
         afterEach(() => {
@@ -187,11 +185,8 @@ describe('Shelves Router', () => {
         });
     });
 
-    describe('GET - /api/v1/shelves/:shelfId', () => {
+    describe(`GET - ${endpointURI}/:shelfId`, () => {
         before(async () => {
-            // Set up request variable
-            request = chai.request(app).get('/api/v1/shelves');
-
             // Create some shelves
             const shelfOne = new Shelf({
                 _id: '5ec73853788ef556ecc225dd',
@@ -232,11 +227,17 @@ describe('Shelves Router', () => {
         });
 
         it('Bad request with a too short ID string (12 characters minimum)', () => {
-            chai.request(app).get('/api/v1/shelves/blah').end((err, res) => {
+            chai.request(app).get(`${endpointURI}/blah`).end((err, res) => {
                 assert.isNotNull(res);
                 // TODO: This is subject to change once I am able to parse MongoDB errors.
                 recognize400(res.body);
                 recognizeErrorMessage(res.body, 'Cast to ObjectId failed');
+            });
+        });
+
+        it('Unable to find document with bad ID.', () => {
+            chai.request(app).get(`${endpointURI}/blahblahblah`).end((err, res) => {
+
             });
         });
     });
