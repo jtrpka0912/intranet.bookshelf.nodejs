@@ -16,7 +16,6 @@ const shelfSchema = new Schema({
         required: true,
         unique: false,
         trim: true,
-        lowercase: true,
         minlength: 0
     },
     showDirectories: {
