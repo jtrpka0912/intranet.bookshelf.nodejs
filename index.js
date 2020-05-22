@@ -37,3 +37,7 @@ app.use('/api/v1/shelves', shelvesRouter);
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
 });
+
+module.exports = {
+    app: app
+};
