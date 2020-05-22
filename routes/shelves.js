@@ -3,9 +3,10 @@ const router = require('express').Router();
 let Shelf = require('../models/shelf.model');
 
 /**
- * @description Retrieve all shelves
+ * @summary Retrieve all shelves
  */
 router.route('/').get((req, res) => {
+    // TODO: Do some validation if no shelves were found.
     Shelf.find().then(shelves => {
         res.json(shelves);
     }).catch(err => {
@@ -18,7 +19,7 @@ router.route('/').get((req, res) => {
 });
 
 /**
- * @description Create new Shelf
+ * @summary Create new shelf
  */
 router.route('/').post((req, res) => {
     // Retrieve the request from the front-end
@@ -56,6 +57,36 @@ router.route('/').post((req, res) => {
             errorCodeMessage: 'Bad Request',
             errorMessage: err.message
         });
+    });
+});
+
+/**
+ * @summary Retrieve a single shelf
+ */
+router.route('/:shelfId').get((req, res) => {
+    // Retrieve the shelfId parameter.
+    const shelfId = req.params.shelfId;
+    
+    // Check if shelf id was found.
+    if(!shelfId) {
+        // Might never happen, but good to have in here.
+        return res.status(400).json({
+            errorCode: 400,
+            errorCodeMessage: 'Bad Request',
+            errorMessage: 'Required param, shelfid, was not found.'
+        });
+    }
+
+    Shelf.findById(shelfId, (mongoError, mongoResponse) => {
+        if(mongoError) {
+            return res.status(400).json({
+                errorCode: 400,
+                errorCodeMessage: 'Bad Request',
+                // TODO: There is a better error message in mongoError, but needs to be parsed.
+                // mongoError.reason needs to be parsed
+                errorMessage: mongoError.message // This will do for now.
+            });
+        }
     });
 });
 

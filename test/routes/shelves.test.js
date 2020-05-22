@@ -80,12 +80,14 @@ describe('Shelves Router', () => {
             // Need to reset the request variable for each test.
             request = null;
         });
+        
+        after(async () => {
+            // Clear out all shelf test documents.
+            await Shelf.deleteMany({});
+        });
 
         it('Recognized path', () => {
-            request.end((err, res) => {
-                assert.isNumber(res.status);
-                assert.notEqual(res.status, 404);
-            });
+            recognizeThePath(request);
         });
 
         it('Return three shelves', () => {
@@ -123,23 +125,21 @@ describe('Shelves Router', () => {
             request = null;
         });
 
+        after(async () => {
+            // Clear out all shelf test documents.
+            await Shelf.deleteMany({});
+        });
+
         it('Recognized path', () => {
-            request.send({}).end((err, res) => {
-                assert.isNumber(res.status);
-                assert.notEqual(res.status, 404);
-            });
+            recognizeThePath(request);
         });
 
         it('Fail request with empty body', () => {
             request.send({}).end((err, res) => {
                 const response = res.body;
                 assert.isNotNull(res);
-                assert.isNumber(response.errorCode);
-                assert.equal(response.errorCode, 400);
-                assert.isString(response.errorCodeMessage);
-                assert.equal(response.errorCodeMessage, 'Bad Request');
-                assert.isString(response.errorMessage);
-                assert.containIgnoreCase(response.errorMessage, 'is required.');
+                recognize400(res.body);
+                recognizeErrorMessage(res.body, 'is required.');
             });
         });
 
@@ -153,12 +153,8 @@ describe('Shelves Router', () => {
                 // Returns an error object response
                 const response = res.body;
                 assert.isNotNull(res);
-                assert.isNumber(response.errorCode);
-                assert.equal(response.errorCode, 400);
-                assert.isString(response.errorCodeMessage);
-                assert.equal(response.errorCodeMessage, 'Bad Request');
-                assert.isString(response.errorMessage);
-                assert.containIgnoreCase(response.errorMessage, 'is shorter than the minimum allowed');
+                recognize400(res.body);
+                recognizeErrorMessage(res.body, 'is shorter than the minimum allowed');
             });
         });
 
@@ -171,12 +167,8 @@ describe('Shelves Router', () => {
             }).end((err, res) => {
                 const response = res.body;
                 assert.isNotNull(res);
-                assert.isNumber(response.errorCode);
-                assert.equal(response.errorCode, 400);
-                assert.isString(response.errorCodeMessage);
-                assert.equal(response.errorCodeMessage, 'Bad Request');
-                assert.isString(response.errorMessage);
-                assert.containIgnoreCase(response.errorMessage, 'you can not use multi-file directories');
+                recognize400(res.body);
+                recognizeErrorMessage(res.body, 'you can not use multi-file directories');
             });
         });
 
@@ -195,7 +187,7 @@ describe('Shelves Router', () => {
         });
     });
 
-    describe('GET - /api/v1/shelves/{shelfId}', () => {
+    describe('GET - /api/v1/shelves/:shelfId', () => {
         before(async () => {
             // Set up request variable
             request = chai.request(app).get('/api/v1/shelves');
@@ -229,5 +221,89 @@ describe('Shelves Router', () => {
             await shelfTwo.save();
             await shelfThree.save();
         });
+
+        after(async () => {
+            // Clear out all shelf test documents.
+            await Shelf.deleteMany({});
+        });
+
+        it('Recognized path', () => {
+            recognizeThePath(request);
+        });
+
+        it('Bad request with a too short ID string (12 characters minimum)', () => {
+            chai.request(app).get('/api/v1/shelves/blah').end((err, res) => {
+                assert.isNotNull(res);
+                // TODO: This is subject to change once I am able to parse MongoDB errors.
+                recognize400(res.body);
+                recognizeErrorMessage(res.body, 'Cast to ObjectId failed');
+            });
+        });
     });
 });
+
+/**
+ * @function recognizeThePath
+ * @summary Check if route exists
+ * @description A reusable test to check if testing recognizes the route exists.
+ * @todo Create a testing helper and export it to other future route test files.
+ * @params { object } request
+ */
+const recognizeThePath = (request) => {
+    request.end((err, res) => {
+        assert.isNumber(res.status);
+        assert.notEqual(res.status, 404);
+    });
+};
+
+/**
+ * @function recognize400
+ * @summary Check if Bad Request (400)
+ * @description A reusable assertion test to see if route had a 400 Bad Request.
+ * @todo Create a testing helper and export it to other future route test files.
+ * @param { * } response 
+ */
+const recognize400 = (response) => {
+    assert.isNumber(response.errorCode);
+    assert.equal(response.errorCode, 400);
+    assert.isString(response.errorCodeMessage);
+    assert.equal(response.errorCodeMessage, 'Bad Request');
+}
+
+/**
+ * @function recognize404
+ * @summary Check if Not Found (404)
+ * @description A reusable assertion test to check if route had a 404 Not Found.
+ * @param { * } response 
+ */
+const recognize404 = (response) => {
+    assert.isNumber(response.errorCode);
+    assert.equal(response.errorCode, 404);
+    assert.isString(response.errorCodeMessage);
+    assert.equal(response.errorCodeMessage, 'Not Found');
+};
+
+/**
+ * @function recognize500
+ * @summary Check if Internal Server Error (500)
+ * @description A reusable assertion test to check if route had an Internal Server Error (500).
+ * @param { * } response 
+ */
+const recognize500 = (response) => {
+    assert.isNumber(response.errorCode);
+    assert.equal(response.errorCode, 500);
+    assert.isString(response.errorCodeMessage);
+    assert.equal(response.errorCodeMessage, 'Internal Server Error');
+}
+
+/**
+ * @function recognizeErrorMessage
+ * @summary Check for contents of error message.
+ * @description A reusable assertion test to check for a sub-string of the error message.
+ * @param { * } response 
+ * @param { string } partialMessage 
+ */
+const recognizeErrorMessage = (response, partialMessage) => {
+    assert.isString(response.errorMessage);
+    assert.containIgnoreCase(response.errorMessage, partialMessage);
+};
