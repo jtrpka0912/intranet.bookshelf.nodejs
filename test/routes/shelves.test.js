@@ -36,9 +36,13 @@ describe('Shelves Router', () => {
     });
 
     describe('GET - /api/v1/shelves', () => {
-        before(async () => {
-            // Create some shelves
+        let request;
 
+        before(async () => {
+            // Set up request variable
+            request = chai.request(app).get('/api/v1/shelves');
+
+            // Create some shelves
             const shelfOne = new Shelf({
                 name: 'Shelf One',
                 root: '/',
@@ -65,8 +69,18 @@ describe('Shelves Router', () => {
             await shelfThree.save();
         });
 
+        beforeEach(() => {
+            // Set up request variable
+            request = chai.request(app).get('/api/v1/shelves');
+        });
+
+        afterEach(() => {
+            // Need to reset the request variable for each test.
+            request = null;
+        });
+
         it('Return three shelves', () => {
-            chai.request(app).get('/api/v1/shelves').end((err, res) => {
+            request.end((err, res) => {
                 const shelfCount = res.body.length;
                 assert.equal(shelfCount, 3, 'Should return only three from mock MongoDB.');
                 assert.isAbove(shelfCount, 2);
@@ -75,27 +89,44 @@ describe('Shelves Router', () => {
         });
 
         it('Return a status of 200', () => {
-            chai.request(app).get('/api/v1/shelves').end((err, res) => {
+            request.end((err, res) => {
                 assert.equal(res.status, 200);
             });
         });
 
         it('Returns no errors', () => {
-            chai.request(app).get('/api/v1/shelves').end((err, res) => {
+            request.end((err, res) => {
                 assert.isNull(err);
             });
         });
     });
 
     describe('POST - /api/v1/shelves', () => {
+        let request;
+
+        beforeEach(() => {
+            // Set up request variable
+            request = chai.request(app).post('/api/v1/shelves');
+        });
+
+        afterEach(() => {
+            // Need to reset the request variable for each test.
+            request = null;
+        });
+
         it('Fail request because of short name', () => {
-            chai.request(app).post('/api/v1/shelves').send({
+            request.send({
                 name: 'Yo', // Need to be three or more
                 root: '/',
                 showDirectories: true,
                 multiFile: false
             }).end((err, res) => {
-                assert.isNotNull(err, 'Should expect an error.');
+                // Returns an error object response
+                const response = res.body;
+                assert.isNotNull(res);
+                assert.isNumber(response.errorCode);
+                assert.equal(response.errorCode, 400);
+                assert.equal(response.errorCodeMessage, 'Bad Request');
             });
         });
     });
