@@ -78,6 +78,7 @@ router.route('/:shelfId').get((req, res) => {
     }
 
     Shelf.findById(shelfId, (mongoError, mongoResponse) => {
+        // Check if any errors from MongoDB
         if(mongoError) {
             return res.status(400).json({
                 errorCode: 400,
@@ -85,6 +86,17 @@ router.route('/:shelfId').get((req, res) => {
                 // TODO: There is a better error message in mongoError, but needs to be parsed.
                 // mongoError.reason needs to be parsed
                 errorMessage: mongoError.message // This will do for now.
+            });
+        }
+
+        // Check if any responses from MongoDB
+        if(mongoResponse) {
+            res.status(200).json(mongoResponse);
+        } else {
+            return res.status(404).json({
+                errorCode: 404,
+                errorCodeMessage: 'Not Found',
+                errorMessage: `Unable to find shelf with id: ${shelfId}.`
             });
         }
     });

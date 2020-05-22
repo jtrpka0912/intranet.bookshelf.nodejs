@@ -134,10 +134,9 @@ describe('Shelves Router', () => {
 
         it('Fail request with empty body', () => {
             request.send({}).end((err, res) => {
-                const response = res.body;
                 assert.isNotNull(res);
-                recognize400(res.body);
-                recognizeErrorMessage(res.body, 'is required.');
+                recognize400(res);
+                recognizeErrorMessage(res, 'is required.');
             });
         });
 
@@ -148,11 +147,9 @@ describe('Shelves Router', () => {
                 showDirectories: true,
                 multiFile: false
             }).end((err, res) => {
-                // Returns an error object response
-                const response = res.body;
                 assert.isNotNull(res);
-                recognize400(res.body);
-                recognizeErrorMessage(res.body, 'is shorter than the minimum allowed');
+                recognize400(res);
+                recognizeErrorMessage(res, 'is shorter than the minimum allowed');
             });
         });
 
@@ -163,10 +160,9 @@ describe('Shelves Router', () => {
                 showDirectories: false,
                 multiFile: true
             }).end((err, res) => {
-                const response = res.body;
                 assert.isNotNull(res);
-                recognize400(res.body);
-                recognizeErrorMessage(res.body, 'you can not use multi-file directories');
+                recognize400(res);
+                recognizeErrorMessage(res, 'you can not use multi-file directories');
             });
         });
 
@@ -223,21 +219,32 @@ describe('Shelves Router', () => {
         });
 
         it('Recognized path', () => {
-            recognizeThePath(request);
+            recognizeThePath(chai.request(app).get(`${endpointURI}/hello`));
         });
 
         it('Bad request with a too short ID string (12 characters minimum)', () => {
             chai.request(app).get(`${endpointURI}/blah`).end((err, res) => {
                 assert.isNotNull(res);
                 // TODO: This is subject to change once I am able to parse MongoDB errors.
-                recognize400(res.body);
-                recognizeErrorMessage(res.body, 'Cast to ObjectId failed');
+                recognize400(res);
+                recognizeErrorMessage(res, 'Cast to ObjectId failed');
             });
         });
 
-        it('Unable to find document with bad ID.', () => {
+        it('Unable to find shelf with bad ID.', () => {
             chai.request(app).get(`${endpointURI}/blahblahblah`).end((err, res) => {
+                assert.isNotNull(res);
+                recognize404(res);
+                recognizeErrorMessage(res, 'Unable to find shelf with id:');
+            });
+        });
 
+        it('Find a shelf with ID (Shelf Two).', () => {
+            chai.request(app).get(`${endpointURI}/5ec5df19ed30ea2b80ef14ae`).end((err, res) => {
+                assert.isNotNull(res);
+                recognize200(res);
+                assert.equal(res.body.name, 'Shelf Two');
+                assert.containIgnoreCase(res.body.root, 'books');
             });
         });
     });
@@ -248,7 +255,7 @@ describe('Shelves Router', () => {
  * @summary Check if route exists
  * @description A reusable test to check if testing recognizes the route exists.
  * @todo Create a testing helper and export it to other future route test files.
- * @params { object } request
+ * @param { object } request
  */
 const recognizeThePath = (request) => {
     request.end((err, res) => {
@@ -258,53 +265,70 @@ const recognizeThePath = (request) => {
 };
 
 /**
+ * @function recognize200
+ * @summary Check if OK Request (200)
+ * @description A reusable test to simply check the actual status of the response if its OK (200).
+ * @param { * } res 
+ */
+const recognize200 = (res) => {
+    assert.isNumber(res.status);
+    assert.equal(res.status, 200);
+}
+
+/**
  * @function recognize400
  * @summary Check if Bad Request (400)
  * @description A reusable assertion test to see if route had a 400 Bad Request.
  * @todo Create a testing helper and export it to other future route test files.
- * @param { * } response 
+ * @param { * } res 
  */
-const recognize400 = (response) => {
-    assert.isNumber(response.errorCode);
-    assert.equal(response.errorCode, 400);
-    assert.isString(response.errorCodeMessage);
-    assert.equal(response.errorCodeMessage, 'Bad Request');
+const recognize400 = (res) => {
+    assert.isNumber(res.status);
+    assert.equal(res.status, 400);
+    assert.isNumber(res.body.errorCode);
+    assert.equal(res.body.errorCode, 400);
+    assert.isString(res.body.errorCodeMessage);
+    assert.equal(res.body.errorCodeMessage, 'Bad Request');
 }
 
 /**
  * @function recognize404
  * @summary Check if Not Found (404)
  * @description A reusable assertion test to check if route had a 404 Not Found.
- * @param { * } response 
+ * @param { * } res 
  */
-const recognize404 = (response) => {
-    assert.isNumber(response.errorCode);
-    assert.equal(response.errorCode, 404);
-    assert.isString(response.errorCodeMessage);
-    assert.equal(response.errorCodeMessage, 'Not Found');
+const recognize404 = (res) => {
+    assert.isNumber(res.status);
+    assert.equal(res.status, 404);
+    assert.isNumber(res.body.errorCode);
+    assert.equal(res.body.errorCode, 404);
+    assert.isString(res.body.errorCodeMessage);
+    assert.equal(res.body.errorCodeMessage, 'Not Found');
 };
 
 /**
  * @function recognize500
  * @summary Check if Internal Server Error (500)
  * @description A reusable assertion test to check if route had an Internal Server Error (500).
- * @param { * } response 
+ * @param { * } res 
  */
-const recognize500 = (response) => {
-    assert.isNumber(response.errorCode);
-    assert.equal(response.errorCode, 500);
-    assert.isString(response.errorCodeMessage);
-    assert.equal(response.errorCodeMessage, 'Internal Server Error');
+const recognize500 = (res) => {
+    assert.isNumber(res.status);
+    assert.equal(res.status, 500);
+    assert.isNumber(res.body.errorCode);
+    assert.equal(res.body.errorCode, 500);
+    assert.isString(res.body.errorCodeMessage);
+    assert.equal(res.body.errorCodeMessage, 'Internal Server Error');
 }
 
 /**
  * @function recognizeErrorMessage
  * @summary Check for contents of error message.
  * @description A reusable assertion test to check for a sub-string of the error message.
- * @param { * } response 
+ * @param { * } res 
  * @param { string } partialMessage 
  */
-const recognizeErrorMessage = (response, partialMessage) => {
-    assert.isString(response.errorMessage);
-    assert.containIgnoreCase(response.errorMessage, partialMessage);
+const recognizeErrorMessage = (res, partialMessage) => {
+    assert.isString(res.body.errorMessage);
+    assert.containIgnoreCase(res.body.errorMessage, partialMessage);
 };
