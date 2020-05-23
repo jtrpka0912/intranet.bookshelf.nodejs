@@ -299,5 +299,18 @@ describe('Shelves Router', () => {
                 recognizeErrorMessage(res, 'You did not send any information');
             });
         });
+
+        it('Fail request because it could not find Shelf', () => {
+            chai.request(app).put(`${endpointURI}/blahblahblah`).send({
+                name: 'Shelf Derp',
+                root: '/derp',
+                showDirectories: true,
+                multiFile: false
+            }).end((err, res) => {
+                assert.isNotNull(res);
+                recognize404(res);
+                recognizeErrorMessage(res, 'Unable to find shelf with id');
+            });
+        });
     })
 });

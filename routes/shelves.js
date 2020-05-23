@@ -99,16 +99,19 @@ router.route('/:shelfId').put((req, res) => {
     // Retrieve the ShelfID
     const shelfId = req.params.shelfId;
 
-    // Initialize variables
-    let shelfName, shelfRoot, shelfShowDirectories, shelfMultiFile;
+    // Initialize shelf variables
+    let shelfUpdate;
 
     // Need to check if there any values in req.body
+    // TODO: Since this is a PUT; make sure all fields are there.
     if(Object.keys(req.body).length > 0) {
         // Retrieve the request from the front-end
-        shelfName             = req.body.name;
-        shelfRoot             = req.body.root;
-        shelfShowDirectories  = req.body.showDirectories;
-        shelfMultiFile        = req.body.multiFile;
+        shelfUpdate = {
+            name: req.body.name,
+            root: req.body.root,
+            showDirectories: req.body.showDirectories,
+            multiFile: req.body.multiFile
+        };
     } else {
         return res.status(400).json({
             errorCode: 400,
@@ -116,6 +119,31 @@ router.route('/:shelfId').put((req, res) => {
             errorMessage: `You did not send any information to update shelf: ${shelfId}`
         });
     }
+
+    // Retrieve the existing Shelf and update
+    Shelf.findByIdAndUpdate(shelfId, shelfUpdate, (mongoError, mongoResponse) => {
+        // Check if any errors from MongoDB
+        if(mongoError) {
+            return res.status(400).json({
+                errorCode: 400,
+                errorCodeMessage: 'Bad Request',
+                // TODO: There is a better error message in mongoError, but needs to be parsed.
+                // mongoError.reason needs to be parsed
+                errorMessage: mongoError.message // This will do for now.
+            });
+        }
+
+        // Check if any responses from MongoDB
+        if(mongoResponse) {
+            res.status(200).send('Hi!');
+        } else {
+            return res.status(404).json({
+                errorCode: 404,
+                errorCodeMessage: 'Not Found',
+                errorMessage: `Unable to find shelf with id: ${shelfId}.`
+            });
+        }
+    });
 });
 
 module.exports = router;

@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+mongoose.set('useFindAndModify', false); // Remove use of deprecated method
 require('dotenv').config();
 
 // Routes
