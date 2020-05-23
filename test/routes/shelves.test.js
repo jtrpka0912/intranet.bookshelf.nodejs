@@ -312,5 +312,8 @@ describe('Shelves Router', () => {
                 recognizeErrorMessage(res, 'Unable to find shelf with id');
             });
         });
+
+        it('Fail request because of partial data since this is a PUT request');
+        it('Successfully updated an existing shelf')
     })
 });

@@ -103,15 +103,12 @@ router.route('/:shelfId').put((req, res) => {
     let shelfUpdate;
 
     // Need to check if there any values in req.body
-    // TODO: Since this is a PUT; make sure all fields are there.
+    
     if(Object.keys(req.body).length > 0) {
+        // TODO: Since this is a PUT; make sure all fields are there.
+
         // Retrieve the request from the front-end
-        shelfUpdate = {
-            name: req.body.name,
-            root: req.body.root,
-            showDirectories: req.body.showDirectories,
-            multiFile: req.body.multiFile
-        };
+        shelfUpdate = req.body;
     } else {
         return res.status(400).json({
             errorCode: 400,
