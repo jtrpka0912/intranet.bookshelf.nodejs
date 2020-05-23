@@ -13,15 +13,15 @@ const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
 // Internal
-const { app } = require('../../index');
-const Shelf = require('../../models/shelf.model');
+const { app } = require('../../index'); // Get the Express app
+const Shelf = require('../../models/shelf.model'); // Shelf model
 const {
     recognizeThePath,
     recognizeErrorMessage,
     recognize200,
     recognize400,
     recognize404,
-} = require('../../helpers/mocha/assert');
+} = require('../../helpers/mocha/assert'); // Helper Mocha Assert Tests
 
 // Global Variables
 let mongoServer;
@@ -255,4 +255,49 @@ describe('Shelves Router', () => {
             });
         });
     });
+
+    describe(`PUT - ${endpointURI}/:shelfId`, () => {
+        let request;
+        const idOfShelf = '5ec73853788ef556ecc225dd';
+
+        before(async () => {
+            // Create a shelf to edit
+            const shelfOne = new Shelf({
+                _id: idOfShelf,
+                name: 'Shelf One',
+                root: '/',
+                showDirectories: false,
+                multiFile: false
+            });
+
+            await shelfOne.save();
+        });
+
+        beforeEach(() => {
+            // Set up request variable
+            request = chai.request(app).put(`${endpointURI}/${idOfShelf}`);
+        });
+
+        afterEach(() => {
+            // Need to reset the request variable for each test.
+            request = null;
+        });
+
+        after(async () => {
+            // Clear out all shelf test documents.
+            await Shelf.deleteMany({});
+        });
+
+        it('Recognized path', () => {
+            recognizeThePath(request);
+        });
+
+        it('Fail request with empty body', () => {
+            request.send({}).end((err, res) => {
+                assert.isNotNull(res);
+                recognize400(res);
+                recognizeErrorMessage(res, 'You did not send any information');
+            });
+        });
+    })
 });

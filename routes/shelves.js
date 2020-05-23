@@ -66,16 +66,6 @@ router.route('/').post((req, res) => {
 router.route('/:shelfId').get((req, res) => {
     // Retrieve the shelfId parameter.
     const shelfId = req.params.shelfId;
-    
-    // Check if shelf id was found.
-    if(!shelfId) {
-        // Might never happen, but good to have in here.
-        return res.status(400).json({
-            errorCode: 400,
-            errorCodeMessage: 'Bad Request',
-            errorMessage: 'Required param, shelfid, was not found.'
-        });
-    }
 
     Shelf.findById(shelfId, (mongoError, mongoResponse) => {
         // Check if any errors from MongoDB
@@ -100,6 +90,32 @@ router.route('/:shelfId').get((req, res) => {
             });
         }
     });
+});
+
+/**
+ * @summary Update a single shelf
+ */
+router.route('/:shelfId').put((req, res) => {
+    // Retrieve the ShelfID
+    const shelfId = req.params.shelfId;
+
+    // Initialize variables
+    let shelfName, shelfRoot, shelfShowDirectories, shelfMultiFile;
+
+    // Need to check if there any values in req.body
+    if(Object.keys(req.body).length > 0) {
+        // Retrieve the request from the front-end
+        shelfName             = req.body.name;
+        shelfRoot             = req.body.root;
+        shelfShowDirectories  = req.body.showDirectories;
+        shelfMultiFile        = req.body.multiFile;
+    } else {
+        return res.status(400).json({
+            errorCode: 400,
+            errorCodeMessage: 'Bad Request',
+            errorMessage: `You did not send any information to update shelf: ${shelfId}`
+        });
+    }
 });
 
 module.exports = router;
