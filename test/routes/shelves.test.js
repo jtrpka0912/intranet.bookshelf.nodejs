@@ -366,4 +366,43 @@ describe('Shelves Router', () => {
             });
         });
     });
+
+    describe(`DELETE - ${endpointURI}/:shelfId`, () => {
+        let request;
+        const shelfOneId = '5ec73853788ef556ecc225dd';
+        const shelfThreeId = '5ec739cdc8bcdc4a1c74e75e';
+
+        before(async () => {
+            // Create just one shelf to delete
+            const shelfOne = new Shelf({
+                _id: shelfOneId,
+                name: 'Shelf One',
+                root: '/',
+                showDirectories: false,
+                multiFile: false
+            });
+
+            await Shelf.create(shelfOne);
+        });
+
+        after(async () => {
+            // Clear out all shelf test documents.
+            await Shelf.deleteMany({});
+        });
+
+        it('Fail request because it could not find Shelf', () => {
+            chai.request(app).delete(`${endpointURI}/blahblahblah`).end((err, res) => {
+                assert.isNotNull(res);
+                recognize404(res);
+                recognizeErrorMessage(res, 'Unable to find shelf with id');
+            });
+        });
+
+        it('Successfully delete a Shelf', () => {
+            chai.request(app).delete(`${endpointURI}/${shelfOneId}`).end((err, res) => {
+                assert.isNotNull(res);
+                recognize200(res);
+            });
+        });
+    });
 });

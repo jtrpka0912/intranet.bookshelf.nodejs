@@ -49,7 +49,7 @@ router.route('/').post((req, res) => {
     });
 
     newShelf.save().then(() => {
-        // Maybe return id
+        // TODO: Figure out a better response. Record on OpenAPI.
         return res.json('Successful'); // Need to do better response.
     }).catch(err => {
         return res.status(400).json({
@@ -133,6 +133,40 @@ router.route('/:shelfId').put((req, res) => {
         // Check if any responses from MongoDB
         if(mongoResponse) {
             res.status(200).json(mongoResponse);
+        } else {
+            return res.status(404).json({
+                errorCode: 404,
+                errorCodeMessage: 'Not Found',
+                errorMessage: `Unable to find shelf with id: ${shelfId}.`
+            });
+        }
+    });
+});
+
+/**
+ * @summary Delete a single shelf
+ */
+router.route('/:shelfId').delete((req, res) => {
+    // Retrieve the shelfId parameter.
+    const shelfId = req.params.shelfId;
+
+    // findByIdAndRemove would be using findAndModify which might take a bit longer
+    Shelf.findByIdAndDelete(shelfId, (mongoError, mongoResponse) => {
+        // Check if any errors from MongoDB
+        if(mongoError) {
+            return res.status(400).json({
+                errorCode: 400,
+                errorCodeMessage: 'Bad Request',
+                // TODO: There is a better error message in mongoError, but needs to be parsed.
+                // mongoError.reason needs to be parsed
+                errorMessage: mongoError.message // This will do for now.
+            });
+        }
+
+        // Check if any responses from MongoDB
+        if(mongoResponse) {
+            // TODO: Figure out a better response. Record on OpenAPI.
+            res.status(200).send('Cue the funeral dance!');
         } else {
             return res.status(404).json({
                 errorCode: 404,
