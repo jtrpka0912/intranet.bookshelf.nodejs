@@ -313,7 +313,27 @@ describe('Shelves Router', () => {
             });
         });
 
-        it('Fail request because of partial data since this is a PUT request');
-        it('Successfully updated an existing shelf')
-    })
+        it('Successfully updated an existing shelf', () => {
+            request.send({
+                name: 'Updated Shelf One',
+                root: '/books',
+                showDirectories: true,
+                multiFile: true
+            }).end((err, res) => {
+                const updatedShelf = res.body;
+                assert.isNotNull(res);
+                recognize200(res);
+
+                // Test old and new values
+                assert.equal(updatedShelf.name, 'Updated Shelf One');
+                assert.notEqual(updatedShelf.name, 'Shelf One');
+                assert.equal(updatedShelf.root, '/books');
+                assert.notEqual(updatedShelf.root, '/');
+                assert.isTrue(updatedShelf.showDirectories);
+                assert.isNotFalse(updatedShelf.showDirectories);
+                assert.isTrue(updatedShelf.multiFile);
+                assert.isNotFalse(updatedShelf.multiFile);
+            });
+        });
+    });
 });

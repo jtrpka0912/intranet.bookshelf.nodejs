@@ -105,8 +105,6 @@ router.route('/:shelfId').put((req, res) => {
     // Need to check if there any values in req.body
     
     if(Object.keys(req.body).length > 0) {
-        // TODO: Since this is a PUT; make sure all fields are there.
-
         // Retrieve the request from the front-end
         shelfUpdate = req.body;
     } else {
@@ -118,7 +116,9 @@ router.route('/:shelfId').put((req, res) => {
     }
 
     // Retrieve the existing Shelf and update
-    Shelf.findByIdAndUpdate(shelfId, shelfUpdate, (mongoError, mongoResponse) => {
+    Shelf.findByIdAndUpdate(shelfId, shelfUpdate, {
+        new: true
+    }, (mongoError, mongoResponse) => {
         // Check if any errors from MongoDB
         if(mongoError) {
             return res.status(400).json({
@@ -132,7 +132,7 @@ router.route('/:shelfId').put((req, res) => {
 
         // Check if any responses from MongoDB
         if(mongoResponse) {
-            res.status(200).send('Hi!');
+            res.status(200).json(mongoResponse);
         } else {
             return res.status(404).json({
                 errorCode: 404,
