@@ -258,24 +258,34 @@ describe('Shelves Router', () => {
 
     describe(`PUT - ${endpointURI}/:shelfId`, () => {
         let request;
-        const idOfShelf = '5ec73853788ef556ecc225dd';
+        const shelfOneId = '5ec73853788ef556ecc225dd';
+        const shelfThreeId = '5ec739cdc8bcdc4a1c74e75e';
 
         before(async () => {
             // Create a shelf to edit
             const shelfOne = new Shelf({
-                _id: idOfShelf,
+                _id: shelfOneId,
                 name: 'Shelf One',
                 root: '/',
                 showDirectories: false,
                 multiFile: false
             });
 
+            const shelfThree = new Shelf({
+                _id: shelfThreeId,
+                name: 'Shelf Three',
+                root: '/magazines',
+                showDirectories: true,
+                multiFile: false
+            });
+
             await shelfOne.save();
+            await shelfThree.save();
         });
 
         beforeEach(() => {
             // Set up request variable
-            request = chai.request(app).put(`${endpointURI}/${idOfShelf}`);
+            request = chai.request(app).put(`${endpointURI}/${shelfOneId}`);
         });
 
         afterEach(() => {
@@ -313,7 +323,7 @@ describe('Shelves Router', () => {
             });
         });
 
-        it('Successfully updated an existing shelf', () => {
+        it('Successfully updated Shelf One', () => {
             request.send({
                 name: 'Updated Shelf One',
                 root: '/books',
@@ -333,6 +343,26 @@ describe('Shelves Router', () => {
                 assert.isNotFalse(updatedShelf.showDirectories);
                 assert.isTrue(updatedShelf.multiFile);
                 assert.isNotFalse(updatedShelf.multiFile);
+            });
+        });
+
+        // Technically, this should be more of a PATCH, but not sure...
+        it('Successfully updated Shelf Three with partial data', () => {
+            chai.request(app).put(`${endpointURI}/${shelfThreeId}`).send({
+                showDirectories: false,
+            }).end((err, res) => {
+                const updatedShelf = res.body;
+                assert.isNotNull(res);
+                recognize200(res);
+
+                // Test old and new values
+                assert.equal(updatedShelf.name, 'Shelf Three'); 
+                assert.equal(updatedShelf.root, '/magazines');
+                assert.isFalse(updatedShelf.multiFile);
+
+                // Updated data
+                assert.isFalse(updatedShelf.showDirectories);
+                assert.isNotTrue(updatedShelf.showDirectories);
             });
         });
     });

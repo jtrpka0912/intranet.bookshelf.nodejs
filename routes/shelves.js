@@ -117,7 +117,7 @@ router.route('/:shelfId').put((req, res) => {
 
     // Retrieve the existing Shelf and update
     Shelf.findByIdAndUpdate(shelfId, shelfUpdate, {
-        new: true
+        new: true // Send the updated shelf data instead of original
     }, (mongoError, mongoResponse) => {
         // Check if any errors from MongoDB
         if(mongoError) {
