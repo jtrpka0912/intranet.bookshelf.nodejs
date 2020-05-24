@@ -1,5 +1,7 @@
 // Packages
 const router = require('express').Router();
+
+// Models
 let Shelf = require('../models/shelf.model');
 
 /**

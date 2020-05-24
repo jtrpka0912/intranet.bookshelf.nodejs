@@ -33,3 +33,5 @@ After the loop is completed, it will return the results to the front-end.
 ## Coming Soon
 
 + User Login: Allow a user to make their own `Shelves` and flag the `Files` as read. Furthermore, the users will be stored outside of the MongoDB database, and it will be in its own user database.
+
++ File Upload: Allow a user to upload a file (and folders) to the server. They will only upload inside the `Shelf` directory if inside a collection.
