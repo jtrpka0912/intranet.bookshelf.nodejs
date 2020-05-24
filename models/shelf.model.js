@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const shelfSchema = new Schema({
-    // It will add primary key field automatically
+    // It will add the primary key field automatically
     name: {
         type: String, // What vartype is it
         required: true, // Is it required
