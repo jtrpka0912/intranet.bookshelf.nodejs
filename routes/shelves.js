@@ -2,7 +2,7 @@
 const router = require('express').Router();
 
 // Models
-let Shelf = require('../models/shelf.model');
+const Shelf = require('../models/shelf.model');
 
 /**
  * @summary Retrieve all shelves

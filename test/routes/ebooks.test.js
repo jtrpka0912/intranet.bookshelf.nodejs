@@ -50,6 +50,31 @@ describe('eBooks Router', () => {
     });
 
     describe(`GET - ${endpointURI}/shelf/:shelfId`, () => {
-        
+        // TODO: Will need to do separate testing with documents in collections
+        // ... and another with empty collections so it can create documents for them.
+        describe('With files and folders in collection', () => {
+            const shelfOneId = '5ec73853788ef556ecc225dd'
+            before(async () => {
+                // Create a shelf
+                const shelfOne = new Shelf({
+                    _id: shelfOneId,
+                    name: 'Shelf One',
+                    root: '/books',
+                    showDirectories: false,
+                    multiFile: false
+                });
+
+                // TODO: Create some files
+
+                // TODO: Create some folders
+
+                await shelfOne.save();
+            });
+
+            after(async () => {
+                // Remove all shelves
+                await Shelf.deleteMany({});
+            });
+        });
     });
 });

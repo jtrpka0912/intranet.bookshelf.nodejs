@@ -2,8 +2,8 @@
 // ========
 // Chai
 const chai = require('chai');
-const chaiHttp = require('chai-http'); // Chai-HTTP Plugin
-const chaiString = require('chai-string'); // Chai String Plugin
+const chaiHttp = require('chai-http'); // Chai-HTTP plugin
+const chaiString = require('chai-string'); // Chai String plugin
 chai.use(chaiHttp); // Allow Chai to use Chai-HTTP plugin.
 chai.use(chaiString); // Allow Chai to use Chai String plugin.
 const assert = chai.assert; // Assert Style
@@ -12,9 +12,13 @@ const assert = chai.assert; // Assert Style
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
-// Internal
+// App
 const { app } = require('../../index'); // Get the Express app
+
+// Models
 const Shelf = require('../../models/shelf.model'); // Shelf model
+
+// Helpers
 const {
     recognizeThePath,
     recognizeErrorMessage,
