@@ -61,22 +61,47 @@ describe('eBooks Router', () => {
     });
 
     describe(`GET - ${endpointURI}/shelf/:shelfId`, () => {
-        // TODO: Will need to do separate testing with documents in collections
-        // ... and another with empty collections so it can create documents for them.
+        const shelfId = '5ec73853788ef556ecc225dd';
+
+        before(async () => {
+            // Create a shelf
+            const shelf = new Shelf({
+                _id: shelfId,
+                name: 'Shelf One',
+                root: '/books',
+                showDirectories: false,
+                multiFile: false
+            });
+
+            await shelf.save();
+        });
+
+        after(async () => {
+            // Remove all shelves
+            await Shelf.deleteMany({});
+        });
+
+        it('Bad request with a too short ID string (12 characters minimum)', () => {
+            chai.request(app).get(`${endpointURI}/shelf/blah`).end((err, res) => {
+                assert.isNotNull(res);
+                // TODO: This is subject to change once I am able to parse MongoDB errors.
+                recognize400(res);
+                recognizeErrorMessage(res, 'Cast to ObjectId failed');
+            });
+        });
+
+        it('Fail request because it could not find Shelf', () => {
+            chai.request(app).get(`${endpointURI}/shelf/blahblahblah`).end((err, res) => {
+                assert.isNotNull(res);
+                recognize404(res);
+                recognizeErrorMessage(res, 'Unable to find shelf with id')
+            });
+        });
+
+        describe('With no files and folders in collection (go through server)', () => {});
 
         describe('With files and folders in collection', () => {
-            const shelfId = '5ec73853788ef556ecc225dd';
-
             before(async () => {
-                // Create a shelf
-                const shelf = new Shelf({
-                    _id: shelfId,
-                    name: 'Shelf One',
-                    root: '/books',
-                    showDirectories: false,
-                    multiFile: false
-                });
-
                 // Create some files
                 const fileOne = new File({
                     type: 'book',
@@ -100,22 +125,15 @@ describe('eBooks Router', () => {
                     path: '/books/example'
                 });
 
-                await shelf.save();
                 await fileOne.save();
                 await fileTwo.save();
                 await folder.save();
             });
 
             after(async () => {
-                // Remove all shelves
-                await Shelf.deleteMany({});
-            });
-
-            it('Unable to find shelf with bad ID', () => {
-                chai.request(app).get(`${endpointURI}/shelf/blahblahblah`).end((err, res) => {
-                    assert.isNotNull(res);
-                    recognize404(res);
-                });
+                // Remove all files and folders
+                await File.deleteMany({});
+                await Folder.deleteMany({});
             });
         });
     });
