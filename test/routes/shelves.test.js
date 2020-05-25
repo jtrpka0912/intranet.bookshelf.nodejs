@@ -220,7 +220,6 @@ describe('Shelves Router', () => {
             await Shelf.deleteMany({});
         });
 
-        // TODO: Use this test with the other VERBS.
         it('Bad request with a too short ID string (12 characters minimum)', () => {
             chai.request(app).get(`${endpointURI}/blah`).end((err, res) => {
                 assert.isNotNull(res);
@@ -295,6 +294,20 @@ describe('Shelves Router', () => {
                 assert.isNotNull(res);
                 recognize400(res);
                 recognizeErrorMessage(res, 'You did not send any information');
+            });
+        });
+
+        it('Bad request with a too short ID string (12 characters minimum)', () => {
+            chai.request(app).get(`${endpointURI}/blah`).send({
+                name: 'Shelf Derp',
+                root: '/derp',
+                showDirectories: true,
+                multiFile: false
+            }).end((err, res) => {
+                assert.isNotNull(res);
+                // TODO: This is subject to change once I am able to parse MongoDB errors.
+                recognize400(res);
+                recognizeErrorMessage(res, 'Cast to ObjectId failed');
             });
         });
 
@@ -375,6 +388,15 @@ describe('Shelves Router', () => {
         after(async () => {
             // Clear out all shelf test documents.
             await Shelf.deleteMany({});
+        });
+
+        it('Bad request with a too short ID string (12 characters minimum)', () => {
+            chai.request(app).delete(`${endpointURI}/blah`).end((err, res) => {
+                assert.isNotNull(res);
+                // TODO: This is subject to change once I am able to parse MongoDB errors.
+                recognize400(res);
+                recognizeErrorMessage(res, 'Cast to ObjectId failed');
+            });
         });
 
         it('Fail request because it could not find Shelf', () => {
