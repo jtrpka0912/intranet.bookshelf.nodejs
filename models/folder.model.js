@@ -21,3 +21,6 @@ const folderSchema = new Schema({
 }, {
     timestamps: true // Added created and modified fields
 });
+
+const Folder = mongoose.model('Folder', folderSchema);
+module.exports = Folder;

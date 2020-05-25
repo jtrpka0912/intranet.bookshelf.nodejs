@@ -17,6 +17,10 @@ const { app } = require('../../index'); // Get the Express app
 
 // Models
 const Shelf = require('../../models/shelf.model'); // Shelf model
+const Folder = require('../../models/folder.model'); // Folder model
+// File model with alias to prevent conflicts with File JavaScript object.
+const { File: FileSchema } = require('../../models/file.model');
+
 
 // Helpers
 const {
@@ -53,7 +57,8 @@ describe('eBooks Router', () => {
         // TODO: Will need to do separate testing with documents in collections
         // ... and another with empty collections so it can create documents for them.
         describe('With files and folders in collection', () => {
-            const shelfOneId = '5ec73853788ef556ecc225dd'
+            const shelfOneId = '5ec73853788ef556ecc225dd';
+
             before(async () => {
                 // Create a shelf
                 const shelfOne = new Shelf({
@@ -64,11 +69,34 @@ describe('eBooks Router', () => {
                     multiFile: false
                 });
 
-                // TODO: Create some files
+                // Create some files
+                const fileOne = new FileSchema({
+                    type: 'book',
+                    name: 'Book One',
+                    path: '/books/example',
+                    cover: '/images/books/example/Book One.jpg',
+                    didRead: false
+                });
 
-                // TODO: Create some folders
+                const fileTwo = new FileSchema({
+                    type: 'book',
+                    name: 'Book Two',
+                    path: '/books/example',
+                    cover: '/images/books/example/Book Two.jpg',
+                    didRead: false
+                });
+
+                // Create some folders
+                const folder = new Folder({
+                    name: 'Example',
+                    path: '/books/example'
+                });
+                
 
                 await shelfOne.save();
+                await fileOne.save();
+                await fileTwo.save();
+                await folder.save();
             });
 
             after(async () => {
