@@ -55,8 +55,8 @@ describe('eBooks Router', () => {
     it('Should not be able to find endpoint with no shelfId.', () => {
         chai.request(app).get(`${endpointURI}/shelf`).end((err, res) => {
             assert.isNotNull(res);
-            assert.isNumber(res.status);
-            assert.equal(res.status, 404);
+            recognize404(res);
+            recognizeErrorMessage(res, 'Missing shelfId.');
         });
     });
 
@@ -115,6 +115,7 @@ describe('eBooks Router', () => {
                 await Shelf.deleteMany({});
             });
             
+
         });
     });
 });
