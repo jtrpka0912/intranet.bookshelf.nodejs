@@ -7,6 +7,7 @@ require('dotenv').config();
 
 // Routes
 const shelvesRouter = require('./routes/shelves');
+const ebooksRouter = require('./routes/ebooks')
 
 // Initialize express
 const app = express();
@@ -34,6 +35,7 @@ connection.once('open', () => {
 
 // Express Routes
 app.use('/api/v1/shelves', shelvesRouter);
+app.use('/api/v1/ebooks', ebooksRouter);
 
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);

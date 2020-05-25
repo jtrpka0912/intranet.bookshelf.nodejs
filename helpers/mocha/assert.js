@@ -7,20 +7,6 @@ chai.use(chaiString); // Allow Chai to use Chai String plugin.
 const assert = chai.assert; // Assert Style
 
 /**
- * @function recognizeThePath
- * @summary Check if route exists
- * @description A reusable test to check if testing recognizes the route exists.
- * @todo Create a testing helper and export it to other future route test files.
- * @param { object } request
- */
-const recognizeThePath = (request) => {
-    request.end((err, res) => {
-        assert.isNumber(res.status);
-        assert.notEqual(res.status, 404);
-    });
-};
-
-/**
  * @function recognize200
  * @summary Check if OK Request (200)
  * @description A reusable test to simply check the actual status of the response if its OK (200).
@@ -90,10 +76,9 @@ const recognizeErrorMessage = (res, partialMessage) => {
 };
 
 module.exports = {
-    recognizeThePath: recognizeThePath,
-    recognize200: recognize200,
-    recognize400: recognize400,
-    recognize404: recognize404,
-    recognize500: recognize500,
-    recognizeErrorMessage: recognizeErrorMessage
+    recognize200,
+    recognize400,
+    recognize404,
+    recognize500,
+    recognizeErrorMessage
 };

@@ -2,8 +2,8 @@
 // ========
 // Chai
 const chai = require('chai');
-const chaiHttp = require('chai-http'); // Chai-HTTP Plugin
-const chaiString = require('chai-string'); // Chai String Plugin
+const chaiHttp = require('chai-http'); // Chai-HTTP plugin
+const chaiString = require('chai-string'); // Chai String plugin
 chai.use(chaiHttp); // Allow Chai to use Chai-HTTP plugin.
 chai.use(chaiString); // Allow Chai to use Chai String plugin.
 const assert = chai.assert; // Assert Style
@@ -12,11 +12,14 @@ const assert = chai.assert; // Assert Style
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
-// Internal
+// App
 const { app } = require('../../index'); // Get the Express app
+
+// Models
 const Shelf = require('../../models/shelf.model'); // Shelf model
+
+// Helpers
 const {
-    recognizeThePath,
     recognizeErrorMessage,
     recognize200,
     recognize400,
@@ -91,10 +94,6 @@ describe('Shelves Router', () => {
             await Shelf.deleteMany({});
         });
 
-        it('Recognized path', () => {
-            recognizeThePath(request);
-        });
-
         it('Return three shelves', () => {
             request.end((err, res) => {
                 const shelfCount = res.body.length;
@@ -133,10 +132,6 @@ describe('Shelves Router', () => {
         after(async () => {
             // Clear out all shelf test documents.
             await Shelf.deleteMany({});
-        });
-
-        it('Recognized path', () => {
-            recognizeThePath(request);
         });
 
         it('Fail request with empty body', () => {
@@ -225,10 +220,6 @@ describe('Shelves Router', () => {
             await Shelf.deleteMany({});
         });
 
-        it('Recognized path', () => {
-            recognizeThePath(chai.request(app).get(`${endpointURI}/hello`));
-        });
-
         it('Bad request with a too short ID string (12 characters minimum)', () => {
             chai.request(app).get(`${endpointURI}/blah`).end((err, res) => {
                 assert.isNotNull(res);
@@ -238,7 +229,7 @@ describe('Shelves Router', () => {
             });
         });
 
-        it('Unable to find shelf with bad ID.', () => {
+        it('Unable to find shelf with bad ID', () => {
             chai.request(app).get(`${endpointURI}/blahblahblah`).end((err, res) => {
                 assert.isNotNull(res);
                 recognize404(res);
@@ -246,7 +237,7 @@ describe('Shelves Router', () => {
             });
         });
 
-        it('Find a shelf with ID (Shelf Two).', () => {
+        it('Find a shelf with ID (Shelf Two)', () => {
             chai.request(app).get(`${endpointURI}/5ec5df19ed30ea2b80ef14ae`).end((err, res) => {
                 assert.isNotNull(res);
                 recognize200(res);
@@ -298,15 +289,25 @@ describe('Shelves Router', () => {
             await Shelf.deleteMany({});
         });
 
-        it('Recognized path', () => {
-            recognizeThePath(request);
-        });
-
         it('Fail request with empty body', () => {
             request.send({}).end((err, res) => {
                 assert.isNotNull(res);
                 recognize400(res);
                 recognizeErrorMessage(res, 'You did not send any information');
+            });
+        });
+
+        it('Bad request with a too short ID string (12 characters minimum)', () => {
+            chai.request(app).get(`${endpointURI}/blah`).send({
+                name: 'Shelf Derp',
+                root: '/derp',
+                showDirectories: true,
+                multiFile: false
+            }).end((err, res) => {
+                assert.isNotNull(res);
+                // TODO: This is subject to change once I am able to parse MongoDB errors.
+                recognize400(res);
+                recognizeErrorMessage(res, 'Cast to ObjectId failed');
             });
         });
 
@@ -370,7 +371,6 @@ describe('Shelves Router', () => {
     describe(`DELETE - ${endpointURI}/:shelfId`, () => {
         let request;
         const shelfOneId = '5ec73853788ef556ecc225dd';
-        const shelfThreeId = '5ec739cdc8bcdc4a1c74e75e';
 
         before(async () => {
             // Create just one shelf to delete
@@ -388,6 +388,15 @@ describe('Shelves Router', () => {
         after(async () => {
             // Clear out all shelf test documents.
             await Shelf.deleteMany({});
+        });
+
+        it('Bad request with a too short ID string (12 characters minimum)', () => {
+            chai.request(app).delete(`${endpointURI}/blah`).end((err, res) => {
+                assert.isNotNull(res);
+                // TODO: This is subject to change once I am able to parse MongoDB errors.
+                recognize400(res);
+                recognizeErrorMessage(res, 'Cast to ObjectId failed');
+            });
         });
 
         it('Fail request because it could not find Shelf', () => {
