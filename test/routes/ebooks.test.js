@@ -103,6 +103,10 @@ describe('eBooks Router', () => {
         describe('With files and folders in collection', () => {
             before(async () => {
                 // Create some files
+                // =================
+
+                // This is inside another folder
+                // Receive? No
                 const fileOne = new File({
                     type: 'book',
                     name: 'Book One',
@@ -111,23 +115,48 @@ describe('eBooks Router', () => {
                     didRead: false
                 });
 
+                // This is inside the root shelf
+                // Receive? Yes
                 const fileTwo = new File({
                     type: 'book',
                     name: 'Book Two',
-                    path: '/books/example',
-                    cover: '/images/books/example/Book Two.jpg',
-                    didRead: false
+                    path: '/books',
+                    cover: '/images/books/Book Two.jpg',
+                    didRead: true
                 });
 
+                // This is outside the root shelf path
+                // Receive? No
+                const fileThree = new File({
+                    type: 'magazine',
+                    name: 'Magainze Issue 000',
+                    path: '/magazines',
+                    cover: null,
+                    didRead: false
+                })
+
                 // Create some folders
-                const folder = new Folder({
+                // ===================
+
+                // This is inside the root shelf
+                // Receive? Yes
+                const folderOne = new Folder({
                     name: 'Example',
                     path: '/books/example'
                 });
 
+                // This is outside the root shelf
+                // Receive? No
+                const folderTwo = new Folder({
+                    name: 'Foobar',
+                    path: '/foo/bar'
+                });
+
                 await fileOne.save();
                 await fileTwo.save();
-                await folder.save();
+                await fileThree.save();
+                await folderOne.save();
+                await folderTwo.save();
             });
 
             after(async () => {
