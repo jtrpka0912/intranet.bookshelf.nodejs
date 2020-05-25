@@ -18,8 +18,7 @@ const { app } = require('../../index'); // Get the Express app
 // Models
 const Shelf = require('../../models/shelf.model'); // Shelf model
 const Folder = require('../../models/folder.model'); // Folder model
-// File model with alias to prevent conflicts with File JavaScript object.
-const { File: FileSchema } = require('../../models/file.model');
+const File = require('../../models/file.model'); // File model
 
 
 // Helpers
@@ -53,16 +52,29 @@ describe('eBooks Router', () => {
         await mongoServer.stop();
     });
 
+    it('Should not be able to find endpoint with no shelfId.', () => {
+        chai.request(app).get(`${endpointURI}/shelf`).end((err, res) => {
+            assert.isNotNull(res);
+            assert.isNumber(res.status);
+            assert.equal(res.status, 404);
+        });
+    });
+
     describe(`GET - ${endpointURI}/shelf/:shelfId`, () => {
         // TODO: Will need to do separate testing with documents in collections
         // ... and another with empty collections so it can create documents for them.
+
+        it('Recognized path', () => {
+            recognizeThePath(chai.request(app).get(`${endpointURI}/shelf/blahblahblah`));
+        });
+
         describe('With files and folders in collection', () => {
-            const shelfOneId = '5ec73853788ef556ecc225dd';
+            const shelfId = '5ec73853788ef556ecc225dd';
 
             before(async () => {
                 // Create a shelf
-                const shelfOne = new Shelf({
-                    _id: shelfOneId,
+                const shelf = new Shelf({
+                    _id: shelfId,
                     name: 'Shelf One',
                     root: '/books',
                     showDirectories: false,
@@ -70,7 +82,7 @@ describe('eBooks Router', () => {
                 });
 
                 // Create some files
-                const fileOne = new FileSchema({
+                const fileOne = new File({
                     type: 'book',
                     name: 'Book One',
                     path: '/books/example',
@@ -78,7 +90,7 @@ describe('eBooks Router', () => {
                     didRead: false
                 });
 
-                const fileTwo = new FileSchema({
+                const fileTwo = new File({
                     type: 'book',
                     name: 'Book Two',
                     path: '/books/example',
@@ -91,9 +103,8 @@ describe('eBooks Router', () => {
                     name: 'Example',
                     path: '/books/example'
                 });
-                
 
-                await shelfOne.save();
+                await shelf.save();
                 await fileOne.save();
                 await fileTwo.save();
                 await folder.save();
@@ -103,6 +114,7 @@ describe('eBooks Router', () => {
                 // Remove all shelves
                 await Shelf.deleteMany({});
             });
+            
         });
     });
 });
