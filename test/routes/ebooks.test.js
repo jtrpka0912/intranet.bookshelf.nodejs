@@ -98,8 +98,6 @@ describe('eBooks Router', () => {
             });
         });
 
-        describe('With no files and folders in collection (go through server)', () => {});
-
         describe('With files and folders in collection', () => {
             before(async () => {
                 // Create some files
@@ -164,6 +162,22 @@ describe('eBooks Router', () => {
                 await File.deleteMany({});
                 await Folder.deleteMany({});
             });
+
+            it('Successfully be able to find the files and folders', () => {
+                chai.request(app).get(`${endpointURI}/shelf/${shelfId}`).end((err, res) => {
+                    assert.isNotNull(res);
+                    recognize200(res);
+
+                    // Only expecting one folder to arrive
+                    assert.equal(1, res.body.directories.length);
+
+                    // Only expecting one file to arrive
+                    assert.equal(1, res.body.files.length);
+
+                });
+            });
         });
+
+        describe('With no files and folders in collection (go through server)', () => {});
     });
 });
