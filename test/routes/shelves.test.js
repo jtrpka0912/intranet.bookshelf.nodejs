@@ -20,7 +20,6 @@ const Shelf = require('../../models/shelf.model'); // Shelf model
 
 // Helpers
 const {
-    recognizeThePath,
     recognizeErrorMessage,
     recognize200,
     recognize400,
@@ -95,10 +94,6 @@ describe('Shelves Router', () => {
             await Shelf.deleteMany({});
         });
 
-        it('Recognized path', () => {
-            recognizeThePath(request);
-        });
-
         it('Return three shelves', () => {
             request.end((err, res) => {
                 const shelfCount = res.body.length;
@@ -137,10 +132,6 @@ describe('Shelves Router', () => {
         after(async () => {
             // Clear out all shelf test documents.
             await Shelf.deleteMany({});
-        });
-
-        it('Recognized path', () => {
-            recognizeThePath(request);
         });
 
         it('Fail request with empty body', () => {
@@ -229,10 +220,7 @@ describe('Shelves Router', () => {
             await Shelf.deleteMany({});
         });
 
-        it('Recognized path', () => {
-            recognizeThePath(chai.request(app).get(`${endpointURI}/hello`));
-        });
-
+        // TODO: Use this test with the other VERBS.
         it('Bad request with a too short ID string (12 characters minimum)', () => {
             chai.request(app).get(`${endpointURI}/blah`).end((err, res) => {
                 assert.isNotNull(res);
@@ -242,7 +230,7 @@ describe('Shelves Router', () => {
             });
         });
 
-        it('Unable to find shelf with bad ID.', () => {
+        it('Unable to find shelf with bad ID', () => {
             chai.request(app).get(`${endpointURI}/blahblahblah`).end((err, res) => {
                 assert.isNotNull(res);
                 recognize404(res);
@@ -250,7 +238,7 @@ describe('Shelves Router', () => {
             });
         });
 
-        it('Find a shelf with ID (Shelf Two).', () => {
+        it('Find a shelf with ID (Shelf Two)', () => {
             chai.request(app).get(`${endpointURI}/5ec5df19ed30ea2b80ef14ae`).end((err, res) => {
                 assert.isNotNull(res);
                 recognize200(res);
@@ -300,10 +288,6 @@ describe('Shelves Router', () => {
         after(async () => {
             // Clear out all shelf test documents.
             await Shelf.deleteMany({});
-        });
-
-        it('Recognized path', () => {
-            recognizeThePath(request);
         });
 
         it('Fail request with empty body', () => {
@@ -374,7 +358,6 @@ describe('Shelves Router', () => {
     describe(`DELETE - ${endpointURI}/:shelfId`, () => {
         let request;
         const shelfOneId = '5ec73853788ef556ecc225dd';
-        const shelfThreeId = '5ec739cdc8bcdc4a1c74e75e';
 
         before(async () => {
             // Create just one shelf to delete

@@ -23,7 +23,6 @@ const File = require('../../models/file.model'); // File model
 
 // Helpers
 const {
-    recognizeThePath,
     recognizeErrorMessage,
     recognize200,
     recognize400,
@@ -54,19 +53,16 @@ describe('eBooks Router', () => {
 
     it('Should not be able to find endpoint with no shelfId.', () => {
         chai.request(app).get(`${endpointURI}/shelf`).end((err, res) => {
+            //console.info('res', res.status, res.body);
             assert.isNotNull(res);
             recognize404(res);
-            recognizeErrorMessage(res, 'Missing shelfId.');
+            recognizeErrorMessage(res, 'Missing ShelfId.');
         });
     });
 
     describe(`GET - ${endpointURI}/shelf/:shelfId`, () => {
         // TODO: Will need to do separate testing with documents in collections
         // ... and another with empty collections so it can create documents for them.
-
-        it('Recognized path', () => {
-            recognizeThePath(chai.request(app).get(`${endpointURI}/shelf/blahblahblah`));
-        });
 
         describe('With files and folders in collection', () => {
             const shelfId = '5ec73853788ef556ecc225dd';
@@ -114,8 +110,13 @@ describe('eBooks Router', () => {
                 // Remove all shelves
                 await Shelf.deleteMany({});
             });
-            
 
+            it('Unable to find shelf with bad ID', () => {
+                chai.request(app).get(`${endpointURI}/shelf/blahblahblah`).end((err, res) => {
+                    assert.isNotNull(res);
+                    recognize404(res);
+                });
+            });
         });
     });
 });

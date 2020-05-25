@@ -4,6 +4,9 @@ const router = require('express').Router();
 // Models
 const Shelf = require('../models/shelf.model');
 
+// Helpers
+const { foundMongoError, shelfNotFound } = require('../helpers/routes');
+
 /**
  * @summary Retrieve all shelves
  */
@@ -70,26 +73,13 @@ router.route('/:shelfId').get((req, res) => {
     const shelfId = req.params.shelfId;
 
     Shelf.findById(shelfId, (mongoError, mongoResponse) => {
-        // Check if any errors from MongoDB
-        if(mongoError) {
-            return res.status(400).json({
-                errorCode: 400,
-                errorCodeMessage: 'Bad Request',
-                // TODO: There is a better error message in mongoError, but needs to be parsed.
-                // mongoError.reason needs to be parsed
-                errorMessage: mongoError.message // This will do for now.
-            });
-        }
+        if(foundMongoError(mongoError, res)) return;
 
         // Check if any responses from MongoDB
         if(mongoResponse) {
             res.status(200).json(mongoResponse);
         } else {
-            return res.status(404).json({
-                errorCode: 404,
-                errorCodeMessage: 'Not Found',
-                errorMessage: `Unable to find shelf with id: ${shelfId}.`
-            });
+            return shelfNotFound(shelfId, res);
         }
     });
 });
@@ -121,26 +111,13 @@ router.route('/:shelfId').put((req, res) => {
     Shelf.findByIdAndUpdate(shelfId, shelfUpdate, {
         new: true // Send the updated shelf data instead of original
     }, (mongoError, mongoResponse) => {
-        // Check if any errors from MongoDB
-        if(mongoError) {
-            return res.status(400).json({
-                errorCode: 400,
-                errorCodeMessage: 'Bad Request',
-                // TODO: There is a better error message in mongoError, but needs to be parsed.
-                // mongoError.reason needs to be parsed
-                errorMessage: mongoError.message // This will do for now.
-            });
-        }
+        if(foundMongoError(mongoError, res)) return;
 
         // Check if any responses from MongoDB
         if(mongoResponse) {
             res.status(200).json(mongoResponse);
         } else {
-            return res.status(404).json({
-                errorCode: 404,
-                errorCodeMessage: 'Not Found',
-                errorMessage: `Unable to find shelf with id: ${shelfId}.`
-            });
+            return shelfNotFound(shelfId, res);
         }
     });
 });
@@ -154,27 +131,15 @@ router.route('/:shelfId').delete((req, res) => {
 
     // findByIdAndRemove would be using findAndModify which might take a bit longer
     Shelf.findByIdAndDelete(shelfId, (mongoError, mongoResponse) => {
-        // Check if any errors from MongoDB
-        if(mongoError) {
-            return res.status(400).json({
-                errorCode: 400,
-                errorCodeMessage: 'Bad Request',
-                // TODO: There is a better error message in mongoError, but needs to be parsed.
-                // mongoError.reason needs to be parsed
-                errorMessage: mongoError.message // This will do for now.
-            });
-        }
+        if(foundMongoError(mongoError, res)) return;
 
         // Check if any responses from MongoDB
         if(mongoResponse) {
-            // TODO: Figure out a better response. Record on OpenAPI.
-            res.status(200).send('Cue the funeral dance!');
+            // TODO: Figure out a better response. 
+            // TODO: Record on OpenAPI.
+            res.status(200).send('Cue the funeral dance meme!');
         } else {
-            return res.status(404).json({
-                errorCode: 404,
-                errorCodeMessage: 'Not Found',
-                errorMessage: `Unable to find shelf with id: ${shelfId}.`
-            });
+            return shelfNotFound(shelfId, res);
         }
     });
 });
