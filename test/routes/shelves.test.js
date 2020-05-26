@@ -35,7 +35,7 @@ describe('Shelves Router', () => {
         // Set up an in-memory MongoDB server
         mongoServer = new MongoMemoryServer();
 
-        // Retrieve the URI from the mock server
+        // Retrieve the URI from the mock database
         const mongoUri = await mongoServer.getUri();
         await mongoose.connect(mongoUri, {
             useNewUrlParser: true
@@ -43,7 +43,7 @@ describe('Shelves Router', () => {
     });
 
     after(async () => {
-        // Disconnect mongoose and stop the mock server.
+        // Disconnect mongoose and stop the mock database.
         await mongoose.disconnect();
         await mongoServer.stop();
     });

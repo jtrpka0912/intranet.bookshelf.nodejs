@@ -20,7 +20,6 @@ const Shelf = require('../../models/shelf.model'); // Shelf model
 const Folder = require('../../models/folder.model'); // Folder model
 const File = require('../../models/file.model'); // File model
 
-
 // Helpers
 const {
     recognizeErrorMessage,
@@ -38,7 +37,7 @@ describe('eBooks Router', () => {
         // Set up an in-memory MongoDB server
         mongoServer = new MongoMemoryServer();
 
-        // Retrieve the URI from the mock server
+        // Retrieve the URI from the mock database
         const mongoUri = await mongoServer.getUri();
         await mongoose.connect(mongoUri, {
             useNewUrlParser: true
@@ -46,7 +45,7 @@ describe('eBooks Router', () => {
     });
 
     after(async () => {
-        // Disconnect mongoose and stop the mock server.
+        // Disconnect mongoose and stop the mock database.
         await mongoose.disconnect();
         await mongoServer.stop();
     });
