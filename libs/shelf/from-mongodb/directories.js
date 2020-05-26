@@ -8,9 +8,14 @@ const Folder = require('../../../models/folder.model');
  * @returns { object[] }
  */
 const retrieveFolders = (shelf) => {
-    let directories = [];
-
-    return directories;
+    // console.info('Shelf', shelf);
+    Folder.find({}).then((response) => {
+        console.info('Response', response);
+        return response;
+    }).catch((err) => {
+        console.error('Error', err);
+        return [];
+    });
 }
 
 module.exports = {

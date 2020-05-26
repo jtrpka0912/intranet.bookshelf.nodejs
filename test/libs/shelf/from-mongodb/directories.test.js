@@ -41,14 +41,18 @@ describe('Directories from MongoDB', () => {
 
     it('Should not find any documents.', () => {
         const folders = retrieveFolders();
+        console.info('Folders', folders);
         assert.equal(folders.length, 0);
     });
 
     describe('Folders (documents) in the collection', () => {
+        let bookShelf;
+
         before(async () => {
             // Create some shelves
             // ===================
-            const bookShelf = new Shelf({
+            bookShelf = new Shelf({
+                _id: '5ecd01b4a3d0b90b0830a25a',
                 name: 'Book Shelf',
                 root: '/books',
                 showDirectories: true,
@@ -96,6 +100,12 @@ describe('Directories from MongoDB', () => {
         after(async () => {
             Shelf.deleteMany({});
             Folder.deleteMany({});
+        });
+
+        it('Find all folders from book shelf', () => {
+            const folders = retrieveFolders(bookShelf);
+            console.info('Folders', folders);
+            assert.equal(folders.length, 2);
         });
     });
 });
