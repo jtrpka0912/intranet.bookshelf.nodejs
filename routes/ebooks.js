@@ -7,7 +7,7 @@ const File = require('../models/file.model');
 const Folder = require('../models/folder.model');
 
 // Helpers
-const { foundMongoError, shelfNotFound } = require('../helpers/routes');
+const { foundMongoError, shelfNotFound } = require('../libs/routes');
 
 /**
  * @description Throw an error since this is a dead endpoint.

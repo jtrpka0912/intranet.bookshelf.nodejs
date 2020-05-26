@@ -5,7 +5,7 @@ const router = require('express').Router();
 const Shelf = require('../models/shelf.model');
 
 // Helpers
-const { foundMongoError, shelfNotFound } = require('../helpers/routes');
+const { foundMongoError, shelfNotFound } = require('../libs/routes');
 
 /**
  * @summary Retrieve all shelves
