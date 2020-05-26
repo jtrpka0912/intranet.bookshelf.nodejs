@@ -27,7 +27,7 @@ const {
     recognize200,
     recognize400,
     recognize404,
-} = require('../../libs/mocha/assert'); // Helper Mocha Assert Tests
+} = require('../../libs/helpers/mocha/assert'); // Helper Mocha Assert Tests
 
 // Global Variables
 let mongoServer;
@@ -165,6 +165,8 @@ describe('eBooks Router', () => {
 
             it('Successfully be able to find the files and folders', () => {
                 chai.request(app).get(`${endpointURI}/shelf/${shelfId}`).end((err, res) => {
+                    // console.info('res', res);
+
                     assert.isNotNull(res);
                     recognize200(res);
 

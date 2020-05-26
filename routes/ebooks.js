@@ -7,7 +7,7 @@ const File = require('../models/file.model');
 const Folder = require('../models/folder.model');
 
 // Helpers
-const { foundMongoError, shelfNotFound } = require('../libs/routes');
+const { foundMongoError, shelfNotFound } = require('../libs/helpers/routes');
 
 /**
  * @description Throw an error since this is a dead endpoint.
@@ -85,6 +85,12 @@ router.route('/shelf/:shelfId').get((req, res) => {
             // After it inserts new documents to MongoDB, then check if any were found at all (files and folders) then repeat above.
 
             // If none, then show an empty response message (maybe status 204 - No Content).
+
+            res.status(200).json({
+                breadcrumbs,
+                directories,
+                files
+            });
         } else {
             return shelfNotFound(shelfId, res);
         }
