@@ -168,12 +168,11 @@ describe('eBooks Router', () => {
                     assert.isNotNull(res);
                     recognize200(res);
 
-                    // Only expecting one folder to arrive
+                    // Only expecting one folder, from directories, to arrive (folderOne)
                     assert.equal(1, res.body.directories.length);
 
-                    // Only expecting one file to arrive
+                    // Only expecting one file to arrive (fileTwo)
                     assert.equal(1, res.body.files.length);
-
                 });
             });
         });
