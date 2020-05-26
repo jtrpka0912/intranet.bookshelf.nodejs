@@ -39,17 +39,24 @@ describe('Directories from MongoDB', () => {
         await mongoServer.stop();
     });
 
-    describe('No folders (documents) in the collection', () => {
-        it('Should not find any documents.', () => {
-            const folders = retrieveFolders();
-
-            assert.equal(folders.length, 0);
-        });
+    it('Should not find any documents.', () => {
+        const folders = retrieveFolders();
+        assert.equal(folders.length, 0);
     });
 
     describe('Folders (documents) in the collection', () => {
         before(async () => {
+            // Create some shelves
+            // ===================
+            const bookShelf = new Shelf({
+                name: 'Book Shelf',
+                root: '/books',
+                showDirectories: true,
+                multiFile: false
+            });
+
             // Create some directories
+            // =======================
             const bookExample = new Folder({
                 name: 'Book Example',
                 path: '/books/example'
@@ -75,12 +82,20 @@ describe('Directories from MongoDB', () => {
                 path: '/magazines/example/issues'
             });
 
+            // Save Shelves into mock database
+            await bookShelf.save();
+
             // Save Folders into mock database
             await bookExample.save();
             await magazineExample.save();
             await bookFoobar.save();
             await rootExample.save();
             await magazineExample.save();
+        });
+
+        after(async () => {
+            Shelf.deleteMany({});
+            Folder.deleteMany({});
         });
     });
 });
