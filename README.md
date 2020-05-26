@@ -22,6 +22,24 @@ This project is a **(M)ongoDB (E)xpress (R)eact (N)ode.js** stack with React bei
 
 + **PDF.js**: A JavaScript library to help work with the PDF files like retrieving the first page to act as the cover of an eBook entry.
 
+## Directory Structure
+
++ **libs** - Collection of functions to work with the *Node.js* app
+  + **helpers** - Shortcut functions that can help reduce code around the app
+    + **mocha** - Helper functions for *Mocha* tests
+      + There *might* be one file for each of the different assertion styles.
+  + **shelf** - Functions to retrieve folders and files
+    + **from-mongodb** - Functions to retrieve folders and files from *MongoDB*
+    + **from-server** - Functions to retrieve folders and files from the server
++ **models** - All of the *Mongoose* schemas
++ **node_modules** - All of the NPM dependency packages
++ **public** - All of the public assets (images, etc...) are stored
+  + **images** - Storage of all images to be used
+    + **covers** - All of the eBook cover images are stored here
++ **routes** - All of the *express.js* routers are stored
++ **test** - *Mocha* test files (it mirrors the *Node.js* directory structure)
+
+
 ## How does it work?
 
 It all starts with a creation of a `Shelf` object. This will act as a collection of eBook files and directories at a location in a server. When first created, it will be given a name, and an absolute path from the server. This absolute path will be used for the files and folders.
