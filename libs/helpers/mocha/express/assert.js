@@ -8,14 +8,36 @@ const assert = chai.assert; // Assert Style
 
 /**
  * @function recognize200
- * @summary Check if OK Request (200)
+ * @summary Check if OK Response (200)
  * @description A reusable test to simply check the actual status of the response if its OK (200).
  * @param { * } res 
  */
 const recognize200 = (res) => {
     assert.isNumber(res.status);
     assert.equal(res.status, 200);
-}
+};
+
+/**
+ * @function recognize201
+ * @summary Check if Created Response (201)
+ * @description A reusable test to simply check the actual status of the response if its Created (201).
+ * @param { * } res 
+ */
+const recognize201 = (res) => {
+    assert.isNumber(res.status);
+    assert.equal(res.status, 201);
+};
+
+/**
+ * @function recognize204
+ * @summary Check if No Content Response (204)
+ * @description A reusable test to simply check the actual status of the response if its No Content (204).
+ * @param { * } res 
+ */
+const recognize204 = (res) => {
+    assert.isNumber(res.status);
+    assert.equal(res.status, 204);
+};
 
 /**
  * @function recognize400
@@ -77,6 +99,8 @@ const recognizeErrorMessage = (res, partialMessage) => {
 
 module.exports = {
     recognize200,
+    recognize201,
+    recognize204,
     recognize400,
     recognize404,
     recognize500,

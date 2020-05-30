@@ -5,7 +5,7 @@ const router = require('express').Router();
 const Shelf = require('../models/shelf.model');
 
 // Helpers
-const { foundMongoError, shelfNotFound } = require('../libs/helpers/routes');
+const { foundMongoError, pathArrayToString, pathStringToArray, shelfNotFound } = require('../libs/helpers/routes');
 
 /**
  * @summary Retrieve all shelves
@@ -13,7 +13,15 @@ const { foundMongoError, shelfNotFound } = require('../libs/helpers/routes');
 router.route('/').get((req, res) => {
     // TODO: Do some validation if no shelves were found.
     Shelf.find().then(shelves => {
-        res.json(shelves);
+        const updatedShelves = shelves.map((shelf) => {
+            // Convert to a JavaScript Object
+            shelf = shelf.toObject();
+            shelf.root = pathArrayToString(shelf.root);
+
+            return shelf;
+        });
+
+        res.json(updatedShelves);
     }).catch(err => {
         res.status(400).json({
             errorCode: 400,
@@ -45,17 +53,28 @@ router.route('/').post((req, res) => {
         });
     }
 
+    // Need to convert to array for MongoDB
+    let convertedRoot = [];
+    if(shelfRoot) {
+        convertedRoot = pathStringToArray(shelfRoot);
+    }
+
     // Create a new Shelf
     const newShelf = new Shelf({
         name: shelfName,
-        root: shelfRoot,
+        root: convertedRoot, 
         showDirectories: shelfShowDirectories,
         multiFile: shelfMultiFile
     });
 
-    newShelf.save().then(() => {
-        // TODO: Figure out a better response. Record on OpenAPI.
-        return res.json('Successful'); // Need to do better response.
+    newShelf.save().then((mongoResponse) => {
+        // Convert from Mongo Object to JavaScript Object
+        mongoResponse = mongoResponse.toObject();
+
+        // Convert to a string path.
+        mongoResponse.root = pathArrayToString(mongoResponse.root);
+
+        return res.status(201).json(mongoResponse);
     }).catch(err => {
         return res.status(400).json({
             errorCode: 400,
@@ -77,6 +96,10 @@ router.route('/:shelfId').get((req, res) => {
 
         // Check if any responses from MongoDB
         if(mongoResponse) {
+            mongoResponse = mongoResponse.toObject();
+
+            mongoResponse.root = pathArrayToString(mongoResponse.root);
+
             res.status(200).json(mongoResponse);
         } else {
             return shelfNotFound(shelfId, res);
@@ -99,6 +122,12 @@ router.route('/:shelfId').put((req, res) => {
     if(Object.keys(req.body).length > 0) {
         // Retrieve the request from the front-end
         shelfUpdate = req.body;
+
+        // Check if update body contains root
+        if(shelfUpdate.root) {
+            shelfUpdate.root = pathStringToArray(shelfUpdate.root);
+        }
+        
     } else {
         return res.status(400).json({
             errorCode: 400,
@@ -115,6 +144,9 @@ router.route('/:shelfId').put((req, res) => {
 
         // Check if any responses from MongoDB
         if(mongoResponse) {
+            mongoResponse = mongoResponse.toObject();
+            mongoResponse.root = pathArrayToString(mongoResponse.root);
+
             res.status(200).json(mongoResponse);
         } else {
             return shelfNotFound(shelfId, res);
@@ -135,9 +167,8 @@ router.route('/:shelfId').delete((req, res) => {
 
         // Check if any responses from MongoDB
         if(mongoResponse) {
-            // TODO: Figure out a better response. 
-            // TODO: Record on OpenAPI.
-            res.status(200).send('Cue the funeral dance meme!');
+            // Responds back with the deleted shelf.
+            res.status(204).send();
         } else {
             return shelfNotFound(shelfId, res);
         }
