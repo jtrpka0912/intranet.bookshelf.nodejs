@@ -122,6 +122,12 @@ router.route('/:shelfId').put((req, res) => {
     if(Object.keys(req.body).length > 0) {
         // Retrieve the request from the front-end
         shelfUpdate = req.body;
+
+        // Check if update body contains root
+        if(shelfUpdate.root) {
+            shelfUpdate.root = pathStringToArray(shelfUpdate.root);
+        }
+        
     } else {
         return res.status(400).json({
             errorCode: 400,
@@ -138,6 +144,8 @@ router.route('/:shelfId').put((req, res) => {
 
         // Check if any responses from MongoDB
         if(mongoResponse) {
+            mongoResponse = mongoResponse.toObject();
+            mongoResponse.root = pathArrayToString(mongoResponse.root);
 
             res.status(200).json(mongoResponse);
         } else {

@@ -95,7 +95,7 @@ describe('Shelves Router', () => {
             await Shelf.deleteMany({});
         });
 
-        it('Return three shelves', () => {
+        it('Return three shelves', (done) => {
             request.end((err, res) => {
                 recognize200(res);
                 const shelfCount = res.body.length;
@@ -107,6 +107,7 @@ describe('Shelves Router', () => {
                 assert.equal(res.body[0].root, '/');
                 assert.equal(res.body[1].root, '/books/publishers');
                 assert.equal(res.body[2].root, '/magazines');
+                done();
             });
         });
     });
@@ -129,15 +130,16 @@ describe('Shelves Router', () => {
             await Shelf.deleteMany({});
         });
 
-        it('Fail request with empty body', () => {
+        it('Fail request with empty body', (done) => {
             request.send({}).end((err, res) => {
                 assert.isNotNull(res);
                 recognize400(res);
                 recognizeErrorMessage(res, 'is required.');
+                done();
             });
         });
 
-        it('Fail request because of short name', () => {
+        it('Fail request because of short name', (done) => {
             request.send({
                 name: 'Yo', // Need to be three or more
                 root: '/',
@@ -147,10 +149,11 @@ describe('Shelves Router', () => {
                 assert.isNotNull(res);
                 recognize400(res);
                 recognizeErrorMessage(res, 'is shorter than the minimum allowed');
+                done();
             });
         });
 
-        it('Fail request because of conflicts with show directories and multi-files.', () => {
+        it('Fail request because of conflicts with show directories and multi-files.', (done) => {
             request.send({
                 name: 'Sample', // Need to be three or more
                 root: '/',
@@ -160,10 +163,11 @@ describe('Shelves Router', () => {
                 assert.isNotNull(res);
                 recognize400(res);
                 recognizeErrorMessage(res, 'you can not use multi-file directories');
+                done();
             });
         });
 
-        it('Successfully create a new shelf', () => {
+        it('Successfully create a new shelf', (done) => {
             request.send({
                 name: 'From Test',
                 root: '/example/foo/bar',
@@ -178,6 +182,7 @@ describe('Shelves Router', () => {
                 assert.containIgnoreCase(response.name, 'From Test');
                 assert.isNotArray(response.root); // We make it an array in mongo, but should return back as string
                 assert.equal(response.root, '/example/foo/bar');
+                done();
             });
         });
     });
@@ -219,38 +224,42 @@ describe('Shelves Router', () => {
             await Shelf.deleteMany({});
         });
 
-        it('Bad request with a too short ID string (12 characters minimum)', () => {
+        it('Bad request with a too short ID string (12 characters minimum)', (done) => {
             chai.request(app).get(`${endpointURI}/blah`).end((err, res) => {
                 assert.isNotNull(res);
                 // TODO: This is subject to change once I am able to parse MongoDB errors.
                 recognize400(res);
                 recognizeErrorMessage(res, 'Cast to ObjectId failed');
+                done();
             });
         });
 
-        it('Unable to find shelf with bad ID', () => {
+        it('Unable to find shelf with bad ID', (done) => {
             chai.request(app).get(`${endpointURI}/blahblahblah`).end((err, res) => {
                 assert.isNotNull(res);
                 recognize404(res);
                 recognizeErrorMessage(res, 'Unable to find shelf with id:');
+                done();
             });
         });
 
-        it('Find a shelf with ID (Shelf Two)', () => {
+        it('Find a shelf with ID (Shelf Two)', (done) => {
             chai.request(app).get(`${endpointURI}/5ec5df19ed30ea2b80ef14ae`).end((err, res) => {
                 assert.isNotNull(res);
                 recognize200(res);
                 assert.equal(res.body.name, 'Shelf Two');
                 assert.containIgnoreCase(res.body.root, '/books');
+                done();
             });
         });
 
-        it('Find the magazine shelf (Shelf Three)', () => {
+        it('Find the magazine shelf (Shelf Three)', (done) => {
             chai.request(app).get(`${endpointURI}/5ec739cdc8bcdc4a1c74e75e`).end((err, res) => {
                 assert.isNotNull(res);
                 recognize200(res);
                 assert.equal(res.body.name, 'Shelf Three');
                 assert.containIgnoreCase(res.body.root, '/magazines/issues');
+                done();
             });
         });
     });
@@ -297,15 +306,16 @@ describe('Shelves Router', () => {
             await Shelf.deleteMany({});
         });
 
-        it('Fail request with empty body', () => {
+        it('Fail request with empty body', (done) => {
             request.send({}).end((err, res) => {
                 assert.isNotNull(res);
                 recognize400(res);
                 recognizeErrorMessage(res, 'You did not send any information');
+                done();
             });
         });
 
-        it('Bad request with a too short ID string (12 characters minimum)', () => {
+        it('Bad request with a too short ID string (12 characters minimum)', (done) => {
             chai.request(app).get(`${endpointURI}/blah`).send({
                 name: 'Shelf Derp',
                 root: '/derp',
@@ -316,10 +326,11 @@ describe('Shelves Router', () => {
                 // TODO: This is subject to change once I am able to parse MongoDB errors.
                 recognize400(res);
                 recognizeErrorMessage(res, 'Cast to ObjectId failed');
+                done();
             });
         });
 
-        it('Fail request because it could not find Shelf', () => {
+        it('Fail request because it could not find Shelf', (done) => {
             chai.request(app).put(`${endpointURI}/blahblahblah`).send({
                 name: 'Shelf Derp',
                 root: '/derp',
@@ -329,13 +340,14 @@ describe('Shelves Router', () => {
                 assert.isNotNull(res);
                 recognize404(res);
                 recognizeErrorMessage(res, 'Unable to find shelf with id');
+                done();
             });
         });
 
-        it('Successfully updated Shelf One', () => {
+        it('Successfully updated Shelf One', (done) => {
             request.send({
                 name: 'Updated Shelf One',
-                root: '/books',
+                root: '/books/updated',
                 showDirectories: true,
                 multiFile: true
             }).end((err, res) => {
@@ -346,17 +358,19 @@ describe('Shelves Router', () => {
                 // Test old and new values
                 assert.equal(updatedShelf.name, 'Updated Shelf One');
                 assert.notEqual(updatedShelf.name, 'Shelf One');
-                assert.equal(updatedShelf.root, '/books');
-                assert.notEqual(updatedShelf.root, '/');
+                assert.isNotArray(updatedShelf.root);
+                assert.equal(updatedShelf.root, '/books/updated');
+                assert.notEqual(updatedShelf.root, '/books');
                 assert.isTrue(updatedShelf.showDirectories);
                 assert.isNotFalse(updatedShelf.showDirectories);
                 assert.isTrue(updatedShelf.multiFile);
                 assert.isNotFalse(updatedShelf.multiFile);
+                done();
             });
         });
 
         // Technically, this should be more of a PATCH, but not sure...
-        it('Successfully updated Shelf Three with partial data', () => {
+        it('Successfully updated Shelf Three with partial data', (done) => {
             chai.request(app).put(`${endpointURI}/${shelfThreeId}`).send({
                 showDirectories: false,
             }).end((err, res) => {
@@ -365,13 +379,15 @@ describe('Shelves Router', () => {
                 recognize200(res);
 
                 // Test old and new values
-                assert.equal(updatedShelf.name, 'Shelf Three'); 
-                assert.equal(updatedShelf.root[0], 'magazines');
+                assert.equal(updatedShelf.name, 'Shelf Three');
+                assert.isNotArray(updatedShelf.root);
+                assert.equal(updatedShelf.root, '/magazines');
                 assert.isFalse(updatedShelf.multiFile);
 
                 // Updated data
                 assert.isFalse(updatedShelf.showDirectories);
                 assert.isNotTrue(updatedShelf.showDirectories);
+                done();
             });
         });
     });
@@ -398,27 +414,30 @@ describe('Shelves Router', () => {
             await Shelf.deleteMany({});
         });
 
-        it('Bad request with a too short ID string (12 characters minimum)', () => {
+        it('Bad request with a too short ID string (12 characters minimum)', (done) => {
             chai.request(app).delete(`${endpointURI}/blah`).end((err, res) => {
                 assert.isNotNull(res);
                 // TODO: This is subject to change once I am able to parse MongoDB errors.
                 recognize400(res);
                 recognizeErrorMessage(res, 'Cast to ObjectId failed');
+                done();
             });
         });
 
-        it('Fail request because it could not find Shelf', () => {
+        it('Fail request because it could not find Shelf', (done) => {
             chai.request(app).delete(`${endpointURI}/blahblahblah`).end((err, res) => {
                 assert.isNotNull(res);
                 recognize404(res);
                 recognizeErrorMessage(res, 'Unable to find shelf with id');
+                done();
             });
         });
 
-        it('Successfully delete a Shelf', () => {
+        it('Successfully delete a Shelf', (done) => {
             chai.request(app).delete(`${endpointURI}/${shelfOneId}`).end((err, res) => {
                 assert.isNotNull(res);
                 recognize200(res);
+                done();
             });
         });
     });
