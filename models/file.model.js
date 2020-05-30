@@ -20,7 +20,7 @@ const fileSchema = new Schema({
     path: {
         type: [String], // Each folder will be an array item
         required: true,
-        unique: true, // There should be no eBook with the same path
+        unique: false,
         trim: true,
         minlength: 0
     },

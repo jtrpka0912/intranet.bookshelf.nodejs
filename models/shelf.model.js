@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 const shelfSchema = new Schema({
     // It will add the primary key field automatically
     name: {
+        // The comments are just notes below
         type: String, // What vartype is it
         required: true, // Is it required
         unique: false, // Can only one value exist
