@@ -210,7 +210,7 @@ describe('Shelves Router', () => {
             const shelfThree = new Shelf({
                 _id: '5ec739cdc8bcdc4a1c74e75e',
                 name: 'Shelf Three',
-                root: ['magazines'],
+                root: ['magazines', 'issues'],
                 showDirectories: true,
                 multiFile: false
             });
@@ -247,7 +247,16 @@ describe('Shelves Router', () => {
                 assert.isNotNull(res);
                 recognize200(res);
                 assert.equal(res.body.name, 'Shelf Two');
-                assert.containIgnoreCase(res.body.root[0], 'books');
+                assert.containIgnoreCase(res.body.root, '/books');
+            });
+        });
+
+        it('Find the magazine shelf (Shelf Three)', () => {
+            chai.request(app).get(`${endpointURI}/5ec739cdc8bcdc4a1c74e75e`).end((err, res) => {
+                assert.isNotNull(res);
+                recognize200(res);
+                assert.equal(res.body.name, 'Shelf Three');
+                assert.containIgnoreCase(res.body.root, '/magazines/issues');
             });
         });
     });

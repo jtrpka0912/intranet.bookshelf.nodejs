@@ -88,6 +88,10 @@ router.route('/:shelfId').get((req, res) => {
 
         // Check if any responses from MongoDB
         if(mongoResponse) {
+            mongoResponse = mongoResponse.toObject();
+
+            mongoResponse.root = pathArrayToString(mongoResponse.root);
+
             res.status(200).json(mongoResponse);
         } else {
             return shelfNotFound(shelfId, res);
@@ -126,6 +130,7 @@ router.route('/:shelfId').put((req, res) => {
 
         // Check if any responses from MongoDB
         if(mongoResponse) {
+
             res.status(200).json(mongoResponse);
         } else {
             return shelfNotFound(shelfId, res);
