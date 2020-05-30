@@ -40,6 +40,7 @@ describe('Directories from MongoDB', () => {
     });
 
     it('Should not find any documents.', async () => {
+        // TODO: Should it throw an empty array or an error message
         const folders = await retrieveFolders();
         assert.equal(folders.length, 0);
     });
@@ -48,11 +49,16 @@ describe('Directories from MongoDB', () => {
         let bookShelf;
         let magazineShelf;
 
+        let bookExample;
+        let magazineExample;
+        let bookFoobar;
+        let rootExample;
+        let magazineExampleIssues;
+
         before(async () => {
             // Create some shelves
             // ===================
             bookShelf = new Shelf({
-                _id: '5ed1c3619f86124364c45682',
                 name: 'Book Shelf',
                 root: ['books'],
                 showDirectories: true,
@@ -60,7 +66,6 @@ describe('Directories from MongoDB', () => {
             });
 
             magazineShelf = new Shelf({
-                _id: '5ed1c33d64a74416e8988b65',
                 name: 'Magazine Shelf',
                 root: ['magazines'],
                 showDirectories: true,
@@ -69,27 +74,27 @@ describe('Directories from MongoDB', () => {
 
             // Create some directories
             // =======================
-            const bookExample = new Folder({
+            bookExample = new Folder({
                 name: 'Book Example',
                 path: ['books', 'example']
             });
 
-            const magazineExample = new Folder({
+            magazineExample = new Folder({
                 name: 'Magazine Example',
                 path: ['magazines', 'example']
             });
 
-            const bookFoobar = new Folder({
+            bookFoobar = new Folder({
                 name: 'Book Foobar',
                 path: ['books', 'foobar']
             });
 
-            const rootExample = new Folder({
+            rootExample = new Folder({
                 name: 'Root Example',
                 path: ['example']
             });
 
-            const magazineExampleIssues = new Folder({
+            magazineExampleIssues = new Folder({
                 name: 'Issues',
                 path: ['magazines', 'example', 'issues']
             });
@@ -103,7 +108,7 @@ describe('Directories from MongoDB', () => {
             await magazineExample.save();
             await bookFoobar.save();
             await rootExample.save();
-            await magazineExample.save();
+            await magazineExampleIssues.save();
         });
 
         after(async () => {
@@ -119,6 +124,11 @@ describe('Directories from MongoDB', () => {
         it('Find the two folders in the books shelf', async () => {
             const folders = await retrieveFolders(bookShelf);
             assert.equal(folders.length, 2);
-        })
+        });
+
+        it.skip('Find the magazine example issues', async () => {
+            const folders = await retrieveFolders(magazineShelf, magazineExampleIssues);
+            assert.equal(folders.length, 1);
+        });
     });
 });
