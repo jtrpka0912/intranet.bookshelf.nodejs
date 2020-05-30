@@ -23,6 +23,7 @@ const {
     recognizeErrorMessage,
     recognize200,
     recognize201,
+    recognize204,
     recognize400,
     recognize404,
 } = require('../../libs/helpers/mocha/express/assert'); // Helper Mocha Assert Tests
@@ -436,7 +437,7 @@ describe('Shelves Router', () => {
         it('Successfully delete a Shelf', (done) => {
             chai.request(app).delete(`${endpointURI}/${shelfOneId}`).end((err, res) => {
                 assert.isNotNull(res);
-                recognize200(res);
+                recognize204(res);
                 done();
             });
         });

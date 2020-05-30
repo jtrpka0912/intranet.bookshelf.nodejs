@@ -167,9 +167,8 @@ router.route('/:shelfId').delete((req, res) => {
 
         // Check if any responses from MongoDB
         if(mongoResponse) {
-            // TODO: Figure out a better response. 
-            // TODO: Record on OpenAPI.
-            res.status(200).send('Cue the funeral dance meme!');
+            // Responds back with the deleted shelf.
+            res.status(204).send();
         } else {
             return shelfNotFound(shelfId, res);
         }
