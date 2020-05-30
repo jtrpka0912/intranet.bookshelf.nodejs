@@ -11,8 +11,10 @@ const Folder = require('../../../models/folder.model');
 const retrieveFolders = async (shelf, currentFolder) => {
     try {
         if(!shelf) {
-            // TODO: Should this throw an empty array or an error message
-            throw 'Shelf was missing in call.'
+            // Need to throw it in an object with message for the try/catch to get the message. Little hacky.
+            throw {
+                message: 'Shelf was missing in call.'
+            };
         }
 
         // TODO: Need to make sure that the shelf and current folder share a common path.

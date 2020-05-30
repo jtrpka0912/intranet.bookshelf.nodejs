@@ -2,7 +2,7 @@
 // ========
 // Chai
 const chai = require('chai');
-const chaiString = require('chai-http');
+const chaiString = require('chai-string');
 chai.use(chaiString);
 const assert = chai.assert;
 
@@ -43,6 +43,7 @@ describe('Directories from MongoDB', () => {
     it('Throw an error because its missing a shelf', async () => {
         // TODO: Should it throw an empty array or an error message
         const error = await retrieveFolders();
+        console.error('Error in test', error);
         assert.isString(error.errorCodeMessage);
         assert.containIgnoreCase(error.errorMessage, 'Shelf was missing in call.');
     });
