@@ -12,9 +12,9 @@ const folderSchema = new Schema({
         minlength: 3
     },
     path: {
-        type: String,
+        type: [String], // Each folder will be an array item
         required: true,
-        unique: true, // There should be no folder with the same path
+        unique: false,
         trim: true,
         minlength: 0
     }

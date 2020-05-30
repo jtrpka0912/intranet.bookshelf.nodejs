@@ -24,7 +24,7 @@ const {
     recognize200,
     recognize400,
     recognize404,
-} = require('../../libs/helpers/mocha/assert'); // Helper Mocha Assert Tests
+} = require('../../libs/helpers/mocha/express/assert'); // Helper Mocha Assert Tests
 
 // Global Variables
 let mongoServer;
@@ -35,7 +35,7 @@ describe('Shelves Router', () => {
         // Set up an in-memory MongoDB server
         mongoServer = new MongoMemoryServer();
 
-        // Retrieve the URI from the mock server
+        // Retrieve the URI from the mock database
         const mongoUri = await mongoServer.getUri();
         await mongoose.connect(mongoUri, {
             useNewUrlParser: true
@@ -43,7 +43,7 @@ describe('Shelves Router', () => {
     });
 
     after(async () => {
-        // Disconnect mongoose and stop the mock server.
+        // Disconnect mongoose and stop the mock database.
         await mongoose.disconnect();
         await mongoServer.stop();
     });
@@ -55,21 +55,21 @@ describe('Shelves Router', () => {
             // Create some shelves
             const shelfOne = new Shelf({
                 name: 'Shelf One',
-                root: '/',
+                root: [],
                 showDirectories: false,
                 multiFile: false
             });
 
             const shelfTwo = new Shelf({
                 name: 'Shelf Two',
-                root: '/books',
+                root: ['books'],
                 showDirectories: true,
                 multiFile: true
             });
 
             const shelfThree = new Shelf({
                 name: 'Shelf Three',
-                root: '/magazines',
+                root: ['magazines'],
                 showDirectories: true,
                 multiFile: false
             });
@@ -189,7 +189,7 @@ describe('Shelves Router', () => {
             const shelfOne = new Shelf({
                 _id: '5ec73853788ef556ecc225dd',
                 name: 'Shelf One',
-                root: '/',
+                root: [],
                 showDirectories: false,
                 multiFile: false
             });
@@ -197,7 +197,7 @@ describe('Shelves Router', () => {
             const shelfTwo = new Shelf({
                 _id: '5ec5df19ed30ea2b80ef14ae',
                 name: 'Shelf Two',
-                root: '/books',
+                root: ['books'],
                 showDirectories: true,
                 multiFile: true
             });
@@ -205,7 +205,7 @@ describe('Shelves Router', () => {
             const shelfThree = new Shelf({
                 _id: '5ec739cdc8bcdc4a1c74e75e',
                 name: 'Shelf Three',
-                root: '/magazines',
+                root: ['magazines'],
                 showDirectories: true,
                 multiFile: false
             });
@@ -242,7 +242,7 @@ describe('Shelves Router', () => {
                 assert.isNotNull(res);
                 recognize200(res);
                 assert.equal(res.body.name, 'Shelf Two');
-                assert.containIgnoreCase(res.body.root, 'books');
+                assert.containIgnoreCase(res.body.root[0], 'books');
             });
         });
     });
@@ -257,7 +257,7 @@ describe('Shelves Router', () => {
             const shelfOne = new Shelf({
                 _id: shelfOneId,
                 name: 'Shelf One',
-                root: '/',
+                root: [],
                 showDirectories: false,
                 multiFile: false
             });
@@ -265,7 +265,7 @@ describe('Shelves Router', () => {
             const shelfThree = new Shelf({
                 _id: shelfThreeId,
                 name: 'Shelf Three',
-                root: '/magazines',
+                root: ['magazines'],
                 showDirectories: true,
                 multiFile: false
             });
@@ -358,7 +358,7 @@ describe('Shelves Router', () => {
 
                 // Test old and new values
                 assert.equal(updatedShelf.name, 'Shelf Three'); 
-                assert.equal(updatedShelf.root, '/magazines');
+                assert.equal(updatedShelf.root[0], 'magazines');
                 assert.isFalse(updatedShelf.multiFile);
 
                 // Updated data
@@ -377,7 +377,7 @@ describe('Shelves Router', () => {
             const shelfOne = new Shelf({
                 _id: shelfOneId,
                 name: 'Shelf One',
-                root: '/',
+                root: [],
                 showDirectories: false,
                 multiFile: false
             });
