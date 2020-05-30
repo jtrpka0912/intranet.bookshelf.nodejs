@@ -55,7 +55,7 @@ router.route('/').post((req, res) => {
 
     newShelf.save().then(() => {
         // TODO: Figure out a better response. Record on OpenAPI.
-        return res.json('Successful'); // Need to do better response.
+        return res.status(201).json('Successful'); // Need to do better response.
     }).catch(err => {
         return res.status(400).json({
             errorCode: 400,

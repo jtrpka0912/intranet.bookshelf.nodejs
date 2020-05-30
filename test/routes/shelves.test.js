@@ -22,6 +22,7 @@ const Shelf = require('../../models/shelf.model'); // Shelf model
 const {
     recognizeErrorMessage,
     recognize200,
+    recognize201,
     recognize400,
     recognize404,
 } = require('../../libs/helpers/mocha/express/assert'); // Helper Mocha Assert Tests
@@ -177,6 +178,9 @@ describe('Shelves Router', () => {
             }).end((err, res) => {
                 const response = res.body;
                 assert.isNotNull(res);
+                recognize201(res);
+
+                // TODO: Need to figure out better way to return from successful post.
                 assert.isString(response);
                 assert.equal(response, 'Successful');
             });
