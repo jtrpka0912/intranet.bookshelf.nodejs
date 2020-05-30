@@ -134,7 +134,7 @@ describe('Directories from MongoDB', () => {
 
         it('Return an error message that shelf and folder do not belong to each other.', async () => {
             const error = await retrieveFolders(magazineShelf, rootExample);
-            assert.containIgnoreCase(error.errorMessage, 'Shelf and current folder are not compatible');
+            assert.containIgnoreCase(error.errorMessage, 'Shelf and current folder are not compatible.');
         });
     });
 });
