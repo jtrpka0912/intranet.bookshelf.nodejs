@@ -1,4 +1,23 @@
 /**
+ * @function pathStringToArray
+ * @summary Convert a string path to an array for MongoDB.
+ * @description Take the string path, to the folder or file, and convert it to an array. This will allow MongoDB to fetch folders, and files easily.
+ * @param { string } pathString
+ * @returns { string[] }
+ */
+const pathStringToArray = (pathString) => {
+    // Will need to remove the first '/' that starts the path.
+    console.info('Before substring', pathString);
+
+    if(pathString.indexOf('/') === 0) {
+        pathString = pathString.substr(1);
+        console.info('After substring', pathString);
+    }
+    
+    return pathString.split('/');
+}
+
+/**
  * @function foundMongoError
  * @summary Check if any errors from MongoDB.
  * @description If a mongo error was detected, send an error response back to the client.
@@ -40,5 +59,6 @@ const shelfNotFound = (shelfId, res) => {
 
 module.exports = {
     foundMongoError,
+    pathStringToArray,
     shelfNotFound
 };

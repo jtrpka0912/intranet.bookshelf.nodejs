@@ -172,7 +172,7 @@ describe('Shelves Router', () => {
         it('Successfully create a new shelf', () => {
             request.send({
                 name: 'From Test',
-                root: '/',
+                root: '/example/foo/bar',
                 showDirectories: true,
                 multiFile: false
             }).end((err, res) => {
@@ -180,9 +180,8 @@ describe('Shelves Router', () => {
                 assert.isNotNull(res);
                 recognize201(res);
 
-                // TODO: Need to figure out better way to return from successful post.
-                assert.isString(response);
-                assert.equal(response, 'Successful');
+                assert.containIgnoreCase(response.name, 'From Test');
+                assert.isNotArray(response.root); // We make it an array in mongo, but should return back as string
             });
         });
     });

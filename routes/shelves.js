@@ -5,7 +5,7 @@ const router = require('express').Router();
 const Shelf = require('../models/shelf.model');
 
 // Helpers
-const { foundMongoError, shelfNotFound } = require('../libs/helpers/routes');
+const { foundMongoError, pathStringToArray, shelfNotFound } = require('../libs/helpers/routes');
 
 /**
  * @summary Retrieve all shelves
@@ -45,15 +45,23 @@ router.route('/').post((req, res) => {
         });
     }
 
+    // Need to convert to array for MongoDB
+    let convertedRoot = [];
+    if(shelfRoot) {
+        convertedRoot = pathStringToArray(shelfRoot);
+    }
+
     // Create a new Shelf
     const newShelf = new Shelf({
         name: shelfName,
-        root: shelfRoot,
+        root: convertedRoot, 
         showDirectories: shelfShowDirectories,
         multiFile: shelfMultiFile
     });
 
-    newShelf.save().then(() => {
+    newShelf.save().then((mongoResponse) => {
+        console.info('Mongo Response', mongoResponse);
+
         // TODO: Figure out a better response. Record on OpenAPI.
         return res.status(201).json('Successful'); // Need to do better response.
     }).catch(err => {
