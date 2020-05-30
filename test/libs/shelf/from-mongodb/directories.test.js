@@ -115,5 +115,10 @@ describe('Directories from MongoDB', () => {
             const folders = await retrieveFolders(magazineShelf);
             assert.equal(folders.length, 1);
         });
+
+        it('Find the two folders in the books shelf', async () => {
+            const folders = await retrieveFolders(bookShelf);
+            assert.equal(folders.length, 2);
+        })
     });
 });

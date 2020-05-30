@@ -15,36 +15,46 @@ const retrieveFolders = async(shelf) => {
 
         // console.info('Shelf', shelf);
 
-        // TODO: Will have to add with current folder later.
-        const sizeOfPath = shelf.root.length; // 1 for [books]
+        // TODO: Check if Shelf shows directories or not.
+        // The code below assumes it will show directories.
 
-        // Will need to make an array for the $and expressions
-        let andExpressionsForPaths = [];
-        
-        // Add the shelf root path to andExpression array
-        shelf.root.forEach((folder, index) => {
-            // Queries need to be in the form of objects
-            let partialExpression = {};
+        let query = null; // This might retrieve all folders
+
+        if(shelf.showDirectories) {
+            // TODO: Will have to add with current folder later.
+            const sizeOfPath = shelf.root.length; // 1 for [books]
+
+            // Will need to make an array for the $and expressions
+            let andExpressionsForPaths = [];
             
-            // Dynamically add a property with a variable
-            partialExpression[`path.${index}`] = {
-                $eq: folder
+            // Add the shelf root path to andExpression array
+            shelf.root.forEach((folder, index) => {
+                // Queries need to be in the form of objects
+                let partialExpression = {};
+                
+                // Dynamically add a property with a variable
+                partialExpression[`path.${index}`] = {
+                    $eq: folder
+                };
+
+                andExpressionsForPaths.push(partialExpression);
+            });
+
+            // For the current folder; add the shelf root length to the index with its forEach looper
+
+            query = {
+                $and: andExpressionsForPaths
             };
+        } else {
+            // something?
+        }
 
-            andExpressionsForPaths.push(partialExpression);
-        });
-
-        // For the current folder; add the shelf root length to the index with its forEach looper
-
-        // const query = `{ $and: [${ andExpressionsForPaths.join(', ') }] }`;
-        const query = {
-            $and: andExpressionsForPaths
-        };
+        
 
         // Exec will make the Mongo query return a full Promise.
         const folders = await Folder.find(query).exec();
 
-        // console.info('Folders', folders);
+        console.info('Folders', folders);
 
         return folders;
     } catch (err) {
