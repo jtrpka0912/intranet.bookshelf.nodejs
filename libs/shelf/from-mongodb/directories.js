@@ -12,7 +12,7 @@ const retrieveFolders = async (shelf, currentFolder) => {
     try {
         if(!shelf) {
             // TODO: Should this throw an empty array or an error message
-            return [];
+            throw 'Shelf was missing in call.'
         }
 
         // TODO: Need to make sure that the shelf and current folder share a common path.

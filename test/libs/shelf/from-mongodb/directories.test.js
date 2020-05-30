@@ -40,10 +40,11 @@ describe('Directories from MongoDB', () => {
         await mongoServer.stop();
     });
 
-    it('Should not find any documents.', async () => {
+    it('Throw an error because its missing a shelf', async () => {
         // TODO: Should it throw an empty array or an error message
-        const folders = await retrieveFolders();
-        assert.equal(folders.length, 0);
+        const error = await retrieveFolders();
+        assert.isString(error.errorCodeMessage);
+        assert.containIgnoreCase(error.errorMessage, 'Shelf was missing in call.');
     });
 
     describe('Folders (documents) in the collection', () => {
