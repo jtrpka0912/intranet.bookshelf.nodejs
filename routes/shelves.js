@@ -5,7 +5,7 @@ const router = require('express').Router();
 const Shelf = require('../models/shelf.model');
 
 // Helpers
-const { foundMongoError, pathStringToArray, shelfNotFound } = require('../libs/helpers/routes');
+const { foundMongoError, pathArrayToString, pathStringToArray, shelfNotFound } = require('../libs/helpers/routes');
 
 /**
  * @summary Retrieve all shelves
@@ -60,10 +60,13 @@ router.route('/').post((req, res) => {
     });
 
     newShelf.save().then((mongoResponse) => {
-        console.info('Mongo Response', mongoResponse);
+        // Convert from Mongo Object to JavaScript Object
+        mongoResponse = mongoResponse.toObject();
 
-        // TODO: Figure out a better response. Record on OpenAPI.
-        return res.status(201).json('Successful'); // Need to do better response.
+        // Convert to a string path.
+        mongoResponse.root = pathArrayToString(mongoResponse.root);
+
+        return res.status(201).json(mongoResponse);
     }).catch(err => {
         return res.status(400).json({
             errorCode: 400,

@@ -177,11 +177,13 @@ describe('Shelves Router', () => {
                 multiFile: false
             }).end((err, res) => {
                 const response = res.body;
+
                 assert.isNotNull(res);
                 recognize201(res);
 
                 assert.containIgnoreCase(response.name, 'From Test');
                 assert.isNotArray(response.root); // We make it an array in mongo, but should return back as string
+                assert.equal(response.root, '/example/foo/bar');
             });
         });
     });

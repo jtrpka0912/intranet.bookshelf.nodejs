@@ -7,15 +7,23 @@
  */
 const pathStringToArray = (pathString) => {
     // Will need to remove the first '/' that starts the path.
-    console.info('Before substring', pathString);
-
     if(pathString.indexOf('/') === 0) {
         pathString = pathString.substr(1);
-        console.info('After substring', pathString);
     }
     
     return pathString.split('/');
 }
+
+/**
+ * @function pathArrayToString
+ * @summary Convert an array path, from MongoDB, to a string.
+ * @description Take the string array path, from MongoDB, and convert it back to a string path for easier programmable operations to fetch files and folders.
+ * @param { string[] } pathArray
+ * @returns { string }
+ */
+const pathArrayToString = (pathArray) => {
+    return '/' + pathArray.join('/');
+};
 
 /**
  * @function foundMongoError
@@ -59,6 +67,7 @@ const shelfNotFound = (shelfId, res) => {
 
 module.exports = {
     foundMongoError,
+    pathArrayToString,
     pathStringToArray,
     shelfNotFound
 };
