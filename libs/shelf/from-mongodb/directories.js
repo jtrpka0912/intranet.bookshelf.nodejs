@@ -7,15 +7,20 @@ const Folder = require('../../../models/folder.model');
  * @param { object } shelf - Shelf Schema
  * @returns { object[] }
  */
-const retrieveFolders = (shelf) => {
+const retrieveFolders = async(shelf) => {
     // console.info('Shelf', shelf);
-    Folder.find({}).then((response) => {
-        console.info('Response', response);
-        return response;
-    }).catch((err) => {
-        console.error('Error', err);
-        return [];
-    });
+
+    // Exec will make the Mongo query return a full Promise.
+    try {
+        const folders = await Folder.find('hello').exec();
+
+        console.info('Folders', folders);
+
+        return folders;
+    } catch (err) {
+        console.error(err);
+    }
+    
 }
 
 module.exports = {

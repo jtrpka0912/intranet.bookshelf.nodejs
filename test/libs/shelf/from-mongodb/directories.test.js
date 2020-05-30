@@ -39,9 +39,8 @@ describe('Directories from MongoDB', () => {
         await mongoServer.stop();
     });
 
-    it('Should not find any documents.', () => {
-        const folders = retrieveFolders();
-        console.info('Folders', folders);
+    it('Should not find any documents.', async () => {
+        const folders = await retrieveFolders();
         assert.equal(folders.length, 0);
     });
 
@@ -102,9 +101,8 @@ describe('Directories from MongoDB', () => {
             Folder.deleteMany({});
         });
 
-        it('Find all folders from book shelf', () => {
-            const folders = retrieveFolders(bookShelf);
-            console.info('Folders', folders);
+        it('Find all folders from book shelf', async () => {
+            const folders = await retrieveFolders(bookShelf);
             assert.equal(folders.length, 2);
         });
     });
