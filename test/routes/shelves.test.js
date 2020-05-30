@@ -63,7 +63,7 @@ describe('Shelves Router', () => {
 
             const shelfTwo = new Shelf({
                 name: 'Shelf Two',
-                root: ['books'],
+                root: ['books/publishers'],
                 showDirectories: true,
                 multiFile: true
             });
@@ -97,22 +97,16 @@ describe('Shelves Router', () => {
 
         it('Return three shelves', () => {
             request.end((err, res) => {
+                recognize200(res);
                 const shelfCount = res.body.length;
                 assert.equal(shelfCount, 3, 'Should return only three from mock MongoDB.');
                 assert.isAbove(shelfCount, 2);
                 assert.isBelow(shelfCount, 5);
-            });
-        });
 
-        it('Return a status of 200', () => {
-            request.end((err, res) => {
-                recognize200(res);
-            });
-        });
-
-        it('Returns no errors', () => {
-            request.end((err, res) => {
-                assert.isNull(err);
+                // Check paths
+                assert.equal(res.body[0].root, '/');
+                assert.equal(res.body[1].root, '/books/publishers');
+                assert.equal(res.body[2].root, '/magazines');
             });
         });
     });

@@ -13,7 +13,15 @@ const { foundMongoError, pathArrayToString, pathStringToArray, shelfNotFound } =
 router.route('/').get((req, res) => {
     // TODO: Do some validation if no shelves were found.
     Shelf.find().then(shelves => {
-        res.json(shelves);
+        const updatedShelves = shelves.map((shelf) => {
+            // Convert to a JavaScript Object
+            shelf = shelf.toObject();
+            shelf.root = pathArrayToString(shelf.root);
+
+            return shelf;
+        });
+
+        res.json(updatedShelves);
     }).catch(err => {
         res.status(400).json({
             errorCode: 400,
