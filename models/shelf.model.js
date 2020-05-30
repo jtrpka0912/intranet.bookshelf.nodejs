@@ -12,7 +12,7 @@ const shelfSchema = new Schema({
         minlength: 3 // Minimum string length validation
     },
     root: {
-        type: String,
+        type: [String], // Each folder will be an array item
         required: true,
         unique: false,
         trim: true,

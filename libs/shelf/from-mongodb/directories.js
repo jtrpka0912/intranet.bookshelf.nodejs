@@ -8,12 +8,20 @@ const Folder = require('../../../models/folder.model');
  * @returns { object[] }
  */
 const retrieveFolders = async(shelf) => {
-    try {
-        // console.info('Shelf', shelf);
+    if(!shelf) {
+        return [];
+    }
 
+    try {
+        console.info('Shelf', shelf);
+        
         // Shelf has /books
         // With just /books and show directories at true:
         // Find any directories with just /books/*; nothing beyond /books/*/*
+
+        // Refer to this:
+        // https://docs.mongodb.com/manual/tutorial/query-arrays/
+        // db.inventory.find( { "root.1": { $eq: foo } } ) // Find value, in array, by index
 
         // Exec will make the Mongo query return a full Promise.
         const folders = await Folder.find({}).exec();

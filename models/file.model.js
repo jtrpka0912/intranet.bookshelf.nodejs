@@ -18,14 +18,14 @@ const fileSchema = new Schema({
         minlength: 3
     },
     path: {
-        type: String,
+        type: [String], // Each folder will be an array item
         required: true,
         unique: true, // There should be no eBook with the same path
         trim: true,
         minlength: 0
     },
     cover: {
-        type: String,
+        type: [String], // Each folder will be an array item
         required: false,
         unique: false, // Would prefer to be true, but some might not have a cover.
         trim: true,
