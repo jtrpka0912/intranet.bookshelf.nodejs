@@ -17,15 +17,17 @@ const retrieveFolders = async (shelf, currentFolder) => {
             };
         }
 
-        // TODO: Need to make sure that the shelf and current folder share a common path.
-
-        // SHELF: [books]
-        // FOLDER: [books, foo] (OK)
-
-        // SHELF [books]
-        // FOLDER [magazines, foo] (X)
-
-        // console.info('Shelf', shelf);
+        // Need to make sure that the shelf and current folder share a common path.
+        if(currentFolder) {
+            shelf.root.forEach((folder, index) => {
+                if(currentFolder.path[index] !== folder) {
+                    throw {
+                        message: 'Shelf and current folder are not compatible.'
+                    };
+                }
+            });
+        }
+        
 
         let query = {}; // By default, return all.
 
@@ -83,8 +85,8 @@ const retrieveFolders = async (shelf, currentFolder) => {
 
         return folders;
     } catch (err) {
-        console.error('Error: ', err);
-
+        // console.error('Error: ', err);
+        // TODO: How to handle with express?
         return {
             errorCode: 500,
             errorCodeMessage: 'Internal Server Error',
