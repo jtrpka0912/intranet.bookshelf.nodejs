@@ -28,9 +28,9 @@ const retrieveFolders = async (shelf, currentFolder) => {
         let query = {}; // By default, return all.
 
         if(shelf.showDirectories) {
-            let sizeOfPath = shelf.root.length + 1; // Find the number of directories, plus one, that the shelf root has.
-
-            const sizeExpression = { path: { $size: sizeOfPath } };
+            // Find the number of directories, plus one
+            let sizeOfPath = currentFolder ? currentFolder.path.length + 1 : shelf.root.length + 1;
+            const sizeExpression = { path: { $size: sizeOfPath } }; // Add expression to find sizes
 
             // Will need to make an array for the $and expressions
             let andExpressionsForPaths = [sizeExpression];
@@ -48,26 +48,20 @@ const retrieveFolders = async (shelf, currentFolder) => {
                 andExpressionsForPaths.push(partialExpression);
             });
 
-            // console.info('Current Folder', currentFolder);
-
             // Optionally add the current folder
             if(currentFolder) {
-                currentFolder.path.forEach((folder, index) => {
-                    // Add the index to the shelf root length to match path index progression
-                    index + shelf.root.length;
-    
-                    // TODO: This can be DRY'd up.
-    
+                // Instead of using a forEach; just use a for loop for better control of the iterator.
+                for(let x = shelf.root.length; x < currentFolder.path.length; x++) {
                     // Queries need to be in the form of objects
                     let partialExpression = {};
     
                     // Dynamically add a property with a variable
-                    partialExpression[`path.${index}`] = {
-                        $eq: folder
+                    partialExpression[`path.${x}`] = {
+                        $eq: currentFolder.path[x]
                     };
-    
+
                     andExpressionsForPaths.push(partialExpression);
-                });
+                }
             }
 
             query = {
@@ -78,6 +72,7 @@ const retrieveFolders = async (shelf, currentFolder) => {
         }
 
         // console.info('Query', query);
+        // query['$and'].forEach((subquery) => console.info('Inside Query', subquery));
 
         // Exec will make the Mongo query return a full Promise.
         const folders = await Folder.find(query).exec();

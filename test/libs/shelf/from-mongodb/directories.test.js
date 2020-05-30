@@ -127,9 +127,11 @@ describe('Directories from MongoDB', () => {
             assert.equal(folders.length, 2);
         });
 
-        it.skip('Find the magazine example issues', async () => {
-            const folders = await retrieveFolders(magazineShelf, magazineExampleIssues);
+        it('Find the magazine example issues', async () => {
+            const folders = await retrieveFolders(magazineShelf, magazineExample);
             assert.equal(folders.length, 1);
         });
+
+        it('Return an error message that shelf and folder do not belong to each other.');
     });
 });
