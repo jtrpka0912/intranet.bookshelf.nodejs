@@ -8,19 +8,28 @@ const Folder = require('../../../models/folder.model');
  * @returns { object[] }
  */
 const retrieveFolders = async(shelf) => {
-    // console.info('Shelf', shelf);
-
-    // Exec will make the Mongo query return a full Promise.
     try {
-        const folders = await Folder.find('hello').exec();
+        // console.info('Shelf', shelf);
+
+        // Shelf has /books
+        // With just /books and show directories at true:
+        // Find any directories with just /books/*; nothing beyond /books/*/*
+
+        // Exec will make the Mongo query return a full Promise.
+        const folders = await Folder.find({}).exec();
 
         console.info('Folders', folders);
 
         return folders;
     } catch (err) {
-        console.error(err);
+        console.error('Error: ', err);
+
+        return {
+            errorCode: 500,
+            errorCodeMessage: 'Internal Server Error',
+            errorMessage: err.message
+        };
     }
-    
 }
 
 module.exports = {
