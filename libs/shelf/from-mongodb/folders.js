@@ -2,13 +2,13 @@
 const Folder = require('../../../models/folder.model');
 
 /**
- * @function retrieveFolders
+ * @function retrieveDirectories
  * @description Retrieve folders (documents) from the MongoDB database.
  * @param { object } shelf - Shelf Schema
  * @param { object } currentFolder - Folder Schema
  * @returns { object[] }
  */
-const retrieveFolders = async (shelf, currentFolder) => {
+const retrieveDirectories = async (shelf, currentFolder) => {
     try {
         if(!shelf) {
             // Need to throw it in an object with message for the try/catch to get the message. Little hacky.
@@ -90,6 +90,8 @@ const retrieveFolders = async (shelf, currentFolder) => {
     }
 }
 
+// TODO Add retrieveBreadcrumbs
+
 module.exports = {
-    retrieveFolders
+    retrieveDirectories
 };
