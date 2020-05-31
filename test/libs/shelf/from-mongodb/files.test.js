@@ -110,6 +110,13 @@ describe('Files from MongoDB', () => {
             Folder.deleteMany({});
             File.deleteMany({});
         });
+
+        it('Retrieve no files from the shelf root', async () => {
+            const files = await retrieveFiles(novelShelf);
+            assert.isArray(files);
+            // TODO: Apply this to the directory tests
+            assert.lengthOf(files, 0);
+        });
     });
 
     describe('Find files when not showing directories', () => {
