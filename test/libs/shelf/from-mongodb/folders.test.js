@@ -42,7 +42,7 @@ describe('Directories from MongoDB', () => {
 
     it('Throw an error because its missing a shelf', async () => {
         const error = await retrieveDirectories();
-        assert.isString(error.errorCodeMessage);
+        assert.isString(error.errorMessage);
         assert.containIgnoreCase(error.errorMessage, 'Shelf was missing in call.');
     });
 
