@@ -118,6 +118,12 @@ describe('Files from MongoDB', () => {
             assert.lengthOf(files, 0);
         });
 
+        it('Retrieve one drama book', async () => {
+            const files = await retrieveFiles(novelShelf, novelDrama);
+            assert.isArray(files);
+            assert.lengthOf(files, 1);
+        });
+
         it('Retrieve two literature books', async () => {
             const files = await retrieveFiles(novelShelf, novelLiterature);
             assert.isArray(files);
