@@ -71,6 +71,12 @@ describe('Files from MongoDB', () => {
                 path: ['library', 'books', 'novels', 'drama']
             });
 
+            // Use to test against shelf compatibility.
+            blahFolder = new Folder({
+                name: 'Blah',
+                path: ['library', 'blah']
+            });
+
             // Create some files
             // =================
             threeKingdoms = new File({
@@ -100,6 +106,7 @@ describe('Files from MongoDB', () => {
             await novelShelf.save();
             await novelLiterature.save();
             await novelDrama.save();
+            await blahFolder.save();
             await threeKingdoms.save();
             await journeyToWest.save();
             await huckeberryFinn.save();
@@ -128,6 +135,12 @@ describe('Files from MongoDB', () => {
             const files = await retrieveFiles(novelShelf, novelLiterature);
             assert.isArray(files);
             assert.lengthOf(files, 2);
+        });
+
+        it('Throw error with folder being incompatible with shelf', async () => {
+            const error = await retrieveFiles(novelShelf, blahFolder);
+            assert.isObject(error);
+            assert.containIgnoreCase(error.errorMessage, 'Shelf and current folder are not compatible.');
         });
     });
 

@@ -17,7 +17,7 @@ const retrieveFiles = async (shelf, currentFolder) => {
             };
         }
 
-        if(!_isCurrentFolderCompatible(shelf, currentFolder)) {
+        if(_isCurrentFolderCompatible(shelf, currentFolder) === false) {
             // Need to throw it in an object with message for the try/catch to get the message. Little hacky.
             throw {
                 message: 'Shelf and current folder are not compatible.'
@@ -73,11 +73,15 @@ const retrieveFiles = async (shelf, currentFolder) => {
  */
 const _isCurrentFolderCompatible = (shelf, currentFolder) => {
     if(currentFolder) {
+        // Flag the check as true at start
+        let compatible = true;
         shelf.root.forEach((folder, index) => {
-            if(currentFolder.path[index] !== folder) {
-                return false;
+            if(compatible && currentFolder.path[index] !== folder) {
+                compatible = false;
             }
         });
+
+        return compatible;
     }
     
     return true;
