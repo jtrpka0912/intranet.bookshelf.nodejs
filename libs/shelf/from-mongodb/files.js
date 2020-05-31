@@ -17,6 +17,13 @@ const retrieveFiles = async (shelf, currentFolder) => {
             };
         }
 
+        if(!_isCurrentFolderCompatible(shelf, currentFolder)) {
+            // Need to throw it in an object with message for the try/catch to get the message. Little hacky.
+            throw {
+                message: 'Shelf and current folder are not compatible.'
+            };
+        }
+
         let query = {}; // By default, return all.
 
         if(shelf.showDirectories) {
@@ -26,13 +33,13 @@ const retrieveFiles = async (shelf, currentFolder) => {
             let andExpressionsForPaths = [sizeExpression];
             
             // Add the shelf root path to andExpression array
-            andExpressionsForPaths.concat(
+            andExpressionsForPaths = andExpressionsForPaths.concat(
                 _getShelfArrayElementExpression(shelf)
             );
 
             // Optionally add the current folder
             if(currentFolder) {
-                andExpressionsForPaths.concat(
+                andExpressionsForPaths = andExpressionsForPaths.concat(
                     _getCurrentFolderArrayElementExpression(currentFolder, shelf.root.length)
                 );
             }
@@ -45,8 +52,6 @@ const retrieveFiles = async (shelf, currentFolder) => {
         // Exec will make the Mongo query return a full Promise.
         const files = await File.find(query).exec();
 
-        console.info('Files', files);
-
         return files;
     } catch(err) {
         // TODO: How to handle with express?
@@ -56,6 +61,26 @@ const retrieveFiles = async (shelf, currentFolder) => {
             errorMessage: err.message
         };
     }
+}
+
+/**
+ * @private
+ * @function _isCurrentFolderCompatible
+ * @description Check if the current folder has the same path as the shelf's root path.
+ * @param { object } shelf 
+ * @param { object } currentFolder 
+ * @returns { boolean }
+ */
+const _isCurrentFolderCompatible = (shelf, currentFolder) => {
+    if(currentFolder) {
+        shelf.root.forEach((folder, index) => {
+            if(currentFolder.path[index] !== folder) {
+                return false;
+            }
+        });
+    }
+    
+    return true;
 }
 
 /**

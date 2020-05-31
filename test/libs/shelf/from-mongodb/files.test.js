@@ -61,12 +61,12 @@ describe('Files from MongoDB', () => {
 
             // Create some folders
             // ===================
-            novelLiterature = new Shelf({
+            novelLiterature = new Folder({
                 name: 'Romance',
                 path: ['library', 'books', 'novels', 'literature']
             });
 
-            novelDrama = new Shelf({
+            novelDrama = new Folder({
                 name: 'Drama',
                 path: ['library', 'books', 'novels', 'drama']
             });
@@ -116,6 +116,12 @@ describe('Files from MongoDB', () => {
             assert.isArray(files);
             // TODO: Apply this to the directory tests
             assert.lengthOf(files, 0);
+        });
+
+        it('Retrieve two literature books', async () => {
+            const files = await retrieveFiles(novelShelf, novelLiterature);
+            assert.isArray(files);
+            assert.lengthOf(files, 2);
         });
     });
 
