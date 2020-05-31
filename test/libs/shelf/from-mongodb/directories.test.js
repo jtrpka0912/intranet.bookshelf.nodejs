@@ -15,7 +15,7 @@ const Shelf = require('../../../../models/shelf.model');
 const Folder = require('../../../../models/folder.model');
 
 // Libs
-const { retrieveFolders } = require('../../../../libs/shelf/from-mongodb/directories');
+const { retrieveDirectories } = require('../../../../libs/shelf/from-mongodb/folders');
 
 // Global Variables
 let mongoServer;
@@ -41,7 +41,7 @@ describe('Directories from MongoDB', () => {
     });
 
     it('Throw an error because its missing a shelf', async () => {
-        const error = await retrieveFolders();
+        const error = await retrieveDirectories();
         assert.isString(error.errorCodeMessage);
         assert.containIgnoreCase(error.errorMessage, 'Shelf was missing in call.');
     });
@@ -131,27 +131,27 @@ describe('Directories from MongoDB', () => {
         });
 
         it('Find the one folder from magazine shelf root directory.', async () => {
-            const folders = await retrieveFolders(magazineShelf);
+            const folders = await retrieveDirectories(magazineShelf);
             assert.equal(folders.length, 1);
         });
 
         it('Find the two folders in the books shelf', async () => {
-            const folders = await retrieveFolders(bookShelf);
+            const folders = await retrieveDirectories(bookShelf);
             assert.equal(folders.length, 2);
         });
 
         it('Find the magazine example issues', async () => {
-            const folders = await retrieveFolders(magazineShelf, magazineExample);
+            const folders = await retrieveDirectories(magazineShelf, magazineExample);
             assert.equal(folders.length, 1);
         });
 
         it('Return an error message that shelf and folder do not belong to each other', async () => {
-            const error = await retrieveFolders(magazineShelf, rootExample);
+            const error = await retrieveDirectories(magazineShelf, rootExample);
             assert.containIgnoreCase(error.errorMessage, 'Shelf and current folder are not compatible.');
         });
 
         it('Return nothing back if we are not going to show directories', async () => {
-            const folders = await retrieveFolders(comicShelf);
+            const folders = await retrieveDirectories(comicShelf);
             assert.equal(folders.length, 0);
             assert.isEmpty(folders);
         });
