@@ -16,7 +16,7 @@ const Folder = require('../../../../models/folder.model');
 const File = require('../../../../models/file.model');
 
 // Libs
-const { retrieveFiles } = require('../../../../libs/shelf/from-mongodb/files');
+const { retrieveFiles } = require('../../../../libs/shelf/mongodb');
 
 // Global Variables
 let mongoServer;
