@@ -113,6 +113,11 @@ const retrieveFiles = async (shelf, currentFolder) => {
             query = {
                 $and: andExpressionsForPaths
             };
+        } else {
+            // Need only to check each file if it matches the first set of directories to the shelf
+            query = {
+                $and: _getShelfArrayElementExpression(shelf)
+            }
         }
 
         // Exec will make the Mongo query return a full Promise.

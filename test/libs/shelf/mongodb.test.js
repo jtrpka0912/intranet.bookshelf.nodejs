@@ -165,18 +165,7 @@ describe('Retrieve Files and Folders from MongoDB', () => {
     });
 
     describe('Retrieve Files from MongoDB', () => {
-        let novelShelf;
-
         before(async () => {
-            // Create some shelves
-            // ===================
-            novelShelf = new Shelf({
-                name: 'Book Shelf',
-                root: ['library', 'books', 'novels'],
-                showDirectories: true,
-                multiFile: false
-            });
-
             // Create some folders
             // ===================
             novelLiterature = new Folder({
@@ -221,27 +210,49 @@ describe('Retrieve Files and Folders from MongoDB', () => {
                 didRead: false
             });
 
-            await novelShelf.save();
+            // Used to test against retrieving all books.
+            theArtDeal = new File({
+                type: 'book',
+                name: 'The Art of the Deal',
+                path: ['library', 'trash'],
+                cover: [],
+                didRead: false
+            });
+
             await novelLiterature.save();
             await novelDrama.save();
             await blahFolder.save();
             await threeKingdoms.save();
             await journeyToWest.save();
             await huckeberryFinn.save();
+            await theArtDeal.save();
         });
 
         after(async () => {
-            Shelf.deleteMany({});
             Folder.deleteMany({});
             File.deleteMany({});
         });
 
         describe('Find files when showing directories', () => {
+            let novelShelf;
+
+            before(async () => {
+                // Create some shelves
+                // ===================
+                novelShelf = new Shelf({
+                    name: 'Book Shelf',
+                    root: ['library', 'books', 'novels'],
+                    showDirectories: true,
+                    multiFile: false
+                });
+            });
+            after(async () => {
+                await Shelf.deleteMany({});
+            });
     
             it('Retrieve no files from the shelf root', async () => {
                 const files = await retrieveFiles(novelShelf);
                 assert.isArray(files);
-                // TODO: Apply this to the directory tests
                 assert.lengthOf(files, 0);
             });
 
@@ -265,7 +276,30 @@ describe('Retrieve Files and Folders from MongoDB', () => {
         });
 
         describe('Find files when not showing directories', () => {
+            let novelShelf;
+            
+            before(async () => {
+                // Create some shelves
+                // ===================
+                novelShelf = new Shelf({
+                    name: 'Book Shelf',
+                    root: ['library', 'books', 'novels'],
+                    showDirectories: false,
+                    multiFile: false
+                });
 
+                await novelShelf.save();
+            });
+
+            after(async () => {
+                await Shelf.deleteMany({});
+            });
+
+            it('Retrieve all three books with the novel shelf', async () => {
+                const files = await retrieveFiles(novelShelf);
+                assert.isArray(files);
+                assert.lengthOf(files, 3);
+            });
         });
     });
 });
