@@ -27,10 +27,11 @@ This project is a **(M)ongoDB (E)xpress (R)eact (N)ode.js** stack with React bei
 + **libs** - Collection of functions to work with the *Node.js* app
   + **helpers** - Shortcut functions that can help reduce code around the app
     + **mocha** - Helper functions for *Mocha* tests
-      + There *might* be one file for each of the different assertion styles.
+      + **express** - Helper functions for the express tests
+        + *assert.js* - Assert Style Tests
   + **shelf** - Functions to retrieve folders and files
-    + **from-mongodb** - Functions to retrieve folders and files from *MongoDB*
-    + **from-server** - Functions to retrieve folders and files from the server
+    + *mongodb.js* - Functions to retrieve folders and files from *MongoDB*
+    + *server.js* - Functions to retrieve folders and files from the server
 + **models** - All of the *Mongoose* schemas
 + **node_modules** - All of the NPM dependency packages
 + **public** - All of the public assets (images, etc...) are stored
