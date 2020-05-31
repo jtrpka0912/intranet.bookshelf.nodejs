@@ -17,15 +17,17 @@ const retrieveFolders = async (shelf, currentFolder) => {
             };
         }
 
-        // TODO: Need to make sure that the shelf and current folder share a common path.
-
-        // SHELF: [books]
-        // FOLDER: [books, foo] (OK)
-
-        // SHELF [books]
-        // FOLDER [magazines, foo] (X)
-
-        // console.info('Shelf', shelf);
+        // Need to make sure that the shelf and current folder share a common path.
+        if(currentFolder) {
+            shelf.root.forEach((folder, index) => {
+                if(currentFolder.path[index] !== folder) {
+                    throw {
+                        message: 'Shelf and current folder are not compatible.'
+                    };
+                }
+            });
+        }
+        
 
         let query = {}; // By default, return all.
 
@@ -70,21 +72,16 @@ const retrieveFolders = async (shelf, currentFolder) => {
                 $and: andExpressionsForPaths
             };
         } else {
-            // something?
+            // If we are not going to show directories; then return an empty array, or maybe null.
+            return [];
         }
-
-        // console.info('Query', query);
-        // query['$and'].forEach((subquery) => console.info('Inside Query', subquery));
 
         // Exec will make the Mongo query return a full Promise.
         const folders = await Folder.find(query).exec();
 
-        // console.info('Folders', folders);
-
         return folders;
     } catch (err) {
-        console.error('Error: ', err);
-
+        // TODO: How to handle with express?
         return {
             errorCode: 500,
             errorCodeMessage: 'Internal Server Error',

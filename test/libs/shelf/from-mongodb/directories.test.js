@@ -41,9 +41,7 @@ describe('Directories from MongoDB', () => {
     });
 
     it('Throw an error because its missing a shelf', async () => {
-        // TODO: Should it throw an empty array or an error message
         const error = await retrieveFolders();
-        console.error('Error in test', error);
         assert.isString(error.errorCodeMessage);
         assert.containIgnoreCase(error.errorMessage, 'Shelf was missing in call.');
     });
@@ -51,6 +49,7 @@ describe('Directories from MongoDB', () => {
     describe('Folders (documents) in the collection', () => {
         let bookShelf;
         let magazineShelf;
+        let comicShelf;
 
         let bookExample;
         let magazineExample;
@@ -61,6 +60,7 @@ describe('Directories from MongoDB', () => {
         before(async () => {
             // Create some shelves
             // ===================
+            // Use this for fetching multiple folders at root
             bookShelf = new Shelf({
                 name: 'Book Shelf',
                 root: ['books'],
@@ -68,10 +68,19 @@ describe('Directories from MongoDB', () => {
                 multiFile: false
             });
 
+            // Use this for finding grandchildren folders
             magazineShelf = new Shelf({
                 name: 'Magazine Shelf',
                 root: ['magazines'],
                 showDirectories: true,
+                multiFile: false
+            });
+
+            // Use this for NOT showing directories.
+            comicShelf = new Shelf({
+                name: 'Comicbook Shelf',
+                root: ['comicbooks'],
+                showDirectories: false,
                 multiFile: false
             });
 
@@ -92,6 +101,7 @@ describe('Directories from MongoDB', () => {
                 path: ['books', 'foobar']
             });
 
+            // Use this to test negative against any other shelf
             rootExample = new Folder({
                 name: 'Root Example',
                 path: ['example']
@@ -105,6 +115,7 @@ describe('Directories from MongoDB', () => {
             // Save Shelves into mock database
             await bookShelf.save();
             await magazineShelf.save();
+            await comicShelf.save();
 
             // Save Folders into mock database
             await bookExample.save();
@@ -134,6 +145,15 @@ describe('Directories from MongoDB', () => {
             assert.equal(folders.length, 1);
         });
 
-        it('Return an error message that shelf and folder do not belong to each other.');
+        it('Return an error message that shelf and folder do not belong to each other', async () => {
+            const error = await retrieveFolders(magazineShelf, rootExample);
+            assert.containIgnoreCase(error.errorMessage, 'Shelf and current folder are not compatible.');
+        });
+
+        it('Return nothing back if we are not going to show directories', async () => {
+            const folders = await retrieveFolders(comicShelf);
+            assert.equal(folders.length, 0);
+            assert.isEmpty(folders);
+        });
     });
 });
