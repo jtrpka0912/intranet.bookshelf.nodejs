@@ -72,20 +72,15 @@ const retrieveFolders = async (shelf, currentFolder) => {
                 $and: andExpressionsForPaths
             };
         } else {
-            // something?
+            // If we are not going to show directories; then return an empty array, or maybe null.
+            return [];
         }
-
-        // console.info('Query', query);
-        // query['$and'].forEach((subquery) => console.info('Inside Query', subquery));
 
         // Exec will make the Mongo query return a full Promise.
         const folders = await Folder.find(query).exec();
 
-        // console.info('Folders', folders);
-
         return folders;
     } catch (err) {
-        // console.error('Error: ', err);
         // TODO: How to handle with express?
         return {
             errorCode: 500,
