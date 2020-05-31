@@ -1,5 +1,71 @@
 // Models
-const File = require('../../../models/file.model');
+const Folder = require('../../models/folder.model');
+const File = require('../../models/file.model');
+
+/**
+ * @function retrieveDirectories
+ * @description Retrieve folders (documents) from the MongoDB database.
+ * @param { object } shelf - Shelf Schema
+ * @param { object } currentFolder - Folder Schema
+ * @returns { object[] }
+ */
+const retrieveDirectories = async (shelf, currentFolder) => {
+    try {
+        if(!shelf) {
+            // Need to throw it in an object with message for the try/catch to get the message. Little hacky.
+            throw {
+                message: 'Shelf was missing in call.'
+            };
+        }
+
+        if(_isCurrentFolderCompatible(shelf, currentFolder) === false) {
+            // Need to throw it in an object with message for the try/catch to get the message. Little hacky.
+            throw {
+                message: 'Shelf and current folder are not compatible.'
+            };
+        }
+
+        let query = {}; // By default, return all.
+
+        if(shelf.showDirectories) {
+            const sizeExpression = _getSizeExpression(shelf, currentFolder);
+
+            // Will need to make an array for the $and expressions
+            let andExpressionsForPaths = [sizeExpression];
+            
+            // Add the shelf root path to andExpression array
+            andExpressionsForPaths = andExpressionsForPaths.concat(
+                _getShelfArrayElementExpression(shelf)
+            );
+
+            // Optionally add the current folder
+            if(currentFolder) {
+                andExpressionsForPaths = andExpressionsForPaths.concat(
+                    _getCurrentFolderArrayElementExpression(currentFolder, shelf.root.length)
+                );
+            }
+            
+            query = {
+                $and: andExpressionsForPaths
+            };
+        } else {
+            // If we are not going to show directories; then return an empty array, or maybe null.
+            return [];
+        }
+
+        // Exec will make the Mongo query return a full Promise.
+        const directories = await Folder.find(query).exec();
+
+        return directories;
+    } catch (err) {
+        // TODO: How to handle with express?
+        return {
+            errorCode: 500,
+            errorCodeMessage: 'Internal Server Error',
+            errorMessage: err.message
+        };
+    }
+}
 
 /**
  * @function retrieveFiles
@@ -62,6 +128,8 @@ const retrieveFiles = async (shelf, currentFolder) => {
         };
     }
 }
+
+
 
 /**
  * @private
@@ -160,5 +228,6 @@ const _getCurrentFolderArrayElementExpression = (currentFolder, shelfLength) => 
 }
 
 module.exports = {
+    retrieveDirectories,
     retrieveFiles
 };
