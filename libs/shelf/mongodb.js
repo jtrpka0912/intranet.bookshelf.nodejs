@@ -172,8 +172,16 @@ const isCurrentFolderCompatible = (shelf, currentFolder) => {
  * @returns { object }
  */
 const getSizeExpression = (shelf, currentFolder) => {
-    // Find the number of directories, plus one
-    let sizeOfPath = currentFolder ? currentFolder.path.length + 1 : shelf.root.length + 1;
+    let sizeOfPath; // Initialize sizeOfPath
+
+    // Check if shelf was passed
+    if(!shelf) {
+        // Return 0 when shelf was not passed
+        sizeOfPath = 0;
+    } else {
+        // Find the number of directories, plus one
+        sizeOfPath = currentFolder ? currentFolder.path.length + 1 : shelf.root.length + 1;
+    }
 
     // Add expression to find sizes
     return { path: { $size: sizeOfPath } };
@@ -234,9 +242,11 @@ const getCurrentFolderArrayElementExpression = (currentFolder, shelfLength) => {
     return expressions;
 }
 
+// TODO: Figure out a way to test the helper functions without exporting.
 module.exports = {
     retrieveDirectories,
     retrieveFiles,
     // Only for testing purposes
-    isCurrentFolderCompatible
+    isCurrentFolderCompatible,
+    getSizeExpression
 };

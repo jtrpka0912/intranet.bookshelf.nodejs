@@ -19,8 +19,11 @@ const File = require('../../../models/file.model');
 const { 
     retrieveFiles, 
     retrieveDirectories,
-    isCurrentFolderCompatible
+    isCurrentFolderCompatible, // Really shouldn't be exported, but doing it for testing reasons.
+    getSizeExpression // Really shouldn't be exported, but doing it for testing reasons.
 } = require('../../../libs/shelf/mongodb');
+
+// TODO: Maybe figure out a way to allow not exporting some of those functions above.
 
 // Global Variables
 let mongoServer;
@@ -194,7 +197,29 @@ describe('Retrieve Files and Folders from MongoDB', () => {
                 const answer = isCurrentFolderCompatible(magazineShelf, magazineExampleIssues);
                 assert.isTrue(answer);
             });
-        }); 
+        });
+
+        describe('getSizeExpression()', () => {
+            it('Return zero (0) with size of path', () => {
+                const expression = getSizeExpression();
+                assertGetSizeExpressionTests(expression, 0);
+            });
+
+            it('Return two (2) with a shelf', () => {
+                const expression = getSizeExpression(magazineShelf);
+                assertGetSizeExpressionTests(expression, 2);
+            });
+
+            it('Return three (3) with a shelf and current folder', () => {
+                const expression = getSizeExpression(magazineShelf, magazineExample);
+                assertGetSizeExpressionTests(expression, 3);
+            });
+
+            it('Return four (4) with a shelf and a current folder with grand-children', () => {
+                const expression = getSizeExpression(magazineShelf, magazineExampleIssues);
+                assertGetSizeExpressionTests(expression, 4);
+            });
+        });
     });
 
     describe('Retrieve Files from MongoDB', () => {
@@ -336,3 +361,15 @@ describe('Retrieve Files and Folders from MongoDB', () => {
         });
     });
 });
+
+/**
+ * @summary Test the getSizeEpxression return value
+ * @description Test the get size expressions with this test. It will test if expression is an object, $size is a number, and the value of the number expected.
+ * @param { object } expression 
+ * @param { number } expectedValue
+ */
+const assertGetSizeExpressionTests = (expression, expectedValue) => {
+    assert.isObject(expression);
+    assert.isNumber(expression.path.$size);
+    assert.equal(expression.path.$size, expectedValue);
+}
