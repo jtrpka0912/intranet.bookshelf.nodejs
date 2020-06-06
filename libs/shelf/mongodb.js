@@ -18,7 +18,7 @@ const retrieveDirectories = async (shelf, currentFolder) => {
             };
         }
 
-        if(_isCurrentFolderCompatible(shelf, currentFolder) === false) {
+        if(isCurrentFolderCompatible(shelf, currentFolder) === false) {
             // Need to throw it in an object with message for the try/catch to get the message. Little hacky.
             throw {
                 message: 'Shelf and current folder are not compatible.'
@@ -28,20 +28,20 @@ const retrieveDirectories = async (shelf, currentFolder) => {
         let query = {}; // By default, return all.
 
         if(shelf.showDirectories) {
-            const sizeExpression = _getSizeExpression(shelf, currentFolder);
+            const sizeExpression = getSizeExpression(shelf, currentFolder);
 
             // Will need to make an array for the $and expressions
             let andExpressionsForPaths = [sizeExpression];
             
             // Add the shelf root path to andExpression array
             andExpressionsForPaths = andExpressionsForPaths.concat(
-                _getShelfArrayElementExpression(shelf)
+                getShelfArrayElementExpression(shelf)
             );
 
             // Optionally add the current folder
             if(currentFolder) {
                 andExpressionsForPaths = andExpressionsForPaths.concat(
-                    _getCurrentFolderArrayElementExpression(currentFolder, shelf.root.length)
+                    getCurrentFolderArrayElementExpression(currentFolder, shelf.root.length)
                 );
             }
             
@@ -83,7 +83,7 @@ const retrieveFiles = async (shelf, currentFolder) => {
             };
         }
 
-        if(_isCurrentFolderCompatible(shelf, currentFolder) === false) {
+        if(isCurrentFolderCompatible(shelf, currentFolder) === false) {
             // Need to throw it in an object with message for the try/catch to get the message. Little hacky.
             throw {
                 message: 'Shelf and current folder are not compatible.'
@@ -93,20 +93,20 @@ const retrieveFiles = async (shelf, currentFolder) => {
         let query = {}; // By default, return all.
 
         if(shelf.showDirectories) {
-            const sizeExpression = _getSizeExpression(shelf, currentFolder);
+            const sizeExpression = getSizeExpression(shelf, currentFolder);
 
             // Will need to make an array for the $and expressions
             let andExpressionsForPaths = [sizeExpression];
             
             // Add the shelf root path to andExpression array
             andExpressionsForPaths = andExpressionsForPaths.concat(
-                _getShelfArrayElementExpression(shelf)
+                getShelfArrayElementExpression(shelf)
             );
 
             // Optionally add the current folder
             if(currentFolder) {
                 andExpressionsForPaths = andExpressionsForPaths.concat(
-                    _getCurrentFolderArrayElementExpression(currentFolder, shelf.root.length)
+                    getCurrentFolderArrayElementExpression(currentFolder, shelf.root.length)
                 );
             }
             
@@ -116,7 +116,7 @@ const retrieveFiles = async (shelf, currentFolder) => {
         } else {
             // Need only to check each file if it matches the first set of directories to the shelf
             query = {
-                $and: _getShelfArrayElementExpression(shelf)
+                $and: getShelfArrayElementExpression(shelf)
             }
         }
 
@@ -134,17 +134,19 @@ const retrieveFiles = async (shelf, currentFolder) => {
     }
 }
 
-
-
 /**
  * @private
- * @function _isCurrentFolderCompatible
+ * @function isCurrentFolderCompatible
  * @description Check if the current folder has the same path as the shelf's root path.
  * @param { object } shelf 
  * @param { object } currentFolder 
  * @returns { boolean }
  */
-const _isCurrentFolderCompatible = (shelf, currentFolder) => {
+const isCurrentFolderCompatible = (shelf, currentFolder) => {
+    if(!shelf) {
+        return false;
+    }
+    
     if(currentFolder) {
         // Flag the check as true at start
         let compatible = true;
@@ -162,14 +164,14 @@ const _isCurrentFolderCompatible = (shelf, currentFolder) => {
 
 /**
  * @private
- * @function _getSizeExpression
+ * @function getSizeExpression
  * @summary Array size expression
  * @description Construct the expression to check the size of the array of the path.
  * @param { object } shelf 
  * @param { object } currentFolder 
  * @returns { object }
  */
-const _getSizeExpression = (shelf, currentFolder) => {
+const getSizeExpression = (shelf, currentFolder) => {
     // Find the number of directories, plus one
     let sizeOfPath = currentFolder ? currentFolder.path.length + 1 : shelf.root.length + 1;
 
@@ -179,13 +181,13 @@ const _getSizeExpression = (shelf, currentFolder) => {
 
 /**
  * @private
- * @function _getShelfArrayElementExpression
+ * @function getShelfArrayElementExpression
  * @summary Array element check by index
  * @description Construct the expressions to check each element, of the path, if it matches.
  * @param { object } shelf
  * @returns { object[] }
  */
-const _getShelfArrayElementExpression = (shelf) => {
+const getShelfArrayElementExpression = (shelf) => {
     // Initialize an array to return
     let expressions = [];
 
@@ -206,13 +208,13 @@ const _getShelfArrayElementExpression = (shelf) => {
 
 /**
  * @private
- * @function _getCurrentFolderArrayElementExpression
+ * @function getCurrentFolderArrayElementExpression
  * @summary Array element check by index
  * @description Construct the expressions to check each element, of the path, if it matches.
  * @param { object } currentFolder
  * @returns { object[] }
  */
-const _getCurrentFolderArrayElementExpression = (currentFolder, shelfLength) => {
+const getCurrentFolderArrayElementExpression = (currentFolder, shelfLength) => {
     // Initialize an array to return
     let expressions = [];
 
@@ -234,5 +236,7 @@ const _getCurrentFolderArrayElementExpression = (currentFolder, shelfLength) => 
 
 module.exports = {
     retrieveDirectories,
-    retrieveFiles
+    retrieveFiles,
+    // Only for testing purposes
+    isCurrentFolderCompatible
 };

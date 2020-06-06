@@ -16,7 +16,11 @@ const Folder = require('../../../models/folder.model');
 const File = require('../../../models/file.model');
 
 // Libs
-const { retrieveFiles, retrieveDirectories } = require('../../../libs/shelf/mongodb');
+const { 
+    retrieveFiles, 
+    retrieveDirectories,
+    isCurrentFolderCompatible
+} = require('../../../libs/shelf/mongodb');
 
 // Global Variables
 let mongoServer;
@@ -125,43 +129,72 @@ describe('Retrieve Files and Folders from MongoDB', () => {
             Folder.deleteMany({});
         });
 
-        it('Throw an error because its missing a shelf', async () => {
-            const error = await retrieveDirectories();
-            assert.isObject(error);
-            assert.isString(error.errorMessage);
-            assert.containIgnoreCase(error.errorMessage, 'Shelf was missing in call.');
+        describe('retrieveDirectories()', () => {
+            it('Throw an error because its missing a shelf', async () => {
+                const error = await retrieveDirectories();
+                assert.isObject(error);
+                assert.isString(error.errorMessage);
+                assert.containIgnoreCase(error.errorMessage, 'Shelf was missing in call.');
+            });
+    
+            it('Find the one folder from magazine shelf root directory.', async () => {
+                const folders = await retrieveDirectories(magazineShelf);
+                assert.isArray(folders);
+                assert.lengthOf(folders, 1);
+            });
+    
+            it('Find the two folders in the books shelf', async () => {
+                const folders = await retrieveDirectories(bookShelf);
+                assert.isArray(folders);
+                assert.lengthOf(folders, 2);
+            });
+    
+            it('Find the magazine example issues', async () => {
+                const folders = await retrieveDirectories(magazineShelf, magazineExample);
+                assert.isArray(folders);
+                assert.lengthOf(folders, 1);
+            });
+    
+            it('Return an error message that shelf and folder do not belong to each other', async () => {
+                const error = await retrieveDirectories(magazineShelf, rootExample);
+                assert.isObject(error);
+                assert.containIgnoreCase(error.errorMessage, 'Shelf and current folder are not compatible.');
+            });
+    
+            it('Return nothing back if we are not going to show directories', async () => {
+                const folders = await retrieveDirectories(comicShelf);
+                assert.isArray(folders);
+                assert.lengthOf(folders, 0);
+                assert.isEmpty(folders);
+            });
         });
 
-        it('Find the one folder from magazine shelf root directory.', async () => {
-            const folders = await retrieveDirectories(magazineShelf);
-            assert.isArray(folders);
-            assert.lengthOf(folders, 1);
-        });
+        describe('isCurrentFolderCompatible()', () => {
+            it('Return false if no argument supplied', () => {
+                const answer = isCurrentFolderCompatible();
+                assert.isFalse(answer);
+            });
 
-        it('Find the two folders in the books shelf', async () => {
-            const folders = await retrieveDirectories(bookShelf);
-            assert.isArray(folders);
-            assert.lengthOf(folders, 2);
-        });
+            it('Return true since it is just a shelf', () => {
+                const answer = isCurrentFolderCompatible(magazineShelf);
+                assert.isTrue(answer);
+            });
 
-        it('Find the magazine example issues', async () => {
-            const folders = await retrieveDirectories(magazineShelf, magazineExample);
-            assert.isArray(folders);
-            assert.lengthOf(folders, 1);
-        });
+            it('Return false with a non-compatible current folder', () => {
+                const answer = isCurrentFolderCompatible(magazineShelf, rootExample);
+                assert.isFalse(answer);
+            });
 
-        it('Return an error message that shelf and folder do not belong to each other', async () => {
-            const error = await retrieveDirectories(magazineShelf, rootExample);
-            assert.isObject(error);
-            assert.containIgnoreCase(error.errorMessage, 'Shelf and current folder are not compatible.');
-        });
+            it('Returns true with a compatible current folder', () => {
+                const answer = isCurrentFolderCompatible(magazineShelf, magazineExample);
+                assert.isTrue(answer);
+            });
 
-        it('Return nothing back if we are not going to show directories', async () => {
-            const folders = await retrieveDirectories(comicShelf);
-            assert.isArray(folders);
-            assert.lengthOf(folders, 0);
-            assert.isEmpty(folders);
-        });
+            it('Returns true with another compatible current folder, but have grand-children', () => {
+                const answer = isCurrentFolderCompatible(magazineShelf, magazineExampleIssues);
+                assert.isTrue(answer);
+            });
+        }); 
     });
 
     describe('Retrieve Files from MongoDB', () => {
