@@ -16,7 +16,14 @@ const Folder = require('../../../models/folder.model');
 const File = require('../../../models/file.model');
 
 // Libs
-const { retrieveFiles, retrieveDirectories } = require('../../../libs/shelf/mongodb');
+const { 
+    retrieveFiles, 
+    retrieveDirectories,
+    isCurrentFolderCompatible, // Really shouldn't be exported, but doing it for testing reasons.
+    getSizeExpression // Really shouldn't be exported, but doing it for testing reasons.
+} = require('../../../libs/shelf/mongodb');
+
+// TODO: Maybe figure out a way to allow not exporting some of those functions above.
 
 // Global Variables
 let mongoServer;
@@ -125,42 +132,93 @@ describe('Retrieve Files and Folders from MongoDB', () => {
             Folder.deleteMany({});
         });
 
-        it('Throw an error because its missing a shelf', async () => {
-            const error = await retrieveDirectories();
-            assert.isObject(error);
-            assert.isString(error.errorMessage);
-            assert.containIgnoreCase(error.errorMessage, 'Shelf was missing in call.');
+        describe('retrieveDirectories()', () => {
+            it('Throw an error because its missing a shelf', async () => {
+                const error = await retrieveDirectories();
+                assert.isObject(error);
+                assert.isString(error.errorMessage);
+                assert.containIgnoreCase(error.errorMessage, 'Shelf was missing in call.');
+            });
+    
+            it('Find the one folder from magazine shelf root directory.', async () => {
+                const folders = await retrieveDirectories(magazineShelf);
+                assert.isArray(folders);
+                assert.lengthOf(folders, 1);
+            });
+    
+            it('Find the two folders in the books shelf', async () => {
+                const folders = await retrieveDirectories(bookShelf);
+                assert.isArray(folders);
+                assert.lengthOf(folders, 2);
+            });
+    
+            it('Find the magazine example issues', async () => {
+                const folders = await retrieveDirectories(magazineShelf, magazineExample);
+                assert.isArray(folders);
+                assert.lengthOf(folders, 1);
+            });
+    
+            it('Return an error message that shelf and folder do not belong to each other', async () => {
+                const error = await retrieveDirectories(magazineShelf, rootExample);
+                assert.isObject(error);
+                assert.containIgnoreCase(error.errorMessage, 'Shelf and current folder are not compatible.');
+            });
+    
+            it('Return nothing back if we are not going to show directories', async () => {
+                const folders = await retrieveDirectories(comicShelf);
+                assert.isArray(folders);
+                assert.lengthOf(folders, 0);
+                assert.isEmpty(folders);
+            });
         });
 
-        it('Find the one folder from magazine shelf root directory.', async () => {
-            const folders = await retrieveDirectories(magazineShelf);
-            assert.isArray(folders);
-            assert.lengthOf(folders, 1);
+        describe('isCurrentFolderCompatible()', () => {
+            it('Return false if no argument supplied', () => {
+                const answer = isCurrentFolderCompatible();
+                assert.isFalse(answer);
+            });
+
+            it('Return true since it is just a shelf', () => {
+                const answer = isCurrentFolderCompatible(magazineShelf);
+                assert.isTrue(answer);
+            });
+
+            it('Return false with a non-compatible current folder', () => {
+                const answer = isCurrentFolderCompatible(magazineShelf, rootExample);
+                assert.isFalse(answer);
+            });
+
+            it('Returns true with a compatible current folder', () => {
+                const answer = isCurrentFolderCompatible(magazineShelf, magazineExample);
+                assert.isTrue(answer);
+            });
+
+            it('Returns true with another compatible current folder, but have grand-children', () => {
+                const answer = isCurrentFolderCompatible(magazineShelf, magazineExampleIssues);
+                assert.isTrue(answer);
+            });
         });
 
-        it('Find the two folders in the books shelf', async () => {
-            const folders = await retrieveDirectories(bookShelf);
-            assert.isArray(folders);
-            assert.lengthOf(folders, 2);
-        });
+        describe('getSizeExpression()', () => {
+            it('Return zero (0) with size of path', () => {
+                const expression = getSizeExpression();
+                assertGetSizeExpressionTests(expression, 0);
+            });
 
-        it('Find the magazine example issues', async () => {
-            const folders = await retrieveDirectories(magazineShelf, magazineExample);
-            assert.isArray(folders);
-            assert.lengthOf(folders, 1);
-        });
+            it('Return two (2) with a shelf', () => {
+                const expression = getSizeExpression(magazineShelf);
+                assertGetSizeExpressionTests(expression, 2);
+            });
 
-        it('Return an error message that shelf and folder do not belong to each other', async () => {
-            const error = await retrieveDirectories(magazineShelf, rootExample);
-            assert.isObject(error);
-            assert.containIgnoreCase(error.errorMessage, 'Shelf and current folder are not compatible.');
-        });
+            it('Return three (3) with a shelf and current folder', () => {
+                const expression = getSizeExpression(magazineShelf, magazineExample);
+                assertGetSizeExpressionTests(expression, 3);
+            });
 
-        it('Return nothing back if we are not going to show directories', async () => {
-            const folders = await retrieveDirectories(comicShelf);
-            assert.isArray(folders);
-            assert.lengthOf(folders, 0);
-            assert.isEmpty(folders);
+            it('Return four (4) with a shelf and a current folder with grand-children', () => {
+                const expression = getSizeExpression(magazineShelf, magazineExampleIssues);
+                assertGetSizeExpressionTests(expression, 4);
+            });
         });
     });
 
@@ -303,3 +361,15 @@ describe('Retrieve Files and Folders from MongoDB', () => {
         });
     });
 });
+
+/**
+ * @summary Test the getSizeEpxression return value
+ * @description Test the get size expressions with this test. It will test if expression is an object, $size is a number, and the value of the number expected.
+ * @param { object } expression 
+ * @param { number } expectedValue
+ */
+const assertGetSizeExpressionTests = (expression, expectedValue) => {
+    assert.isObject(expression);
+    assert.isNumber(expression.path.$size);
+    assert.equal(expression.path.$size, expectedValue);
+}
