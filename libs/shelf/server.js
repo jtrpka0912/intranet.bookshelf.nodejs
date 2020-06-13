@@ -37,10 +37,8 @@ const retrieveFilesFolders = async (shelf) => {
         }
 
         const rootStringPath = Shelf.convertRootToString(shelf.root);
-        console.info('Root String', rootStringPath);
 
-        const files = await fs.promises.readdir(rootStringPath);
-        console.info('Files', files);
+        const nodes = await fs.promises.readdir(rootStringPath);
     } catch(err) {
         // TODO: Please use this method, and refactor code from other parts of app.
         return err;

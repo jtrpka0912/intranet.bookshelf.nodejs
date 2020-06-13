@@ -22,7 +22,7 @@ const shelfSchema = new Schema({
     showDirectories: {
         type: Boolean,
         required: false,
-        default: true, // Default value for a field?
+        default: true,
         unique: false,
     },
     multiFile: {

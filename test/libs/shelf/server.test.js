@@ -42,6 +42,7 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
 
     describe('retrieveFilesFolders()', () => {
         let unknownShelf;
+        let bookShelf;
 
         before(async () => {
             // Create some shelves
@@ -49,6 +50,14 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
             unknownShelf = new Shelf({
                 name: 'Unknown Shelf',
                 root: ['sample-server', 'Unknown'],
+                showDirectories: true,
+                multiFile: false
+            });
+
+            bookShelf = new Shelf({
+                name: 'Book Shelf',
+                // You will need to adjust the path accordingly
+                root: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Books'],
                 showDirectories: true,
                 multiFile: false
             });
@@ -62,12 +71,21 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
 
         it('Throw error if no shelf was passed', async () => {
             const error = await retrieveFilesFolders();
+            // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
             assert.containIgnoreCase(error.message, 'Shelf was missing in call');
         });
 
         it('Throw error if shelf root directory was not found', async () => {
             const error = await retrieveFilesFolders(unknownShelf);
+            // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
             assert.containIgnoreCase(error.message, 'no such file or directory');
+        });
+
+        // TODO: Go back to this later
+        it('Found nodes in root directory', async () => {
+            const response = await retrieveFilesFolders(bookShelf);
+            assert.isNotObject(response);
+            assert.isUndefined(response);
         });
     });
 });
