@@ -42,6 +42,7 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
 
     describe('retrieveFilesFolders()', () => {
         let unknownShelf;
+        let emptyShelf;
         let bookShelf;
 
         before(async () => {
@@ -50,6 +51,13 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
             unknownShelf = new Shelf({
                 name: 'Unknown Shelf',
                 root: ['sample-server', 'Unknown'],
+                showDirectories: true,
+                multiFile: false
+            });
+
+            emptyShelf = new Shelf({
+                name: 'Empty Shelf',
+                root: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Empty'],
                 showDirectories: true,
                 multiFile: false
             });
@@ -63,6 +71,8 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
             });
 
             await unknownShelf.save();
+            await emptyShelf.save();
+            await bookShelf.save();
         });
 
         after(async () => {
@@ -79,6 +89,12 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
             const error = await retrieveFilesFolders(unknownShelf);
             // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
             assert.containIgnoreCase(error.message, 'no such file or directory');
+        });
+
+        it('Throw error if shelf root directory is empty', async () => {
+            const error = await retrieveFilesFolders(emptyShelf);
+            // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
+            assert.containIgnoreCase(error.message, 'Shelf root directory is empty');
         });
 
         // TODO: Go back to this later

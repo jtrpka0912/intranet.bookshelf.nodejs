@@ -39,6 +39,12 @@ const retrieveFilesFolders = async (shelf) => {
         const rootStringPath = Shelf.convertRootToString(shelf.root);
 
         const nodes = await fs.promises.readdir(rootStringPath);
+
+        if(nodes.length > 0) {
+
+        } else {
+            throw new Error('Shelf root directory is empty');
+        }
     } catch(err) {
         // TODO: Please use this method, and refactor code from other parts of app.
         return err;
