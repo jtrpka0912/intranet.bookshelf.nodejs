@@ -104,4 +104,12 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
             assert.isUndefined(response);
         });
     });
+
+    describe('createFolderToMongoDB()', () => {
+        it('Add assertions');  
+    });
+
+    describe('createFileToMongoDB()', () => {
+        it('Add assertions');
+    });
 });
