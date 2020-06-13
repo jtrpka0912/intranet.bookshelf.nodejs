@@ -14,7 +14,7 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 const Shelf = require('../../../models/shelf.model');
 
 // Libs
-const something = require('../../../libs/shelf/server');
+const { retrieveFilesFolders } = require('../../../libs/shelf/server');
 
 // Global Variables
 let mongoServer;
@@ -40,28 +40,34 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
         await mongoServer.stop();
     });
 
-    describe('Create Folders from server, and retrieve from MongoDB', () => {
-        let comicShelf;
+    describe('retrieveFilesFolders()', () => {
+        let unknownShelf;
 
         before(async () => {
             // Create some shelves
             // ===================
-            comicShelf = new Shelf({
-                name: 'Comicbook Shelf',
-                root: ['library', 'comics'],
+            unknownShelf = new Shelf({
+                name: 'Unknown Shelf',
+                root: ['sample-server', 'Unknown'],
                 showDirectories: true,
                 multiFile: false
             });
 
-            await comicShelf.save();
+            await unknownShelf.save();
         });
 
         after(async () => {
             await Shelf.deleteMany({});
         });
 
-        it('Something', () => {
-            assert(true);
+        it('Throw error if no shelf was passed', async () => {
+            const error = await retrieveFilesFolders();
+            assert.containIgnoreCase(error.message, 'Shelf was missing in call');
+        });
+
+        it('Throw error if shelf root directory was not found', async () => {
+            const error = await retrieveFilesFolders(unknownShelf);
+            assert.containIgnoreCase(error.message, 'no such file or directory');
         });
     });
 });

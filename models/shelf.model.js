@@ -35,5 +35,18 @@ const shelfSchema = new Schema({
     timestamps: true // Add created and modified fields
 });
 
+/**
+ * @static
+ * @function convertRootToString
+ * @description Convert root array path to a string path
+ * @todo Need to do some testing
+ * @param { string[] } root
+ * @param { string } separator (default to /)
+ * @returns { string }
+ */
+shelfSchema.statics.convertRootToString = function(root, separator = '/') {
+    return root.join(separator);
+}
+
 const Shelf = mongoose.model('Shelf', shelfSchema);
 module.exports = Shelf;
