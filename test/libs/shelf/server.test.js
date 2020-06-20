@@ -1,5 +1,8 @@
 // Packages
 // ========
+// NodeJS
+const path = require('path');
+
 // Chai
 const chai = require('chai');
 const chaiString = require('chai-string');
@@ -101,20 +104,17 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
     });
 
     describe('createFolderToMongoDB()', () => {
-        it('Throw an error because it is missing shelf', async () => {
+        it('Throw an error because it is missing node path', async () => {
             const error = await createFolderToMongoDB();
             // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
-            assert.containIgnoreCase(error.message, 'Shelf was missing in call');
-        });
-
-        it('Throw an error because it is missing node', async () => {
-            const error = await createFolderToMongoDB(unknownShelf);
-            // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
-            assert.containIgnoreCase(error.message, 'Node was missing in call');
+            assert.containIgnoreCase(error.message, 'Missing node path call');
         });
 
         it('Throw an error if folder does not exist in server', async () => {
-            const error = await createFolderToMongoDB(bookShelf, 'Foobar');
+            const rootStringPath = Shelf.convertRootToString(bookShelf.root);
+            const nodePath = path.join(rootStringPath, 'FooBar');
+
+            const error = await createFolderToMongoDB(nodePath);
             // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
             assert.containIgnoreCase(error.message, 'no such file or directory'); // From FS library
         });

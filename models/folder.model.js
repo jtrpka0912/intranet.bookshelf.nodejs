@@ -31,7 +31,7 @@ const folderSchema = new Schema({
  * @param { string } separator (default to /)
  * @returns { string }
  */
-folderSchema.statics.convertRootToString = function(path, separator = '/') {
+folderSchema.statics.convertPathToString = function(path, separator = '/') {
     return path.join(separator);
 }
 

@@ -53,7 +53,7 @@ const retrieveFilesFolders = async (shelf) => {
                 const nodeDetails = await fs.promises.stat(nodePath);
 
                 if(nodeDetails.isDirectory()) {
-                    const folder = createFolderToMongoDB(shelf, node);
+                    const folder = createFolderToMongoDB(nodePath);
                 } else if(nodeDetails.isFile()) {
                     console.log('Its a file');
                 } else {
@@ -71,30 +71,15 @@ const retrieveFilesFolders = async (shelf) => {
  * @async
  * @function createFolderToMongoDB
  * @description Create a folder document for MongoDB
- * @param { object } shelf
- * @param { string } node 
+ * @param { string } nodePath
  */
-const createFolderToMongoDB = async (shelf, node) => {
+const createFolderToMongoDB = async (nodePath) => {
     try {
         // Throw an error if any are false
-        if(!shelf) throw new Error('Shelf was missing in call');
-        if(!node) throw new Error('Node was missing in call');
-
-        // Construct the path to the folder
-        const rootStringPath = Shelf.convertRootToString(shelf.root);
-        const nodePath = path.join(rootStringPath, node);
+        if(!nodePath) throw new Error('Missing node path call');
 
         // Check if folder exists
-        // Yes, all this to check if error exists; yay for Promises. -.-
-        await new Promise((resolve, reject) => {
-            // This does not return a Promise; so I had to make this into a promise.
-            fs.access(nodePath, fs.constants.F_OK, (error) => {
-                if(error) reject(error);
-                resolve(true);
-            });
-        });
-
-
+        await fs.promises.access(nodePath, fs.constants.F_OK);
     } catch(err) {
         return err;
     }
