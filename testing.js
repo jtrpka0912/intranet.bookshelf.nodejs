@@ -18,6 +18,9 @@ const path = require('path');
             console.info('Is File?', fileDetails.isFile());
             console.info('File Path', filePath);
             console.info('File Extension', path.extname(filePath));
+            console.log('---------------------------');
+            console.info('File', file);
+            console.info('File Details', fileDetails);
         }
 
     } catch (e) {
