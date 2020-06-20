@@ -66,7 +66,6 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
         
         // Remove documents from collections
         await Shelf.deleteMany({});
-        await Folder.deleteMany({});
 
         // Disconnect mongoose and stop the mock database
         await mongoose.disconnect();
@@ -74,6 +73,10 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
     });
 
     describe('retrieveFilesFolders()', () => {
+        afterEach(async () => {
+            await Folder.deleteMany();
+        });
+
         it('Throw error if no shelf was passed', async () => {
             const error = await retrieveFilesFolders();
             // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
@@ -102,6 +105,10 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
     });
 
     describe('createFolderToMongoDB()', () => {
+        afterEach(async () => {
+            await Folder.deleteMany();
+        });
+
         it('Throw an error because it is missing node', async () => {
             const error = await createFolderToMongoDB();
             // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
@@ -134,6 +141,18 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
             assert.isObject(response);
             assert.equal(response.name, node);
             assert.isArray(response.path);
+        });
+
+        it('Prevent duplicated folders from being created', async () => {
+            const node = 'Samples';
+            const rootStringPath = Shelf.convertRootToString(bookShelf.root);
+            const nodePath = path.join(rootStringPath, node);
+
+            await createFolderToMongoDB(node, nodePath);
+            await createFolderToMongoDB(node, nodePath); // This should be prevented
+
+            const count = await Folder.find().countDocuments().exec();
+            assert.equal(count, 1);
         });
     });
 

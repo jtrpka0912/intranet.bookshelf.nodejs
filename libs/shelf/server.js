@@ -84,14 +84,23 @@ const createFolderToMongoDB = async (node, nodePath) => {
         // Check if folder exists
         await fs.promises.access(nodePath, fs.constants.F_OK);
 
-        const folderMongoDB = new Folder({
+        const query = {
             name: node,
             path: Folder.convertPathToArray(nodePath, '\\')
-        });
+        };
 
-        await folderMongoDB.save();
-
-        return folderMongoDB;
+        // Then check if the folder already exists
+        const doesItExist = await Folder.findOne(query).exec();
+        
+        if(!doesItExist) { 
+            // Create it
+            const folderMongoDB = new Folder(query);
+            await folderMongoDB.save();
+            return folderMongoDB;
+        } else {
+            // We still return it, but not create it
+            return doesItExist;
+        }
     } catch(err) {
         return err;
     }
