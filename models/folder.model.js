@@ -35,5 +35,18 @@ folderSchema.statics.convertPathToString = function(path, separator = '/') {
     return path.join(separator);
 }
 
+/**
+ * @static
+ * @function convertPathToArray
+ * @description Convert string path to an array path
+ * @todo Need to do some testing
+ * @param { string } path 
+ * @param { string } separator (default to /)
+ * @returns { string[] }
+ */
+folderSchema.statics.convertPathToArray = function(path, separator = '/') {
+    return path.split(separator);
+}
+
 const Folder = mongoose.model('Folder', folderSchema);
 module.exports = Folder;

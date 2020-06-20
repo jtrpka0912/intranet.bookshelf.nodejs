@@ -62,6 +62,7 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
 
     after(async () => {
         // TODO: Fix comment typo in mongodb.test.js
+        console.log('AFTER MAIN DESCRIBE');
         
         // Remove documents from collections
         await Shelf.deleteMany({});
@@ -85,18 +86,15 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
             assert.containIgnoreCase(error.message, 'no such file or directory');
         });
 
-        it.skip('Find the new nodes from the book shelf in MongoDB', async () => {
+        it('Find the new nodes from the book shelf in MongoDB', async () => {
             await retrieveFilesFolders(bookShelf);
 
             // Retrieve the folder count
-            Folder.find().countDocuments(function(err, count) {
-                assert.equal(count, 1);
-            });
-
             const count = await Folder.find().countDocuments().exec();
             assert.equal(count, 1);
 
-            const sampleFolder = await Folder.findOne({ name: 'Sample' }).exec();
+            // Retrieve the folder that was created
+            const sampleFolder = await Folder.findOne({ name: 'Samples' }).exec();
             assert.isObject(sampleFolder);
             assert.equal(sampleFolder.name, 'Samples');
             assert.equal(Folder.convertPathToString(sampleFolder.path), 'd:/Backend/Nodejs/intranet.bookshelf.nodejs/test/sample-server/Books/Samples');
@@ -124,6 +122,18 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
             const error = await createFolderToMongoDB(node, nodePath);
             // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
             assert.containIgnoreCase(error.message, 'no such file or directory'); // From FS library
+        });
+
+        it('Return back the Folder MongoDB document', async () => {
+            const node = 'Samples';
+            const rootStringPath = Shelf.convertRootToString(bookShelf.root);
+            const nodePath = path.join(rootStringPath, node);
+
+            const response = await createFolderToMongoDB(node, nodePath);
+
+            assert.isObject(response);
+            assert.equal(response.name, node);
+            assert.isArray(response.path);
         });
     });
 

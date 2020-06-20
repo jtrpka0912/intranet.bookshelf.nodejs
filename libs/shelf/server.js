@@ -53,7 +53,7 @@ const retrieveFilesFolders = async (shelf) => {
                 const nodeDetails = await fs.promises.stat(nodePath);
 
                 if(nodeDetails.isDirectory()) {
-                    const folder = createFolderToMongoDB(node, nodePath);
+                    const folder = await createFolderToMongoDB(node, nodePath);
                 } else if(nodeDetails.isFile()) {
                     console.log('Its a file');
                 } else {
@@ -73,6 +73,7 @@ const retrieveFilesFolders = async (shelf) => {
  * @description Create a folder document for MongoDB
  * @param { string } node - Name of folder
  * @param { string } nodePath - Path of Folder
+ * @returns { object } 
  */
 const createFolderToMongoDB = async (node, nodePath) => {
     try {
@@ -82,6 +83,15 @@ const createFolderToMongoDB = async (node, nodePath) => {
 
         // Check if folder exists
         await fs.promises.access(nodePath, fs.constants.F_OK);
+
+        const folderMongoDB = new Folder({
+            name: node,
+            path: Folder.convertPathToArray(nodePath, '\\')
+        });
+
+        await folderMongoDB.save();
+
+        return folderMongoDB;
     } catch(err) {
         return err;
     }
