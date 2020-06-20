@@ -104,17 +104,24 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
     });
 
     describe('createFolderToMongoDB()', () => {
-        it('Throw an error because it is missing node path', async () => {
+        it('Throw an error because it is missing node', async () => {
             const error = await createFolderToMongoDB();
             // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
-            assert.containIgnoreCase(error.message, 'Missing node path call');
+            assert.containIgnoreCase(error.message, 'Missing node argument');
+        });
+
+        it('Throw an error because it is missing node path', async () => {
+            const error = await createFolderToMongoDB('foo/bar');
+            // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
+            assert.containIgnoreCase(error.message, 'Missing node path argument');
         });
 
         it('Throw an error if folder does not exist in server', async () => {
+            const node = 'FooBar';
             const rootStringPath = Shelf.convertRootToString(bookShelf.root);
-            const nodePath = path.join(rootStringPath, 'FooBar');
+            const nodePath = path.join(rootStringPath, node);
 
-            const error = await createFolderToMongoDB(nodePath);
+            const error = await createFolderToMongoDB(node, nodePath);
             // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
             assert.containIgnoreCase(error.message, 'no such file or directory'); // From FS library
         });

@@ -53,7 +53,7 @@ const retrieveFilesFolders = async (shelf) => {
                 const nodeDetails = await fs.promises.stat(nodePath);
 
                 if(nodeDetails.isDirectory()) {
-                    const folder = createFolderToMongoDB(nodePath);
+                    const folder = createFolderToMongoDB(node, nodePath);
                 } else if(nodeDetails.isFile()) {
                     console.log('Its a file');
                 } else {
@@ -71,12 +71,14 @@ const retrieveFilesFolders = async (shelf) => {
  * @async
  * @function createFolderToMongoDB
  * @description Create a folder document for MongoDB
- * @param { string } nodePath
+ * @param { string } node - Name of folder
+ * @param { string } nodePath - Path of Folder
  */
-const createFolderToMongoDB = async (nodePath) => {
+const createFolderToMongoDB = async (node, nodePath) => {
     try {
         // Throw an error if any are false
-        if(!nodePath) throw new Error('Missing node path call');
+        if(!node) throw new Error('Missing node argument');
+        if(!nodePath) throw new Error('Missing node path argument');
 
         // Check if folder exists
         await fs.promises.access(nodePath, fs.constants.F_OK);
