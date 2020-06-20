@@ -43,7 +43,7 @@ describe('Retrieve Files and Folders from MongoDB', () => {
     });
 
     after(async () => {
-        // Disconnect mongoose and stock the mock database.
+        // Disconnect mongoose and stop the mock database.
         await mongoose.disconnect();
         await mongoServer.stop();
     });
