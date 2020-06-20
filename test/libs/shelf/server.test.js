@@ -61,9 +61,6 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
     });
 
     after(async () => {
-        // TODO: Fix comment typo in mongodb.test.js
-        console.log('AFTER MAIN DESCRIBE');
-        
         // Remove documents from collections
         await Shelf.deleteMany({});
 
