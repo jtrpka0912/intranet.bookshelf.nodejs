@@ -22,5 +22,18 @@ const folderSchema = new Schema({
     timestamps: true // Added created and modified fields
 });
 
+/**
+ * @static
+ * @function convertPathToString
+ * @description Convert array path to a string path
+ * @todo Need to do some testing
+ * @param { string[] } path
+ * @param { string } separator (default to /)
+ * @returns { string }
+ */
+folderSchema.statics.convertRootToString = function(path, separator = '/') {
+    return path.join(separator);
+}
+
 const Folder = mongoose.model('Folder', folderSchema);
 module.exports = Folder;

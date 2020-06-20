@@ -29,6 +29,12 @@ FUNC createFolderToMongoDB(folder)
     DO MONGODB STUFF HERE
 */
 
+/**
+ * @async
+ * @function retrieveFilesFolders
+ * @description Recursively go through each folder and file and create a MongoDB document for each of them
+ * @param { object } shelf 
+ */
 const retrieveFilesFolders = async (shelf) => {
     try{
         if(!shelf) {
@@ -41,9 +47,19 @@ const retrieveFilesFolders = async (shelf) => {
         const nodes = await fs.promises.readdir(rootStringPath);
 
         if(nodes.length > 0) {
+            // Loop through the files and folders
+            for(const node of nodes) {
+                const nodePath = path.join(rootStringPath, node);
+                const nodeDetails = await fs.promises.stat(nodePath);
 
-        } else {
-            throw new Error('Shelf root directory is empty');
+                if(nodeDetails.isDirectory()) {
+                    const folder = createFolderToMongoDB(node);
+                } else if(nodeDetails.isFile()) {
+                    console.log('Its a file');
+                } else {
+                    console.warn('Unknown Node');
+                }
+            }
         }
     } catch(err) {
         // TODO: Please use this method, and refactor code from other parts of app.
