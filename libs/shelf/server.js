@@ -34,15 +34,20 @@ FUNC createFolderToMongoDB(folder)
  * @function retrieveFilesFolders
  * @description Recursively go through each folder and file and create a MongoDB document for each of them
  * @param { object } shelf 
+ * @param { string } previousNode
  */
-const retrieveFilesFolders = async (shelf) => {
-    try{
+const retrieveFilesFolders = async (shelf, previousNode) => {
+    try {
         if(!shelf) {
             // TODO: Please use this method, and refactor code from other parts of app. Start using the V8 Error object and just let Express handle HTTP codes.
             throw new Error('Shelf was missing in call');
         }
 
-        const rootStringPath = Shelf.convertRootToString(shelf.root);
+        let rootStringPath = Shelf.convertRootToString(shelf.root);
+        
+        if(previousNode) {
+            rootStringPath = path.join(rootStringPath, previousNode);
+        }
 
         const nodes = await fs.promises.readdir(rootStringPath);
 
@@ -54,8 +59,14 @@ const retrieveFilesFolders = async (shelf) => {
 
                 if(nodeDetails.isDirectory()) {
                     const folder = await createFolderToMongoDB(node, nodePath);
+
+                    // Need to advance the node path for the next iteration.
+                    const nextNode = previousNode ? path.join(previousNode, node) : node;
+
+                    // Recursively call this function again.
+                    await retrieveFilesFolders(shelf, nextNode);
                 } else if(nodeDetails.isFile()) {
-                    console.log('Its a file');
+                    const file = await createFileToMongoDB(node, nodePath);
                 } else {
                     console.warn('Unknown Node');
                 }
@@ -63,6 +74,7 @@ const retrieveFilesFolders = async (shelf) => {
         }
     } catch(err) {
         // TODO: Please use this method, and refactor code from other parts of app.
+        if(previousNode) throw err;
         return err;
     }
 }

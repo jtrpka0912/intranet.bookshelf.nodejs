@@ -99,7 +99,13 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
             assert.isObject(sampleFolder);
             assert.equal(sampleFolder.name, 'Samples');
             assert.equal(Folder.convertPathToString(sampleFolder.path), 'd:/Backend/Nodejs/intranet.bookshelf.nodejs/test/sample-server/Books/Samples');
-        });  
+
+            // Count the files that were created
+            const fileCount = await File.find({}).countDocuments().exec();
+            assert.equal(fileCount, 2);
+
+            // TODO: Figure out how to check how many times createFolderToMongoDB and createFileToMongoDB were called.
+        });
     });
 
     describe('createFolderToMongoDB()', () => {
@@ -141,8 +147,6 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
             assert.equal(response.name, node);
             assert.isArray(response.path);
         });
-
-        it('Return back a folder, recursively, from Magazine shelf');
 
         it('Prevent duplicated folders from being created', async () => {
             const node = 'Samples';
