@@ -106,7 +106,28 @@ const createFolderToMongoDB = async (node, nodePath) => {
     }
 }
 
+/**
+ * @async
+ * @function createFolderToMongoDB
+ * @description Create a file document for MongoDB
+ * @param { string } node - Name of folder
+ * @param { string } nodePath - Path of Folder
+ * @returns { object } 
+ */
+const createFileToMongoDB = async (node, nodePath) => {
+    try {
+        // Throw an error if any are false
+        if(!node) throw new Error('Missing node argument');
+        if(!nodePath) throw new Error('Missing node path argument');
+
+
+    } catch(err) {
+        return err;
+    }
+}
+
 module.exports = {
     retrieveFilesFolders,
-    createFolderToMongoDB
+    createFolderToMongoDB,
+    createFileToMongoDB
 };

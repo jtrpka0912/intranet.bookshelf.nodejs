@@ -16,9 +16,10 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 // Models
 const Shelf = require('../../../models/shelf.model');
 const Folder = require('../../../models/folder.model');
+const File = require('../../../models/file.model');
 
 // Libs
-const { retrieveFilesFolders, createFolderToMongoDB } = require('../../../libs/shelf/server');
+const { retrieveFilesFolders, createFolderToMongoDB, createFileToMongoDB } = require('../../../libs/shelf/server');
 
 // Global Variables
 let mongoServer;
@@ -103,6 +104,7 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
 
     describe('createFolderToMongoDB()', () => {
         afterEach(async () => {
+            // Remove any of the folders created from here
             await Folder.deleteMany();
         });
 
@@ -154,6 +156,21 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
     });
 
     describe('createFileToMongoDB()', () => {
-        it('Add assertions');
+        afterEach(async () => {
+            // Remove any of the files created here
+            await File.deleteMany();
+        });
+
+        it('Throw an error because it is missing node', async () => {
+            const error = await createFileToMongoDB();
+            // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
+            assert.containIgnoreCase(error.message, 'Missing node argument');
+        });
+
+        it('Throw an error because it is missing node path', async () => {
+            const error = await createFileToMongoDB('foo/bar');
+            // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
+            assert.containIgnoreCase(error.message, 'Missing node path argument');
+        });
     });
 });
