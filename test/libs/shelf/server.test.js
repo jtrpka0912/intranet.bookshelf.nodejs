@@ -105,6 +105,7 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
             assert.equal(fileCount, 2);
 
             // Check the sample pdf file
+            // TODO: Add path to the query
             const samplePdf = await File.findOne({ name: 'sample' }).exec();
             assert.isObject(samplePdf);
             assert.equal(samplePdf.type, 'book');
@@ -114,6 +115,7 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
             assert.isFalse(samplePdf.didRead);
 
             // Check the another sample pdf file
+            // TODO: Add path to the query
             const anotherPdf = await File.findOne({ name: 'another-sample' }).exec();
             assert.isObject(anotherPdf);
             assert.equal(anotherPdf.type, 'book');
