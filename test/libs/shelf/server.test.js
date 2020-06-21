@@ -16,9 +16,10 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 // Models
 const Shelf = require('../../../models/shelf.model');
 const Folder = require('../../../models/folder.model');
+const File = require('../../../models/file.model');
 
 // Libs
-const { retrieveFilesFolders, createFolderToMongoDB } = require('../../../libs/shelf/server');
+const { retrieveFilesFolders, createFolderToMongoDB, createFileToMongoDB } = require('../../../libs/shelf/server');
 
 // Global Variables
 let mongoServer;
@@ -61,9 +62,6 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
     });
 
     after(async () => {
-        // TODO: Fix comment typo in mongodb.test.js
-        console.log('AFTER MAIN DESCRIBE');
-        
         // Remove documents from collections
         await Shelf.deleteMany({});
 
@@ -106,6 +104,7 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
 
     describe('createFolderToMongoDB()', () => {
         afterEach(async () => {
+            // Remove any of the folders created from here
             await Folder.deleteMany();
         });
 
@@ -143,6 +142,8 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
             assert.isArray(response.path);
         });
 
+        it('Return back a folder, recursively, from Magazine shelf');
+
         it('Prevent duplicated folders from being created', async () => {
             const node = 'Samples';
             const rootStringPath = Shelf.convertRootToString(bookShelf.root);
@@ -157,6 +158,58 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
     });
 
     describe('createFileToMongoDB()', () => {
-        it('Add assertions');
+        afterEach(async () => {
+            // Remove any of the files created here
+            await File.deleteMany();
+        });
+
+        it('Throw an error because it is missing node', async () => {
+            const error = await createFileToMongoDB();
+            // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
+            assert.containIgnoreCase(error.message, 'Missing node argument');
+        });
+
+        it('Throw an error because it is missing node path', async () => {
+            const error = await createFileToMongoDB('foo/bar');
+            // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
+            assert.containIgnoreCase(error.message, 'Missing node path argument');
+        });
+
+        it('Throw an error if file does not exist in server', async () => {
+            const node = 'Samples/foobar.pdf';
+            const rootStringPath = Shelf.convertRootToString(bookShelf.root);
+            const nodePath = path.join(rootStringPath, node);
+
+            const error = await createFolderToMongoDB(node, nodePath);
+            // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
+            assert.containIgnoreCase(error.message, 'no such file or directory'); // From FS library
+        });
+
+        it('Return back the File MongoDB document', async () => {
+            const node = 'Samples/sample.pdf';
+            const rootStringPath = Shelf.convertRootToString(bookShelf.root);
+            const nodePath = path.join(rootStringPath, node);
+
+            const response = await createFileToMongoDB(node, nodePath);
+
+            assert.isObject(response);
+            assert.equal(response.type, 'book');
+            assert.equal(response.name, node);
+            assert.isArray(response.path);
+            assert.isArray(response.cover);
+            assert.isFalse(response.didRead);
+        });
+
+        it('Prevent duplicated files from being created', async () => {
+            const node = 'Samples/sample.pdf';
+            const rootStringPath = Shelf.convertRootToString(bookShelf.root);
+            const nodePath = path.join(rootStringPath, node);
+
+            await createFileToMongoDB(node, nodePath);
+            await createFileToMongoDB(node, nodePath); // This should not create the file
+
+            const count = await File.find().countDocuments().exec();
+            assert.equal(count, 1);
+        });
     });
 });

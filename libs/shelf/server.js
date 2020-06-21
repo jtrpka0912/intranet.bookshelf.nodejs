@@ -81,7 +81,7 @@ const createFolderToMongoDB = async (node, nodePath) => {
         if(!node) throw new Error('Missing node argument');
         if(!nodePath) throw new Error('Missing node path argument');
 
-        // Check if folder exists
+        // Check if folder exists in server
         await fs.promises.access(nodePath, fs.constants.F_OK);
 
         const query = {
@@ -106,7 +106,52 @@ const createFolderToMongoDB = async (node, nodePath) => {
     }
 }
 
+/**
+ * @async
+ * @function createFolderToMongoDB
+ * @description Create a file document for MongoDB
+ * @param { string } node - Name of folder
+ * @param { string } nodePath - Path of Folder
+ * @returns { object } 
+ */
+const createFileToMongoDB = async (node, nodePath) => {
+    try {
+        // Throw an error if any are false
+        if(!node) throw new Error('Missing node argument');
+        if(!nodePath) throw new Error('Missing node path argument');
+
+        // Check if file exists in server
+        await fs.promises.access(nodePath, fs.constants.F_OK);
+
+        // Create the file with just these properties to check if it already exists in MongoDB
+        const query = {
+            name: node,
+            path: File.convertPathToArray(nodePath, '\\'),
+        }; // Add any other properties; like cover, after creation.
+
+        // Then check if the file already exists
+        const doesItExist = await File.findOne(query).exec();
+
+        if(!doesItExist) {
+            // Create new file
+            const folderMongoDB = new File(query);
+            await folderMongoDB.save();
+
+            // TODO: Any other properties like cover
+
+            return folderMongoDB;
+        } else {
+            // Return it, but do not create it.
+            return doesItExist;
+        }
+        
+    } catch(err) {
+        return err;
+    }
+}
+
 module.exports = {
     retrieveFilesFolders,
-    createFolderToMongoDB
+    createFolderToMongoDB,
+    createFileToMongoDB
 };
