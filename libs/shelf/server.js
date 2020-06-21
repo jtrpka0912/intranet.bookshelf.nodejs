@@ -114,7 +114,7 @@ const createFileToMongoDB = async (node, nodePath) => {
         await fs.promises.access(nodePath, fs.constants.F_OK);
 
         // Remove the extension from the node
-        const name = path.parse(node).name; // Retrieve just the name without file extension
+        const name = path.parse(node).name;
 
         // Create the file with just these properties to check if it already exists in MongoDB
         const query = {
