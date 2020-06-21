@@ -48,5 +48,18 @@ shelfSchema.statics.convertRootToString = function(root, separator = '/') {
     return root.join(separator);
 }
 
+/**
+ * @static
+ * @function convertPathToArray
+ * @description Convert root string path to an array path
+ * @todo Need to do some testing
+ * @param { string } root 
+ * @param { string } separator (default to /)
+ * @returns { string[] }
+ */
+shelfSchema.statics.convertRootToArray = function(root, separator = '/') {
+    return root.split(separator);
+}
+
 const Shelf = mongoose.model('Shelf', shelfSchema);
 module.exports = Shelf;
