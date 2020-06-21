@@ -8,7 +8,8 @@ const fileSchema = new Schema({
         type: String,
         required: true,
         unique: false,
-        enum: ['book', 'magazine', 'comicbook'], // Default should be book
+        enum: ['book', 'magazine', 'comicbook'],
+        default: 'book'
     },
     name: {
         type: String,
@@ -34,11 +35,38 @@ const fileSchema = new Schema({
     didRead: {
         type: Boolean,
         required: false,
-        unique: false
+        unique: false,
+        default: false
     }
 }, {
     timestamps: true // Added created and modified fields
 });
+
+/**
+ * @static
+ * @function convertPathToString
+ * @description Convert array path to a string path
+ * @todo Need to do some testing
+ * @param { string[] } path
+ * @param { string } separator (default to /)
+ * @returns { string }
+ */
+fileSchema.statics.convertPathToString = function(path, separator = '/') {
+    return path.join(separator);
+}
+
+/**
+ * @static
+ * @function convertPathToArray
+ * @description Convert string path to an array path
+ * @todo Need to do some testing
+ * @param { string } path 
+ * @param { string } separator (default to /)
+ * @returns { string[] }
+ */
+fileSchema.statics.convertPathToArray = function(path, separator = '/') {
+    return path.split(separator);
+}
 
 const File = mongoose.model('File', fileSchema);
 module.exports = File;
