@@ -104,6 +104,24 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
             const fileCount = await File.find({}).countDocuments().exec();
             assert.equal(fileCount, 2);
 
+            // Check the sample pdf file
+            const samplePdf = await File.findOne({ name: 'sample' }).exec();
+            assert.isObject(samplePdf);
+            assert.equal(samplePdf.type, 'book');
+            assert.equal(samplePdf.name, 'sample');
+            assert.isArray(samplePdf.path);
+            assert.isArray(samplePdf.cover);
+            assert.isFalse(samplePdf.didRead);
+
+            // Check the another sample pdf file
+            const anotherPdf = await File.findOne({ name: 'another-sample' }).exec();
+            assert.isObject(anotherPdf);
+            assert.equal(anotherPdf.type, 'book');
+            assert.equal(anotherPdf.name, 'another-sample');
+            assert.isArray(anotherPdf.path);
+            assert.isArray(anotherPdf.cover);
+            assert.isFalse(anotherPdf.didRead);
+
             // TODO: Figure out how to check how many times createFolderToMongoDB and createFileToMongoDB were called.
         });
     });
@@ -198,7 +216,7 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
 
             assert.isObject(response);
             assert.equal(response.type, 'book');
-            assert.equal(response.name, node);
+            assert.equal(response.name, 'sample');
             assert.isArray(response.path);
             assert.isArray(response.cover);
             assert.isFalse(response.didRead);
