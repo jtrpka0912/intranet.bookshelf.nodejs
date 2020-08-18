@@ -50,12 +50,12 @@ describe('eBooks Router', () => {
         await mongoServer.stop();
     });
 
-    it('Should not be able to find endpoint with no shelfId.', () => {
+    it('Should not be able to find endpoint with no shelfId.', (done) => {
         chai.request(app).get(`${endpointURI}/shelf`).end((err, res) => {
-            //console.info('res', res.status, res.body);
             assert.isNotNull(res);
             recognize404(res);
-            recognizeErrorMessage(res, 'Missing ShelfId.');
+            recognizeErrorMessage(res, 'Missing Shelf ID.');
+            done();
         });
     });
 
@@ -80,20 +80,22 @@ describe('eBooks Router', () => {
             await Shelf.deleteMany({});
         });
 
-        it('Bad request with a too short ID string (12 characters minimum)', () => {
+        it('Bad request with a too short ID string (12 characters minimum)', (done) => {
             chai.request(app).get(`${endpointURI}/shelf/blah`).end((err, res) => {
                 assert.isNotNull(res);
                 // TODO: This is subject to change once I am able to parse MongoDB errors.
                 recognize400(res);
                 recognizeErrorMessage(res, 'Cast to ObjectId failed');
+                done();
             });
         });
 
-        it('Fail request because it could not find Shelf', () => {
+        it('Fail request because it could not find Shelf', (done) => {
             chai.request(app).get(`${endpointURI}/shelf/blahblahblah`).end((err, res) => {
                 assert.isNotNull(res);
                 recognize404(res);
-                recognizeErrorMessage(res, 'Unable to find shelf with id')
+                recognizeErrorMessage(res, 'Unable to find shelf with id');
+                done();
             });
         });
 
@@ -162,7 +164,7 @@ describe('eBooks Router', () => {
                 await Folder.deleteMany({});
             });
 
-            it.skip('Successfully be able to find the files and folders', () => {
+            it('Successfully be able to find the files and folders', (done) => {
                 chai.request(app).get(`${endpointURI}/shelf/${shelfId}`).end((err, res) => {
                     // console.info('res', res);
 
@@ -174,6 +176,8 @@ describe('eBooks Router', () => {
 
                     // Only expecting one file to arrive (fileTwo)
                     assert.equal(1, res.body.files.length);
+
+                    done();
                 });
             });
         });

@@ -18,7 +18,7 @@ router.route('/shelf').all((req, res) => {
     res.status(404).json({
         errorCode: 404,
         errorCodeMessage: 'Not Found',
-        errorMessage: 'Missing ShelfId.'
+        errorMessage: 'Missing Shelf ID.'
     });
 });
 
@@ -30,12 +30,11 @@ router.route('/shelf/:shelfId').get((req, res) => {
 
     // First, find the shelf if it exists.
     Shelf.findById(shelfId, (mongoError, mongoShelfResponse) => {
-        // console.error('Error', mongoError);
-        // console.info('Shelf Response', mongoShelfResponse);
-
         if(foundMongoError(mongoError, res)) return;
 
         if(mongoShelfResponse) {
+            console.info('Shelf Response', mongoShelfResponse);
+
             // First check if there are files and folders inside the directory
             // ===============================================================
 

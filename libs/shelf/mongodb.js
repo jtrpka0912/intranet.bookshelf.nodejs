@@ -12,17 +12,11 @@ const File = require('../../models/file.model');
 const retrieveDirectories = async (shelf, currentFolder) => {
     try {
         if(!shelf) {
-            // Need to throw it in an object with message for the try/catch to get the message. Little hacky.
-            throw {
-                message: 'Shelf was missing in call.'
-            };
+            throw new Error('Shelf was missing in call.');
         }
 
         if(isCurrentFolderCompatible(shelf, currentFolder) === false) {
-            // Need to throw it in an object with message for the try/catch to get the message. Little hacky.
-            throw {
-                message: 'Shelf and current folder are not compatible.'
-            };
+            throw new Error('Shelf and current folder are not compatible.');
         }
 
         let query = {}; // By default, return all.
@@ -58,12 +52,7 @@ const retrieveDirectories = async (shelf, currentFolder) => {
 
         return directories;
     } catch (err) {
-        // TODO: How to handle with express?
-        return {
-            errorCode: 500,
-            errorCodeMessage: 'Internal Server Error',
-            errorMessage: err.message
-        };
+        return err;
     }
 }
 

@@ -38,7 +38,6 @@ FUNC createFolderToMongoDB(folder)
 const retrieveFilesFolders = async (shelf) => {
     try{
         if(!shelf) {
-            // TODO: Please use this method, and refactor code from other parts of app. Start using the V8 Error object and just let Express handle HTTP codes.
             throw new Error('Shelf was missing in call');
         }
 
@@ -62,7 +61,6 @@ const retrieveFilesFolders = async (shelf) => {
             }
         }
     } catch(err) {
-        // TODO: Please use this method, and refactor code from other parts of app.
         return err;
     }
 }
