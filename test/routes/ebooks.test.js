@@ -68,7 +68,7 @@ describe('eBooks Router', () => {
                 _id: shelfId,
                 name: 'Shelf One',
                 root: ['books'],
-                showDirectories: false,
+                showDirectories: true,
                 multiFile: false
             });
 
