@@ -60,12 +60,12 @@ describe('eBooks Router', () => {
     });
 
     describe(`GET - ${endpointURI}/shelf/:shelfId`, () => {
-        const shelfId = '5ec73853788ef556ecc225dd';
+        const shelfOneId = '5ec73853788ef556ecc225dd';
 
         before(async () => {
             // Create a shelf
             const shelf = new Shelf({
-                _id: shelfId,
+                _id: shelfOneId,
                 name: 'Shelf One',
                 root: ['books'],
                 showDirectories: true,
@@ -104,9 +104,7 @@ describe('eBooks Router', () => {
                 // Create some files
                 // =================
 
-                // This is inside another folder
-                // Receive? No
-                const fileOne = new File({
+                const bookOne = new File({
                     type: 'book',
                     name: 'Book One',
                     path: ['books', 'example'],
@@ -114,9 +112,7 @@ describe('eBooks Router', () => {
                     didRead: false
                 });
 
-                // This is inside the root shelf
-                // Receive? Yes
-                const fileTwo = new File({
+                const bookTwo = new File({
                     type: 'book',
                     name: 'Book Two',
                     path: ['books'],
@@ -124,38 +120,74 @@ describe('eBooks Router', () => {
                     didRead: true
                 });
 
-                // This is outside the root shelf path
-                // Receive? No
-                const fileThree = new File({
+                const bookThree = new File({
+                    type: 'book',
+                    name: 'Book Three',
+                    path: ['books'],
+                    cover: ['images', 'books', 'Book Three.jpg'],
+                    didRead: true
+                });
+
+                const magazineOne = new File({
                     type: 'magazine',
-                    name: 'Magainze Issue 000',
-                    path: ['magazines'],
+                    name: 'Magainze Issue 001',
+                    path: ['magazines', 'issues'],
                     cover: null,
                     didRead: false
-                })
+                });
+
+                const magazineTwo = new File({
+                    type: 'magazine',
+                    name: 'Magainze Issue 002',
+                    path: ['magazines', 'issues'],
+                    cover: null,
+                    didRead: false
+                });
+
+                const magazineThree = new File({
+                    type: 'magazine',
+                    name: 'Magainze Issue 003',
+                    path: ['magazines', 'issues'],
+                    cover: null,
+                    didRead: false
+                });
+
+                const magazineFour = new File({
+                    type: 'magazine',
+                    name: 'Magainze Issue 004',
+                    path: ['magazines', 'issues'],
+                    cover: null,
+                    didRead: false
+                });
 
                 // Create some folders
                 // ===================
 
-                // This is inside the root shelf
-                // Receive? Yes
                 const folderOne = new Folder({
                     name: 'Example',
                     path: ['books', 'example']
                 });
 
-                // This is outside the root shelf
-                // Receive? No
                 const folderTwo = new Folder({
                     name: 'Foobar',
                     path: ['foo', 'bar']
                 });
 
-                await fileOne.save();
-                await fileTwo.save();
-                await fileThree.save();
+                const folderThree = new Folder({
+                    name: 'Issues',
+                    path: ['magazines', 'issues']
+                });
+
+                await bookOne.save();
+                await bookTwo.save();
+                await bookThree.save();
+                await magazineOne.save();
+                await magazineTwo.save();
+                await magazineThree.save();
+                await magazineFour.save();
                 await folderOne.save();
                 await folderTwo.save();
+                await folderThree.save();
             });
 
             after(async () => {
@@ -165,17 +197,17 @@ describe('eBooks Router', () => {
             });
 
             it('Successfully be able to find the files and folders', (done) => {
-                chai.request(app).get(`${endpointURI}/shelf/${shelfId}`).end((err, res) => {
+                chai.request(app).get(`${endpointURI}/shelf/${shelfOneId}`).end((err, res) => {
                     // console.info('res', res);
 
                     assert.isNotNull(res);
                     recognize200(res);
 
-                    // Only expecting one folder, from directories, to arrive (folderOne)
-                    assert.equal(1, res.body.directories.length);
+                    // Only expecting one folder, from directories, to arrive
+                    // assert.equal(1, res.body.directories.length, 'Incorrect folder count');
 
-                    // Only expecting one file to arrive (fileTwo)
-                    assert.equal(1, res.body.files.length);
+                    // Expecting two files to arrive
+                    assert.equal(2, res.body.files.length, 'Incorrect file count');
 
                     done();
                 });
