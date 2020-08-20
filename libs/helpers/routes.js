@@ -65,9 +65,26 @@ const shelfNotFound = (shelfId, res) => {
     });
 };
 
+/**
+ * @function folderNotFound
+ * @summary Folder not found error response
+ * @description Send a response that MongoDB was unable to find a folder by its id.
+ * @param { string } folderId
+ * @param { ServerResponse } res
+ * @returns { object }
+ */
+const folderNotFound = (folderId, res) => {
+    return res.status(404).json({
+        errorCode: 404,
+        errorCodeMessage: 'Not Found',
+        errorMessage: `Unable to find folder with id: ${folderId}.`
+    });
+};
+
 module.exports = {
     foundMongoError,
     pathArrayToString,
     pathStringToArray,
-    shelfNotFound
+    shelfNotFound,
+    folderNotFound
 };
