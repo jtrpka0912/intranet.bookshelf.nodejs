@@ -31,6 +31,8 @@ const {
 // Global Variables
 let mongoServer;
 const endpointURI = '/api/v1/ebooks';
+const shelfOneId = '5ec73853788ef556ecc225dd';
+const shelfTwoId = '5f3e762dbc0d6f00200404b2';
 
 describe('eBooks Router', () => {
     before(async () => {
@@ -60,124 +62,12 @@ describe('eBooks Router', () => {
     });
 
     describe(`GET - ${endpointURI}/shelf/:shelfId`, () => {
-        const shelfOneId = '5ec73853788ef556ecc225dd';
-        const shelfTwoId = '5f3e762dbc0d6f00200404b2';
-
         before(async () => {
-            // Create a shelf
-            const bookShelf = new Shelf({
-                _id: shelfOneId,
-                name: 'Shelf One',
-                root: ['books'],
-                showDirectories: true,
-                multiFile: false
-            });
-
-            const magazineShelf = new Shelf({
-                _id: shelfTwoId,
-                name: 'Shelf Two',
-                root: ['magazines'],
-                showDirectories: true,
-                multiFile: false
-            });
-
-            // Create some folders
-            // ===================
-
-            const folderOne = new Folder({
-                name: 'Example',
-                path: ['books', 'example']
-            });
-
-            const folderTwo = new Folder({
-                name: 'Foobar',
-                path: ['foo', 'bar']
-            });
-
-            const folderThree = new Folder({
-                name: 'Issues',
-                path: ['magazines', 'issues']
-            });
-
-            // Create some files
-            // =================
-
-            const bookOne = new File({
-                type: 'book',
-                name: 'Book One',
-                path: ['books', 'example', 'book1.pdf'],
-                cover: ['images', 'books', 'example', 'Book One.jpg'],
-                didRead: false
-            });
-
-            const bookTwo = new File({
-                type: 'book',
-                name: 'Book Two',
-                path: ['books', 'book2.pdf'],
-                cover: ['images', 'books', 'Book Two.jpg'],
-                didRead: true
-            });
-
-            const bookThree = new File({
-                type: 'book',
-                name: 'Book Three',
-                path: ['books', 'book3.epub'],
-                cover: ['images', 'books', 'Book Three.jpg'],
-                didRead: true
-            });
-
-            const magazineOne = new File({
-                type: 'magazine',
-                name: 'Magainze Issue 001',
-                path: ['magazines', 'issues', '001.pdf'],
-                cover: null,
-                didRead: false
-            });
-
-            const magazineTwo = new File({
-                type: 'magazine',
-                name: 'Magainze Issue 002',
-                path: ['magazines', 'issues', '002.pdf'],
-                cover: null,
-                didRead: false
-            });
-
-            const magazineThree = new File({
-                type: 'magazine',
-                name: 'Magainze Issue 003',
-                path: ['magazines', 'issues', '003.pdf'],
-                cover: null,
-                didRead: false
-            });
-
-            const magazineFour = new File({
-                type: 'magazine',
-                name: 'Magainze Issue 004',
-                path: ['magazines', 'issues', '004.pdf'],
-                cover: null,
-                didRead: false
-            });
-
-            await bookShelf.save();
-            await magazineShelf.save();
-            await folderOne.save();
-            await folderTwo.save();
-            await folderThree.save();
-            await bookOne.save();
-            await bookTwo.save();
-            await bookThree.save();
-            await magazineOne.save();
-            await magazineTwo.save();
-            await magazineThree.save();
-            await magazineFour.save();
-            
+            await createMongoItems();
         });
 
         after(async () => {
-            // Remove all shelves, files, and folders
-            await Shelf.deleteMany({});
-            await File.deleteMany({});
-            await Folder.deleteMany({});
+            await destroyMongoItems();
         });
 
         it('Bad request with a too short ID string (12 characters minimum)', (done) => {
@@ -199,34 +89,160 @@ describe('eBooks Router', () => {
             });
         });
 
-        describe('With files and folders in collection', () => {
-            it('Successfully be able to find files and folders from book shelf', (done) => {
-                chai.request(app).get(`${endpointURI}/shelf/${shelfOneId}`).end((err, res) => {
-                    assert.isNotNull(res);
-                    recognize200(res);
+        it('Successfully be able to find files and folders from book shelf', (done) => {
+            chai.request(app).get(`${endpointURI}/shelf/${shelfOneId}`).end((err, res) => {
+                assert.isNotNull(res);
+                recognize200(res);
 
-                    // Only expecting one folder, from directories, to arrive
-                    assert.equal(1, res.body.directories.length, 'Incorrect folder count');
+                // Only expecting one folder, from directories, to arrive
+                assert.equal(1, res.body.directories.length, 'Incorrect folder count');
 
-                    // Expecting two files to arrive
-                    assert.equal(2, res.body.files.length, 'Incorrect file count');
+                // Expecting two files to arrive
+                assert.equal(2, res.body.files.length, 'Incorrect file count');
 
-                    done();
-                });
+                done();
             });
+        });
 
-            it('Successfully be able to find no files, but one folder from magazine shelf', (done) => {
-                chai.request(app).get(`${endpointURI}/shelf/${shelfTwoId}`).end((err, res) => {
-                    assert.isNotNull(res);
-                    recognize200(res);
+        it('Successfully be able to find no files, but one folder from magazine shelf', (done) => {
+            chai.request(app).get(`${endpointURI}/shelf/${shelfTwoId}`).end((err, res) => {
+                assert.isNotNull(res);
+                recognize200(res);
 
-                    // Expects one folder though that folder does have another folder
-                    assert.equal(1, res.body.directories.length, 1);
-                    assert.equal(0, res.body.files.length, 0);
+                // Expects one folder though that folder does have another folder
+                assert.equal(1, res.body.directories.length, 1);
+                assert.equal(0, res.body.files.length, 0);
 
-                    done();
-                });
+                done();
             });
         });
     });
 });
+
+/**
+ * @async
+ * @function createMongoItems
+ * @description Create the items to use when testing the endpoints.
+ * @author J. Trpka <jtrpka0912@gmail.com>
+ */
+const createMongoItems = async () => {
+    // Create a shelf
+    const bookShelf = new Shelf({
+        _id: shelfOneId,
+        name: 'Shelf One',
+        root: ['books'],
+        showDirectories: true,
+        multiFile: false
+    });
+
+    const magazineShelf = new Shelf({
+        _id: shelfTwoId,
+        name: 'Shelf Two',
+        root: ['magazines'],
+        showDirectories: true,
+        multiFile: false
+    });
+
+    // Create some folders
+    // ===================
+
+    const folderOne = new Folder({
+        name: 'Example',
+        path: ['books', 'example']
+    });
+
+    const folderTwo = new Folder({
+        name: 'Foobar',
+        path: ['foo', 'bar']
+    });
+
+    const folderThree = new Folder({
+        name: 'Issues',
+        path: ['magazines', 'issues']
+    });
+
+    // Create some files
+    // =================
+
+    const bookOne = new File({
+        type: 'book',
+        name: 'Book One',
+        path: ['books', 'example', 'book1.pdf'],
+        cover: ['images', 'books', 'example', 'Book One.jpg'],
+        didRead: false
+    });
+
+    const bookTwo = new File({
+        type: 'book',
+        name: 'Book Two',
+        path: ['books', 'book2.pdf'],
+        cover: ['images', 'books', 'Book Two.jpg'],
+        didRead: true
+    });
+
+    const bookThree = new File({
+        type: 'book',
+        name: 'Book Three',
+        path: ['books', 'book3.epub'],
+        cover: ['images', 'books', 'Book Three.jpg'],
+        didRead: true
+    });
+
+    const magazineOne = new File({
+        type: 'magazine',
+        name: 'Magainze Issue 001',
+        path: ['magazines', 'issues', '001.pdf'],
+        cover: null,
+        didRead: false
+    });
+
+    const magazineTwo = new File({
+        type: 'magazine',
+        name: 'Magainze Issue 002',
+        path: ['magazines', 'issues', '002.pdf'],
+        cover: null,
+        didRead: false
+    });
+
+    const magazineThree = new File({
+        type: 'magazine',
+        name: 'Magainze Issue 003',
+        path: ['magazines', 'issues', '003.pdf'],
+        cover: null,
+        didRead: false
+    });
+
+    const magazineFour = new File({
+        type: 'magazine',
+        name: 'Magainze Issue 004',
+        path: ['magazines', 'issues', '004.pdf'],
+        cover: null,
+        didRead: false
+    });
+
+    await bookShelf.save();
+    await magazineShelf.save();
+    await folderOne.save();
+    await folderTwo.save();
+    await folderThree.save();
+    await bookOne.save();
+    await bookTwo.save();
+    await bookThree.save();
+    await magazineOne.save();
+    await magazineTwo.save();
+    await magazineThree.save();
+    await magazineFour.save();
+};
+
+/**
+ * @async
+ * @function destroyMongoItems
+ * @description Detroy the items that were used for testing the endpoints.
+ * @author J. Trpka <jtrpka0912@gmail.com>
+ */
+const destroyMongoItems = async () => {
+    // Remove all shelves, files, and folders
+    await Shelf.deleteMany({});
+    await File.deleteMany({});
+    await Folder.deleteMany({});
+};
