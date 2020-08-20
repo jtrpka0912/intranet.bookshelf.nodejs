@@ -81,13 +81,103 @@ describe('eBooks Router', () => {
                 multiFile: false
             });
 
+            // Create some folders
+            // ===================
+
+            const folderOne = new Folder({
+                name: 'Example',
+                path: ['books', 'example']
+            });
+
+            const folderTwo = new Folder({
+                name: 'Foobar',
+                path: ['foo', 'bar']
+            });
+
+            const folderThree = new Folder({
+                name: 'Issues',
+                path: ['magazines', 'issues']
+            });
+
+            // Create some files
+            // =================
+
+            const bookOne = new File({
+                type: 'book',
+                name: 'Book One',
+                path: ['books', 'example', 'book1.pdf'],
+                cover: ['images', 'books', 'example', 'Book One.jpg'],
+                didRead: false
+            });
+
+            const bookTwo = new File({
+                type: 'book',
+                name: 'Book Two',
+                path: ['books', 'book2.pdf'],
+                cover: ['images', 'books', 'Book Two.jpg'],
+                didRead: true
+            });
+
+            const bookThree = new File({
+                type: 'book',
+                name: 'Book Three',
+                path: ['books', 'book3.epub'],
+                cover: ['images', 'books', 'Book Three.jpg'],
+                didRead: true
+            });
+
+            const magazineOne = new File({
+                type: 'magazine',
+                name: 'Magainze Issue 001',
+                path: ['magazines', 'issues', '001.pdf'],
+                cover: null,
+                didRead: false
+            });
+
+            const magazineTwo = new File({
+                type: 'magazine',
+                name: 'Magainze Issue 002',
+                path: ['magazines', 'issues', '002.pdf'],
+                cover: null,
+                didRead: false
+            });
+
+            const magazineThree = new File({
+                type: 'magazine',
+                name: 'Magainze Issue 003',
+                path: ['magazines', 'issues', '003.pdf'],
+                cover: null,
+                didRead: false
+            });
+
+            const magazineFour = new File({
+                type: 'magazine',
+                name: 'Magainze Issue 004',
+                path: ['magazines', 'issues', '004.pdf'],
+                cover: null,
+                didRead: false
+            });
+
             await bookShelf.save();
             await magazineShelf.save();
+            await folderOne.save();
+            await folderTwo.save();
+            await folderThree.save();
+            await bookOne.save();
+            await bookTwo.save();
+            await bookThree.save();
+            await magazineOne.save();
+            await magazineTwo.save();
+            await magazineThree.save();
+            await magazineFour.save();
+            
         });
 
         after(async () => {
-            // Remove all shelves
+            // Remove all shelves, files, and folders
             await Shelf.deleteMany({});
+            await File.deleteMany({});
+            await Folder.deleteMany({});
         });
 
         it('Bad request with a too short ID string (12 characters minimum)', (done) => {
@@ -110,102 +200,6 @@ describe('eBooks Router', () => {
         });
 
         describe('With files and folders in collection', () => {
-            before(async () => {
-                // Create some files
-                // =================
-
-                const bookOne = new File({
-                    type: 'book',
-                    name: 'Book One',
-                    path: ['books', 'example', 'book1.pdf'],
-                    cover: ['images', 'books', 'example', 'Book One.jpg'],
-                    didRead: false
-                });
-
-                const bookTwo = new File({
-                    type: 'book',
-                    name: 'Book Two',
-                    path: ['books', 'book2.pdf'],
-                    cover: ['images', 'books', 'Book Two.jpg'],
-                    didRead: true
-                });
-
-                const bookThree = new File({
-                    type: 'book',
-                    name: 'Book Three',
-                    path: ['books', 'book3.epub'],
-                    cover: ['images', 'books', 'Book Three.jpg'],
-                    didRead: true
-                });
-
-                const magazineOne = new File({
-                    type: 'magazine',
-                    name: 'Magainze Issue 001',
-                    path: ['magazines', 'issues', '001.pdf'],
-                    cover: null,
-                    didRead: false
-                });
-
-                const magazineTwo = new File({
-                    type: 'magazine',
-                    name: 'Magainze Issue 002',
-                    path: ['magazines', 'issues', '002.pdf'],
-                    cover: null,
-                    didRead: false
-                });
-
-                const magazineThree = new File({
-                    type: 'magazine',
-                    name: 'Magainze Issue 003',
-                    path: ['magazines', 'issues', '003.pdf'],
-                    cover: null,
-                    didRead: false
-                });
-
-                const magazineFour = new File({
-                    type: 'magazine',
-                    name: 'Magainze Issue 004',
-                    path: ['magazines', 'issues', '004.pdf'],
-                    cover: null,
-                    didRead: false
-                });
-
-                // Create some folders
-                // ===================
-
-                const folderOne = new Folder({
-                    name: 'Example',
-                    path: ['books', 'example']
-                });
-
-                const folderTwo = new Folder({
-                    name: 'Foobar',
-                    path: ['foo', 'bar']
-                });
-
-                const folderThree = new Folder({
-                    name: 'Issues',
-                    path: ['magazines', 'issues']
-                });
-
-                await bookOne.save();
-                await bookTwo.save();
-                await bookThree.save();
-                await magazineOne.save();
-                await magazineTwo.save();
-                await magazineThree.save();
-                await magazineFour.save();
-                await folderOne.save();
-                await folderTwo.save();
-                await folderThree.save();
-            });
-
-            after(async () => {
-                // Remove all files and folders
-                await File.deleteMany({});
-                await Folder.deleteMany({});
-            });
-
             it('Successfully be able to find files and folders from book shelf', (done) => {
                 chai.request(app).get(`${endpointURI}/shelf/${shelfOneId}`).end((err, res) => {
                     assert.isNotNull(res);
