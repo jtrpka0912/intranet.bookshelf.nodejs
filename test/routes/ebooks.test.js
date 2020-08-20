@@ -185,6 +185,23 @@ describe('(ebooks.test.js) eBooks Router', () => {
                 done();
             });
         });
+
+        it('Find all magazine issues from the example issues folder', (done) => {
+            chai.request(app).get(`${endpointURI}/shelf/${shelfTwoId}/folder/${folderThreeId}`).end((err, res) => {
+                assert.isNotNull(res);
+                recognize200(res);
+
+                assert.isArray(res.body.directories);
+                assert.lengthOf(res.body.directories, 0)
+                assert.isArray(res.body.files);
+                assert.lengthOf(res.body.files, 4);
+                assert.isArray(res.body.breadcrumbs);
+                // TODO: Need to implement breadcrumbs
+                // assert.lengthOf(res.body.breadcrumbs, 2);
+
+                done();
+            });
+        });
     });
 });
 
