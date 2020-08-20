@@ -61,10 +61,11 @@ describe('eBooks Router', () => {
 
     describe(`GET - ${endpointURI}/shelf/:shelfId`, () => {
         const shelfOneId = '5ec73853788ef556ecc225dd';
+        const shelfTwoId = '5f3e762dbc0d6f00200404b2';
 
         before(async () => {
             // Create a shelf
-            const shelf = new Shelf({
+            const bookShelf = new Shelf({
                 _id: shelfOneId,
                 name: 'Shelf One',
                 root: ['books'],
@@ -72,7 +73,16 @@ describe('eBooks Router', () => {
                 multiFile: false
             });
 
-            await shelf.save();
+            const magazineShelf = new Shelf({
+                _id: shelfTwoId,
+                name: 'Shelf Two',
+                root: ['magazines'],
+                showDirectories: true,
+                multiFile: false
+            });
+
+            await bookShelf.save();
+            await magazineShelf.save();
         });
 
         after(async () => {
@@ -196,15 +206,13 @@ describe('eBooks Router', () => {
                 await Folder.deleteMany({});
             });
 
-            it('Successfully be able to find the files and folders', (done) => {
+            it('Successfully be able to find files and folders from book shelf', (done) => {
                 chai.request(app).get(`${endpointURI}/shelf/${shelfOneId}`).end((err, res) => {
-                    // console.info('res', res);
-
                     assert.isNotNull(res);
                     recognize200(res);
 
                     // Only expecting one folder, from directories, to arrive
-                    // assert.equal(1, res.body.directories.length, 'Incorrect folder count');
+                    assert.equal(1, res.body.directories.length, 'Incorrect folder count');
 
                     // Expecting two files to arrive
                     assert.equal(2, res.body.files.length, 'Incorrect file count');
@@ -212,8 +220,19 @@ describe('eBooks Router', () => {
                     done();
                 });
             });
-        });
 
-        describe('With no files and folders in collection (go through server)', () => {});
+            it('Successfully be able to find no files, but one folder from magazine shelf', (done) => {
+                chai.request(app).get(`${endpointURI}/shelf/${shelfTwoId}`).end((err, res) => {
+                    assert.isNotNull(res);
+                    recognize200(res);
+
+                    // Expects one folder though that folder does have another folder
+                    assert.equal(1, res.body.directories.length, 1);
+                    assert.equal(0, res.body.files.length, 0);
+
+                    done();
+                });
+            });
+        });
     });
 });
