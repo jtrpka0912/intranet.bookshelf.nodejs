@@ -100,10 +100,10 @@ describe('(ebooks.test.js) eBooks Router', () => {
                 recognize200(res);
 
                 // Only expecting one folder, from directories, to arrive
-                assert.equal(1, res.body.directories.length, 'Incorrect folder count');
+                assert.lengthOf(res.body.directories, 1, 'Incorrect folder count');
 
                 // Expecting two files to arrive
-                assert.equal(2, res.body.files.length, 'Incorrect file count');
+                assert.lengthOf(res.body.files, 2, 'Incorrect file count');
 
                 done();
             });
@@ -115,8 +115,8 @@ describe('(ebooks.test.js) eBooks Router', () => {
                 recognize200(res);
 
                 // Expects one folder though that folder does have another folder
-                assert.equal(1, res.body.directories.length, 1);
-                assert.equal(0, res.body.files.length, 0);
+                assert.lengthOf(res.body.directories, 1);
+                assert.lengthOf(res.body.files, 0);
 
                 done();
             });
@@ -165,6 +165,23 @@ describe('(ebooks.test.js) eBooks Router', () => {
                 assert.isNotNull(res);
                 recognize500(res);
                 recognizeErrorMessage(res, 'Shelf and current folder are not compatible');
+                done();
+            });
+        });
+
+        it('Find one file from the book shelf\'s example folder', (done) => {
+            chai.request(app).get(`${endpointURI}/shelf/${shelfOneId}/folder/${folderOneId}`).end((err, res) => {
+                assert.isNotNull(res);
+                recognize200(res);
+
+                assert.isArray(res.body.directories);
+                assert.lengthOf(res.body.directories, 0)
+                assert.isArray(res.body.files);
+                assert.lengthOf(res.body.files, 1);
+                assert.isArray(res.body.breadcrumbs);
+                // TODO: Need to implement breadcrumbs
+                // assert.lengthOf(res.body.breadcrumbs, 1);
+
                 done();
             });
         });

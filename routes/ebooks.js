@@ -51,7 +51,11 @@ router.route('/shelf/:shelfId').get((req, res) => {
                 directories = await retrieveDirectories(mongoShelfResponse);
                 files = await retrieveFiles(mongoShelfResponse);
             } catch(err) {
-                console.error('Error: ', err);
+                return res.status(500).json({
+                    errorCode: 500,
+                    errorCodeMessage: 'Internal Server Error',
+                    errorMessage: err.message
+                });
             }
 
             res.status(200).json({
@@ -82,19 +86,28 @@ router.route('/shelf/:shelfId/folder/:folderId').get((req, res) => {
                 if(foundMongoError(mongoError, res)) return;
 
                 if(mongoShelfResponse) {
-                    try{
-                        let breadcrumbs = [];
-                        let directories = await retrieveDirectories(mongoShelfResponse, mongoFolderResponse);
-                        let files = await retrieveFiles(mongoShelfResponse, mongoFolderResponse);
-                    } catch(err) {
-                        // console.error('Error: ', err);
+                    let breadcrumbs = [];
+                    let directories = [];
+                    let files = [];
 
+                    try{
+                        directories = await retrieveDirectories(mongoShelfResponse, mongoFolderResponse);
+                        
+                        files = await retrieveFiles(mongoShelfResponse, mongoFolderResponse);
+
+                    } catch(err) {
                         return res.status(500).json({
                             errorCode: 500,
                             errorCodeMessage: 'Internal Server Error',
                             errorMessage: err.message
                         });
                     }
+
+                    res.status(200).json({
+                        breadcrumbs,
+                        directories,
+                        files
+                    });
                 } else {
                     return shelfNotFound(shelfId, res);
                 }
