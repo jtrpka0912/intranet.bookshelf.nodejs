@@ -57,6 +57,8 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
             multiFile: false
         });
 
+        // TODO Add magazine shelf
+
         await unknownShelf.save();
         await bookShelf.save();
     });
@@ -95,11 +97,44 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
             assert.equal(count, 1);
 
             // Retrieve the folder that was created
-            const sampleFolder = await Folder.findOne({ name: 'Samples' }).exec();
-            assert.isObject(sampleFolder);
+            const sampleFolder = await Folder.findOne({ 
+                name: 'Samples', 
+                path: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Books', 'Samples'] 
+            }).exec();
+            assert.isObject(sampleFolder, 'Unable to find sampleFolder');
             assert.equal(sampleFolder.name, 'Samples');
             assert.equal(Folder.convertPathToString(sampleFolder.path), 'd:/Backend/Nodejs/intranet.bookshelf.nodejs/test/sample-server/Books/Samples');
-        });  
+
+            // Count the files that were created
+            const fileCount = await File.find({}).countDocuments().exec();
+            assert.equal(fileCount, 2);
+
+            // Check the sample pdf file
+            const samplePdf = await File.findOne({ 
+                name: 'sample', 
+                path: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Books', 'Samples', 'sample.pdf']
+            }).exec();
+            assert.isObject(samplePdf, 'Unable to find samplePdf');
+            assert.equal(samplePdf.type, 'book');
+            assert.equal(samplePdf.name, 'sample');
+            assert.isArray(samplePdf.path);
+            assert.isArray(samplePdf.cover);
+            assert.isFalse(samplePdf.didRead);
+
+            // Check the another sample pdf file
+            const anotherPdf = await File.findOne({ 
+                name: 'another-sample', 
+                path: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Books', 'Samples', 'another-sample.pdf']
+            }).exec();
+            assert.isObject(anotherPdf, 'Unable to find anotherPdf');
+            assert.equal(anotherPdf.type, 'book');
+            assert.equal(anotherPdf.name, 'another-sample');
+            assert.isArray(anotherPdf.path);
+            assert.isArray(anotherPdf.cover);
+            assert.isFalse(anotherPdf.didRead);
+
+            // TODO: Figure out how to check how many times createFolderToMongoDB and createFileToMongoDB were called.
+        });
     });
 
     describe('createFolderToMongoDB()', () => {
@@ -141,8 +176,6 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
             assert.equal(response.name, node);
             assert.isArray(response.path);
         });
-
-        it('Return back a folder, recursively, from Magazine shelf');
 
         it('Prevent duplicated folders from being created', async () => {
             const node = 'Samples';
@@ -194,7 +227,7 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
 
             assert.isObject(response);
             assert.equal(response.type, 'book');
-            assert.equal(response.name, node);
+            assert.equal(response.name, 'sample');
             assert.isArray(response.path);
             assert.isArray(response.cover);
             assert.isFalse(response.didRead);

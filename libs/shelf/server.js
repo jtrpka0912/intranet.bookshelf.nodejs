@@ -7,41 +7,24 @@ const File = require('../../models/file.model');
 const fs = require('fs');
 const path = require('path');
 
-/*
-Directory and File Creation
-===========================
-
-retrieveFilesFolders(shelf.root)
-
-FUNC retrieveFilesFolders (directory)
-    RETRIEVE FILES AND FOLDERS FROM directory
-    filesFolders FOR LOOP
-        IF FILE
-            createFileToMongoDB(file)
-        IF DIRECTORY
-            createFolderToMongoDB(folder)
-            retrieveFilesFolders(folder)
-            
-FUNC createFileToMongoDB(file)
-    DO MONGODB STUFF HERE
-    
-FUNC createFolderToMongoDB(folder)
-    DO MONGODB STUFF HERE
-*/
-
 /**
  * @async
  * @function retrieveFilesFolders
  * @description Recursively go through each folder and file and create a MongoDB document for each of them
  * @param { object } shelf 
+ * @param { string } previousNode
  */
-const retrieveFilesFolders = async (shelf) => {
-    try{
+const retrieveFilesFolders = async (shelf, previousNode) => {
+    try {
         if(!shelf) {
             throw new Error('Shelf was missing in call');
         }
 
-        const rootStringPath = Shelf.convertRootToString(shelf.root);
+        let rootStringPath = Shelf.convertRootToString(shelf.root);
+        
+        if(previousNode) {
+            rootStringPath = path.join(rootStringPath, previousNode);
+        }
 
         const nodes = await fs.promises.readdir(rootStringPath);
 
@@ -52,16 +35,22 @@ const retrieveFilesFolders = async (shelf) => {
                 const nodeDetails = await fs.promises.stat(nodePath);
 
                 if(nodeDetails.isDirectory()) {
-                    const folder = await createFolderToMongoDB(node, nodePath);
+                    await createFolderToMongoDB(node, nodePath);
+
+                    // Need to advance the node path for the next iteration.
+                    const nextNode = previousNode ? path.join(previousNode, node) : node;
+
+                    // Recursively call this function again.
+                    await retrieveFilesFolders(shelf, nextNode);
                 } else if(nodeDetails.isFile()) {
-                    console.log('Its a file');
+                    await createFileToMongoDB(node, nodePath);
                 } else {
                     console.warn('Unknown Node');
                 }
             }
         }
     } catch(err) {
-        return err;
+        if(previousNode) throw err;
     }
 }
 
@@ -121,9 +110,12 @@ const createFileToMongoDB = async (node, nodePath) => {
         // Check if file exists in server
         await fs.promises.access(nodePath, fs.constants.F_OK);
 
+        // Remove the extension from the node
+        const name = path.parse(node).name;
+
         // Create the file with just these properties to check if it already exists in MongoDB
         const query = {
-            name: node,
+            name: name,
             path: File.convertPathToArray(nodePath, '\\'),
         }; // Add any other properties; like cover, after creation.
 
