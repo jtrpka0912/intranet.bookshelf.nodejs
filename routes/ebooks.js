@@ -44,7 +44,6 @@ router.route('/shelf/:shelfId').get((req, res) => {
         if(foundMongoError(mongoError, res)) return;
 
         if(mongoShelfResponse) {
-            let breadcrumbs = []; // Keep it consistent though none should be made
             let directories = [];
             let files = [];
 
@@ -56,7 +55,7 @@ router.route('/shelf/:shelfId').get((req, res) => {
             }
 
             res.status(200).json({
-                breadcrumbs,
+                breadcrumbs: [], // We are at the root of the shelf
                 directories,
                 files
             });
@@ -73,12 +72,33 @@ router.route('/shelf/:shelfId/folder/:folderId').get((req, res) => {
     const shelfId = req.params.shelfId;
     const folderId = req.params.folderId;
 
-    Folder.findById(folderId, async (mongoError, mongoFolderResponse) => {
-        console.info('Folder', mongoFolderResponse);
+    // First retrieve the folder
+    Folder.findById(folderId, (mongoError, mongoFolderResponse) => {
         if(foundMongoError(mongoError, res)) return;
 
         if(mongoFolderResponse) {
+            // Then retrieve the shelf
+            Shelf.findById(shelfId, async (mongoError, mongoShelfResponse) => {
+                if(foundMongoError(mongoError, res)) return;
 
+                if(mongoShelfResponse) {
+                    try{
+                        let breadcrumbs = [];
+                        let directories = await retrieveDirectories(mongoShelfResponse, mongoFolderResponse);
+                        let files = await retrieveFiles(mongoShelfResponse, mongoFolderResponse);
+                    } catch(err) {
+                        // console.error('Error: ', err);
+
+                        return res.status(500).json({
+                            errorCode: 500,
+                            errorCodeMessage: 'Internal Server Error',
+                            errorMessage: err.message
+                        });
+                    }
+                } else {
+                    return shelfNotFound(shelfId, res);
+                }
+            });
         } else {
             return folderNotFound(shelfId, res);
         }

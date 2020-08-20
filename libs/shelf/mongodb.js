@@ -52,7 +52,7 @@ const retrieveDirectories = async (shelf, currentFolder) => {
 
         return directories;
     } catch (err) {
-        return err;
+        throw err;
     }
 }
 
@@ -114,12 +114,7 @@ const retrieveFiles = async (shelf, currentFolder) => {
 
         return files;
     } catch(err) {
-        // TODO: How to handle with express?
-        return {
-            errorCode: 500,
-            errorCodeMessage: 'Internal Server Error',
-            errorMessage: err.message
-        };
+        throw err;
     }
 }
 

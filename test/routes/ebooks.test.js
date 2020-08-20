@@ -26,6 +26,7 @@ const {
     recognize200,
     recognize400,
     recognize404,
+    recognize500,
 } = require('../../libs/helpers/mocha/express/assert'); // Helper Mocha Assert Tests
 
 // Global Variables
@@ -34,7 +35,11 @@ const endpointURI = '/api/v1/ebooks';
 const shelfOneId = '5ec73853788ef556ecc225dd';
 const shelfTwoId = '5f3e762dbc0d6f00200404b2';
 
-describe('eBooks Router', () => {
+const folderOneId = '5f3eaf75dd9ede497015699a';
+const folderTwoId = '5f3eaf75dd9ede497015699b';
+const folderThreeId = '5f3eaf75dd9ede497015699c';
+
+describe('(ebooks.test.js) eBooks Router', () => {
     before(async () => {
         // Set up an in-memory MongoDB server
         mongoServer = new MongoMemoryServer();
@@ -154,6 +159,15 @@ describe('eBooks Router', () => {
                 done();
             });
         });
+
+        it('Fail to find folder from book shelf.', (done) => {
+            chai.request(app).get(`${endpointURI}/shelf/${shelfOneId}/folder/${folderTwoId}`).end((err, res) => {
+                assert.isNotNull(res);
+                recognize500(res);
+                recognizeErrorMessage(res, 'Shelf and current folder are not compatible');
+                done();
+            });
+        });
     });
 });
 
@@ -185,16 +199,19 @@ const createMongoItems = async () => {
     // ===================
 
     const folderOne = new Folder({
+        _id: folderOneId,
         name: 'Example',
         path: ['books', 'example']
     });
 
     const folderTwo = new Folder({
+        _id: folderTwoId,
         name: 'Foobar',
         path: ['foo', 'bar']
     });
 
     const folderThree = new Folder({
+        _id: folderThreeId,
         name: 'Issues',
         path: ['magazines', 'issues']
     });
