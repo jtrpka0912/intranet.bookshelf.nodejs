@@ -144,6 +144,8 @@ describe('Retrieve Files and Folders from MongoDB', () => {
                 const folders = await retrieveDirectories(magazineShelf);
                 assert.isArray(folders);
                 assert.lengthOf(folders, 1);
+
+                assert.equal(folders[0].name, 'Magazine Example');
             });
     
             it('Find the two folders in the books shelf', async () => {
@@ -156,6 +158,7 @@ describe('Retrieve Files and Folders from MongoDB', () => {
                 const folders = await retrieveDirectories(magazineShelf, magazineExample);
                 assert.isArray(folders);
                 assert.lengthOf(folders, 1);
+                assert.equal(folders[0].name, 'Issues');
             });
     
             it('Return an error message that shelf and folder do not belong to each other', async () => {

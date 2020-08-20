@@ -107,7 +107,7 @@ describe('eBooks Router', () => {
                 const bookOne = new File({
                     type: 'book',
                     name: 'Book One',
-                    path: ['books', 'example'],
+                    path: ['books', 'example', 'book1.pdf'],
                     cover: ['images', 'books', 'example', 'Book One.jpg'],
                     didRead: false
                 });
@@ -115,7 +115,7 @@ describe('eBooks Router', () => {
                 const bookTwo = new File({
                     type: 'book',
                     name: 'Book Two',
-                    path: ['books'],
+                    path: ['books', 'book2.pdf'],
                     cover: ['images', 'books', 'Book Two.jpg'],
                     didRead: true
                 });
@@ -123,7 +123,7 @@ describe('eBooks Router', () => {
                 const bookThree = new File({
                     type: 'book',
                     name: 'Book Three',
-                    path: ['books'],
+                    path: ['books', 'book3.epub'],
                     cover: ['images', 'books', 'Book Three.jpg'],
                     didRead: true
                 });
@@ -131,7 +131,7 @@ describe('eBooks Router', () => {
                 const magazineOne = new File({
                     type: 'magazine',
                     name: 'Magainze Issue 001',
-                    path: ['magazines', 'issues'],
+                    path: ['magazines', 'issues', '001.pdf'],
                     cover: null,
                     didRead: false
                 });
@@ -139,7 +139,7 @@ describe('eBooks Router', () => {
                 const magazineTwo = new File({
                     type: 'magazine',
                     name: 'Magainze Issue 002',
-                    path: ['magazines', 'issues'],
+                    path: ['magazines', 'issues', '002.pdf'],
                     cover: null,
                     didRead: false
                 });
@@ -147,7 +147,7 @@ describe('eBooks Router', () => {
                 const magazineThree = new File({
                     type: 'magazine',
                     name: 'Magainze Issue 003',
-                    path: ['magazines', 'issues'],
+                    path: ['magazines', 'issues', '003.pdf'],
                     cover: null,
                     didRead: false
                 });
@@ -155,7 +155,7 @@ describe('eBooks Router', () => {
                 const magazineFour = new File({
                     type: 'magazine',
                     name: 'Magainze Issue 004',
-                    path: ['magazines', 'issues'],
+                    path: ['magazines', 'issues', '004.pdf'],
                     cover: null,
                     didRead: false
                 });
