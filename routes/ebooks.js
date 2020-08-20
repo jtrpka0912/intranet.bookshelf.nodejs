@@ -10,7 +10,7 @@ const Folder = require('../models/folder.model');
 const { retrieveDirectories, retrieveFiles } = require('../libs/shelf/mongodb');
 
 // Helpers
-const { foundMongoError, shelfNotFound } = require('../libs/helpers/routes');
+const { foundMongoError, shelfNotFound, folderNotFound } = require('../libs/helpers/routes');
 
 /**
  * @description Throw an error since this is a dead endpoint.
@@ -25,6 +25,14 @@ router.route('/shelf').all((req, res) => {
     });
 });
 
+router.route('/shelf/:shelfId/folder').all((req, res) => {
+    res.status(404).json({
+        errorCode: 404,
+        errorCodeMessage: 'Not Found',
+        errorMessage: 'Missing Folder ID.'
+    });
+});
+
 /**
  * @summary Retrieve files and folders from base shelf directory
  */
@@ -36,20 +44,13 @@ router.route('/shelf/:shelfId').get((req, res) => {
         if(foundMongoError(mongoError, res)) return;
 
         if(mongoShelfResponse) {
-            // console.info('Shelf Response', mongoShelfResponse);
-
-            // First check if there are files and folders inside the directory
-            // ===============================================================
-
-            let breadcrumbs = [];
+            let breadcrumbs = []; // Keep it consistent though none should be made
             let directories = [];
             let files = [];
 
             try {
                 directories = await retrieveDirectories(mongoShelfResponse);
                 files = await retrieveFiles(mongoShelfResponse);
-
-                // TODO: Implement breadcrumbs later.
             } catch(err) {
                 console.error('Error: ', err);
             }
@@ -61,6 +62,25 @@ router.route('/shelf/:shelfId').get((req, res) => {
             });
         } else {
             return shelfNotFound(shelfId, res);
+        }
+    });
+});
+
+/**
+ * @summary Retrieve files and folders from shelf and current folder.
+ */
+router.route('/shelf/:shelfId/folder/:folderId').get((req, res) => {
+    const shelfId = req.params.shelfId;
+    const folderId = req.params.folderId;
+
+    Folder.findById(folderId, async (mongoError, mongoFolderResponse) => {
+        console.info('Folder', mongoFolderResponse);
+        if(foundMongoError(mongoError, res)) return;
+
+        if(mongoFolderResponse) {
+
+        } else {
+            return folderNotFound(shelfId, res);
         }
     });
 });

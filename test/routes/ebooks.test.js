@@ -52,15 +52,6 @@ describe('eBooks Router', () => {
         await mongoServer.stop();
     });
 
-    it('Should not be able to find endpoint with no shelfId.', (done) => {
-        chai.request(app).get(`${endpointURI}/shelf`).end((err, res) => {
-            assert.isNotNull(res);
-            recognize404(res);
-            recognizeErrorMessage(res, 'Missing Shelf ID.');
-            done();
-        });
-    });
-
     describe(`GET - ${endpointURI}/shelf/:shelfId`, () => {
         before(async () => {
             await createMongoItems();
@@ -68,6 +59,15 @@ describe('eBooks Router', () => {
 
         after(async () => {
             await destroyMongoItems();
+        });
+
+        it('Should not be able to find endpoint with no shelfId.', (done) => {
+            chai.request(app).get(`${endpointURI}/shelf`).end((err, res) => {
+                assert.isNotNull(res);
+                recognize404(res);
+                recognizeErrorMessage(res, 'Missing Shelf ID.');
+                done();
+            });
         });
 
         it('Bad request with a too short ID string (12 characters minimum)', (done) => {
@@ -113,6 +113,44 @@ describe('eBooks Router', () => {
                 assert.equal(1, res.body.directories.length, 1);
                 assert.equal(0, res.body.files.length, 0);
 
+                done();
+            });
+        });
+    });
+
+    describe(`GET - ${endpointURI}/shelf/:shelfId/folder/:folderId`, () => {
+        before(async () => {
+            await createMongoItems();
+        });
+
+        after(async () => {
+            await destroyMongoItems();
+        });
+
+        it('Should not be able to find endpoint with no shelfId.', (done) => {
+            chai.request(app).get(`${endpointURI}/shelf/:shelfId/folder`).end((err, res) => {
+                assert.isNotNull(res);
+                recognize404(res);
+                recognizeErrorMessage(res, 'Missing Folder ID.');
+                done();
+            });
+        });
+
+        it('Bad request with a too short ID string (12 characters minimum)', (done) => {
+            chai.request(app).get(`${endpointURI}/shelf/${shelfOneId}/folder/meh`).end((err, res) => {
+                assert.isNotNull(res);
+                // TODO: This is subject to change once I am able to parse MongoDB errors.
+                recognize400(res);
+                recognizeErrorMessage(res, 'Cast to ObjectId failed');
+                done();
+            });
+        });
+
+        it('Fail request because it could not find Folder', (done) => {
+            chai.request(app).get(`${endpointURI}/shelf/${shelfOneId}/folder/blahblahblah`).end((err, res) => {
+                assert.isNotNull(res);
+                recognize404(res);
+                recognizeErrorMessage(res, 'Unable to find folder with id');
                 done();
             });
         });
