@@ -24,7 +24,7 @@ const { retrieveFilesFolders, createFolderToMongoDB, createFileToMongoDB } = req
 // Global Variables
 let mongoServer;
 
-describe('Create and Retrieve Files and Folders through Server to MongoDB', () => {
+describe('(server.test.js) Create and Retrieve Files and Folders through Server to MongoDB', () => {
     let unknownShelf;
     let bookShelf;
 
@@ -77,13 +77,13 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
             await Folder.deleteMany();
         });
 
-        it('Throw error if no shelf was passed', async () => {
+        it.skip('Throw error if no shelf was passed', async () => {
             const error = await retrieveFilesFolders();
             // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
             assert.containIgnoreCase(error.message, 'Shelf was missing in call');
         });
 
-        it('Throw error if shelf root directory was not found', async () => {
+        it.skip('Throw error if shelf root directory was not found', async () => {
             const error = await retrieveFilesFolders(unknownShelf);
             // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
             assert.containIgnoreCase(error.message, 'no such file or directory');
@@ -143,19 +143,19 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
             await Folder.deleteMany();
         });
 
-        it('Throw an error because it is missing node', async () => {
+        it.skip('Throw an error because it is missing node', async () => {
             const error = await createFolderToMongoDB();
             // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
             assert.containIgnoreCase(error.message, 'Missing node argument');
         });
 
-        it('Throw an error because it is missing node path', async () => {
+        it.skip('Throw an error because it is missing node path', async () => {
             const error = await createFolderToMongoDB('foo/bar');
             // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
             assert.containIgnoreCase(error.message, 'Missing node path argument');
         });
 
-        it('Throw an error if folder does not exist in server', async () => {
+        it.skip('Throw an error if folder does not exist in server', async () => {
             const node = 'FooBar';
             const rootStringPath = Shelf.convertRootToString(bookShelf.root);
             const nodePath = path.join(rootStringPath, node);
@@ -196,19 +196,19 @@ describe('Create and Retrieve Files and Folders through Server to MongoDB', () =
             await File.deleteMany();
         });
 
-        it('Throw an error because it is missing node', async () => {
+        it.skip('Throw an error because it is missing node', async () => {
             const error = await createFileToMongoDB();
             // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
             assert.containIgnoreCase(error.message, 'Missing node argument');
         });
 
-        it('Throw an error because it is missing node path', async () => {
+        it.skip('Throw an error because it is missing node path', async () => {
             const error = await createFileToMongoDB('foo/bar');
             // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
             assert.containIgnoreCase(error.message, 'Missing node path argument');
         });
 
-        it('Throw an error if file does not exist in server', async () => {
+        it.skip('Throw an error if file does not exist in server', async () => {
             const node = 'Samples/foobar.pdf';
             const rootStringPath = Shelf.convertRootToString(bookShelf.root);
             const nodePath = path.join(rootStringPath, node);

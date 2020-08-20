@@ -45,12 +45,14 @@ const retrieveFilesFolders = async (shelf, previousNode) => {
                 } else if(nodeDetails.isFile()) {
                     await createFileToMongoDB(node, nodePath);
                 } else {
+                    // TODO: Should I throw error?
                     console.warn('Unknown Node');
                 }
             }
         }
     } catch(err) {
-        if(previousNode) throw err;
+        // if(previousNode) throw err;
+        throw err;
     }
 }
 
@@ -89,7 +91,7 @@ const createFolderToMongoDB = async (node, nodePath) => {
             return doesItExist;
         }
     } catch(err) {
-        return err;
+        throw err;
     }
 }
 
@@ -136,7 +138,7 @@ const createFileToMongoDB = async (node, nodePath) => {
         }
         
     } catch(err) {
-        return err;
+        throw err;
     }
 }
 
