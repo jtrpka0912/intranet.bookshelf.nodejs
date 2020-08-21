@@ -53,6 +53,7 @@ describe('(mongodb.test.js) Retrieve Files and Folders from MongoDB', () => {
         let bookShelf;
         let magazineShelf;
         let comicShelf;
+        let longShelf;
 
         // Book folders
         let bookExample;
@@ -64,6 +65,11 @@ describe('(mongodb.test.js) Retrieve Files and Folders from MongoDB', () => {
 
         // Bad folders 
         let rootExample;
+
+        // Long folders
+        let longExample;
+        let longExampleSample;
+        let longExampleSamplePath;
 
         before(async () => {
             // Create some shelves
@@ -92,16 +98,20 @@ describe('(mongodb.test.js) Retrieve Files and Folders from MongoDB', () => {
                 multiFile: false
             });
 
+            longShelf = new Shelf({
+                name: 'Long Shelf',
+                root: ['path', 'to', 'long', 'shelf'],
+                showDirectories: true,
+                multiFile: false
+            });
+
             // Create some directories
             // =======================
+
+            // Book folders
             bookExample = new Folder({
                 name: 'Book Example',
                 path: ['books', 'example']
-            });
-
-            magazineExample = new Folder({
-                name: 'Magazine Example',
-                path: ['magazines', 'example']
             });
 
             bookFoobar = new Folder({
@@ -115,24 +125,49 @@ describe('(mongodb.test.js) Retrieve Files and Folders from MongoDB', () => {
                 path: ['example']
             });
 
+            // Magazine folders
+            magazineExample = new Folder({
+                name: 'Magazine Example',
+                path: ['magazines', 'example']
+            });
+
             magazineExampleIssues = new Folder({
                 name: 'Issues',
                 path: ['magazines', 'example', 'issues']
             });
 
-            comic
+            // Long Folders
+            longExample = new Folder({
+                name: 'Long Example',
+                path: ['path', 'to', 'long', 'shelf', 'example']
+            });
+
+            longExampleSample = new Folder({
+                name: 'Long Example Sample',
+                path: ['path', 'to', 'long', 'shelf', 'example', 'sample']
+            });
+
+            longExampleSamplePath = new Folder({
+                name: 'Long Example Sample Path',
+                path: ['path', 'to', 'long', 'shelf', 'example', 'sample', 'path']
+            });
+
 
             // Save Shelves into mock database
             await bookShelf.save();
             await magazineShelf.save();
             await comicShelf.save();
+            await longShelf.save();
 
             // Save Folders into mock database
             await bookExample.save();
-            await magazineExample.save();
             await bookFoobar.save();
-            await rootExample.save();
+            await magazineExample.save();
             await magazineExampleIssues.save();
+            await rootExample.save();
+            await longExample.save();
+            await longExampleSample.save();
+            await longExampleSamplePath.save();
         });
 
         after(async () => {
@@ -223,12 +258,34 @@ describe('(mongodb.test.js) Retrieve Files and Folders from MongoDB', () => {
                 const breadcrumbs = await retrieveBreadcrumbs(bookShelf, bookExample);
                 assert.isArray(breadcrumbs);
                 assert.lengthOf(breadcrumbs, 1);
+
+                assert.isObject(breadcrumbs[0]);
+                assert.equal(breadcrumbs[0].name, 'Book Shelf');
             });
 
             it('Return an array of breadcrumb folders from the magazine shelf', async () => {
                 const breadcrumbs = await retrieveBreadcrumbs(magazineShelf, magazineExampleIssues);
                 assert.isArray(breadcrumbs);
                 assert.lengthOf(breadcrumbs, 2); // First item should be shelf, second should be a folder
+
+                assert.isObject(breadcrumbs[0]);
+                assert.equal(breadcrumbs[0].name, 'Magazine Shelf');
+                assert.isObject(breadcrumbs[1]);
+                assert.equal(breadcrumbs[1].name, 'Magazine Example');
+            });
+
+            it('Return three breadcrumbs from the long shelf', async () => {
+                // Mostly to test longer root paths
+                const breadcrumbs = await retrieveBreadcrumbs(longShelf, longExampleSamplePath);
+                assert.isArray(breadcrumbs);
+                assert.lengthOf(breadcrumbs, 3);
+
+                assert.isObject(breadcrumbs[0]);
+                assert.equal(breadcrumbs[0].name, 'Long Shelf');
+                assert.isObject(breadcrumbs[1]);
+                assert.equal(breadcrumbs[1].name, 'Long Example');
+                assert.isObject(breadcrumbs[2]);
+                assert.equal(breadcrumbs[2].name, 'Long Example Sample');
             });
         });
 
