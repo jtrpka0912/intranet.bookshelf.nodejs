@@ -3,11 +3,10 @@ const router = require('express').Router();
 
 // Models
 const Shelf = require('../models/shelf.model');
-const File = require('../models/file.model');
 const Folder = require('../models/folder.model');
 
 // Libraries
-const { retrieveDirectories, retrieveFiles } = require('../libs/shelf/mongodb');
+const { retrieveDirectories, retrieveFiles, retrieveBreadcrumbs } = require('../libs/shelf/mongodb');
 
 // Helpers
 const { foundMongoError, shelfNotFound, folderNotFound } = require('../libs/helpers/routes');
@@ -92,7 +91,7 @@ router.route('/shelf/:shelfId/folder/:folderId').get((req, res) => {
 
                     try{
                         directories = await retrieveDirectories(mongoShelfResponse, mongoFolderResponse);
-                        
+                        breadcrumbs = await retrieveBreadcrumbs(mongoShelfResponse, mongoFolderResponse);
                         files = await retrieveFiles(mongoShelfResponse, mongoFolderResponse);
 
                     } catch(err) {
