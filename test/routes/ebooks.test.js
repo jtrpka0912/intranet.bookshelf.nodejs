@@ -41,14 +41,20 @@ const folderThreeId = '5f3eaf75dd9ede497015699c';
 
 describe('(ebooks.test.js) eBooks Router', () => {
     before(async () => {
+        // TODO: Need to figure out how to do connections with MongoDB and Mongoose.
+        mongoose.disconnect(); // Some reason there is already a connection being made.
+
         // Set up an in-memory MongoDB server
         mongoServer = new MongoMemoryServer();
 
         // Retrieve the URI from the mock database
         const mongoUri = await mongoServer.getUri();
+        console.log('URI');
         await mongoose.connect(mongoUri, {
             useNewUrlParser: true
         });
+
+        console.log('Mongoose');
     });
 
     after(async () => {
@@ -179,8 +185,7 @@ describe('(ebooks.test.js) eBooks Router', () => {
                 assert.isArray(res.body.files);
                 assert.lengthOf(res.body.files, 1);
                 assert.isArray(res.body.breadcrumbs);
-                // TODO: Need to implement breadcrumbs
-                // assert.lengthOf(res.body.breadcrumbs, 1);
+                assert.lengthOf(res.body.breadcrumbs, 1);
 
                 done();
             });
@@ -196,8 +201,7 @@ describe('(ebooks.test.js) eBooks Router', () => {
                 assert.isArray(res.body.files);
                 assert.lengthOf(res.body.files, 4);
                 assert.isArray(res.body.breadcrumbs);
-                // TODO: Need to implement breadcrumbs
-                // assert.lengthOf(res.body.breadcrumbs, 2);
+                assert.lengthOf(res.body.breadcrumbs, 1);
 
                 done();
             });
