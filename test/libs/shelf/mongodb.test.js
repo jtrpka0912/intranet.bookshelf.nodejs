@@ -54,11 +54,16 @@ describe('(mongodb.test.js) Retrieve Files and Folders from MongoDB', () => {
         let magazineShelf;
         let comicShelf;
 
+        // Book folders
         let bookExample;
-        let magazineExample;
         let bookFoobar;
-        let rootExample;
+
+        // Magazine folders
+        let magazineExample;
         let magazineExampleIssues;
+
+        // Bad folders 
+        let rootExample;
 
         before(async () => {
             // Create some shelves
@@ -114,6 +119,8 @@ describe('(mongodb.test.js) Retrieve Files and Folders from MongoDB', () => {
                 name: 'Issues',
                 path: ['magazines', 'example', 'issues']
             });
+
+            comic
 
             // Save Shelves into mock database
             await bookShelf.save();
@@ -216,6 +223,12 @@ describe('(mongodb.test.js) Retrieve Files and Folders from MongoDB', () => {
                 const breadcrumbs = await retrieveBreadcrumbs(bookShelf, bookExample);
                 assert.isArray(breadcrumbs);
                 assert.lengthOf(breadcrumbs, 1);
+            });
+
+            it('Return an array of breadcrumb folders from the magazine shelf', async () => {
+                const breadcrumbs = await retrieveBreadcrumbs(magazineShelf, magazineExampleIssues);
+                assert.isArray(breadcrumbs);
+                assert.lengthOf(breadcrumbs, 2); // First item should be shelf, second should be a folder
             });
         });
 
