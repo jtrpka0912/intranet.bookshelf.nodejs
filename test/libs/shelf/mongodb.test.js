@@ -19,6 +19,7 @@ const File = require('../../../models/file.model');
 const { 
     retrieveFiles, 
     retrieveDirectories,
+    retrieveBreadcrumbs,
     isCurrentFolderCompatible, // Really shouldn't be exported, but doing it for testing reasons.
     getSizeExpression // Really shouldn't be exported, but doing it for testing reasons.
 } = require('../../../libs/shelf/mongodb');
@@ -180,6 +181,41 @@ describe('(mongodb.test.js) Retrieve Files and Folders from MongoDB', () => {
                 assert.isArray(folders);
                 assert.lengthOf(folders, 0);
                 assert.isEmpty(folders);
+            });
+        });
+
+        describe('retrieveBreadcrumbs()', () => {
+            it.skip('Throw an error because its missing the shelf', async () => {
+                
+                /*
+                const error = await retrieveBreadcrumbs();
+                console.info('Thrown error', error);
+                // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
+                // assert.isObject(error); // TODO: typeof identifies it as object, but fails
+                assert.containIgnoreCase(error.message, 'Shelf was missing in call.');
+                */
+                assert.throws(() => {
+                    retrieveBreadcrumbs();
+                }, Error);
+            });
+
+            it.skip('Return an error message that shelf and folder do not belong to each other', async () => {
+                const error = await retrieveBreadcrumbs(magazineShelf, rootExample);
+                // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
+                // assert.isObject(error); // TODO: typeof identifies it as object, but fails
+                assert.containIgnoreCase(error.message, 'Shelf and current folder are not compatible.');
+            });
+
+            it('Return an empty array if we do not pass the current folder', async () => {
+                const breadcrumbs = await retrieveBreadcrumbs(magazineShelf);
+                assert.isArray(breadcrumbs);
+                assert.lengthOf(breadcrumbs, 0);
+            });
+
+            it('Return an array of one breadcrumb from book shelf', async () => {
+                const breadcrumbs = await retrieveBreadcrumbs(bookShelf, bookExample);
+                assert.isArray(breadcrumbs);
+                assert.lengthOf(breadcrumbs, 1);
             });
         });
 

@@ -57,6 +57,51 @@ const retrieveDirectories = async (shelf, currentFolder) => {
 }
 
 /**
+ * @function retrieveBreadcrumbs
+ * @description Retrieve the folders that led from the shelf to the current folder
+ * @author J. Trpka <jtrpka0912@gmail.com>
+ * @param { object } shelf 
+ * @param { object } currentFolder 
+ * @returns { object[] }
+ */
+const retrieveBreadcrumbs = async (shelf, currentFolder) => {
+    try {
+        if(!shelf) {
+            throw new Error('Shelf was missing in call.');
+        }
+
+        if(isCurrentFolderCompatible(shelf, currentFolder) === false) {
+            throw new Error('Shelf and current folder are not compatible.');
+        }
+
+        if(currentFolder) {
+            // Start the breadcrumbs with the shelf.
+            let breadcrumbs = [shelf];
+            console.info('Paths', shelf.root, currentFolder.path);
+            const lengthOfShelfRoot = shelf.root.length;
+            const lengthOfCurrentFolder = currentFolder.path.length;
+            const lengthDifference = lengthOfCurrentFolder - lengthOfShelfRoot;
+
+            if(lengthDifference > 1) {
+                // Loop through the path of the current folder, but do not add the final folder (current folder)
+                for(let x = 0; x < lengthOfCurrentFolder - 1; x++) {
+
+                }
+            } // Otherwise, do not add the current folder to the breadcrumbs
+
+            
+            return breadcrumbs;
+        } else {
+            // Since no current folder; just return an empty array;
+            return [];
+        }
+    } catch(err) {
+        throw err;
+    }
+}
+
+
+/**
  * @function retrieveFiles
  * @description Retrieve files from the shelf's collection with an optional folder.
  * @param { object } shelf 
@@ -229,6 +274,7 @@ const getCurrentFolderArrayElementExpression = (currentFolder, shelfLength) => {
 // TODO: Figure out a way to test the helper functions without exporting.
 module.exports = {
     retrieveDirectories,
+    retrieveBreadcrumbs,
     retrieveFiles,
     // Only for testing purposes
     isCurrentFolderCompatible,
