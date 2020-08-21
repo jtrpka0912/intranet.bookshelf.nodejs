@@ -57,6 +57,114 @@ const retrieveDirectories = async (shelf, currentFolder) => {
 }
 
 /**
+ * @function retrieveBreadcrumbs
+ * @description Retrieve the folders that led from the shelf to the current folder
+ * @author J. Trpka <jtrpka0912@gmail.com>
+ * @param { object } shelf 
+ * @param { object } currentFolder 
+ * @returns { object[] }
+ */
+const retrieveBreadcrumbs = async (shelf, currentFolder) => {
+    try {
+        if(!shelf) {
+            throw new Error('Shelf was missing in call.');
+        }
+
+        if(isCurrentFolderCompatible(shelf, currentFolder) === false) {
+            throw new Error('Shelf and current folder are not compatible.');
+        }
+
+        if(currentFolder) {
+            // Start the breadcrumbs with the shelf.
+            let breadcrumbs = [shelf];
+            // console.info('Paths', shelf.root, currentFolder.path);
+            const lengthOfShelfRoot = shelf.root.length;
+            const lengthOfCurrentFolder = currentFolder.path.length;
+            const lengthDifference = lengthOfCurrentFolder - lengthOfShelfRoot;
+
+            // console.info('Shelf Path', shelf.root);
+            // console.info('Lengths', lengthOfShelfRoot, lengthOfCurrentFolder, lengthDifference);
+
+            if(lengthDifference > 1) {
+                // Loop through the path of the current folder
+                // Start where the root would start
+                //     but do not count the last item of the path.
+                for(let x = lengthOfShelfRoot; x < lengthOfCurrentFolder - 1; x++) {
+                    // console.info('X', x);
+                    // Need to copy the array so the currentFolder.path doesn't get tampered.
+                    const currentPath = currentFolder.path.slice();
+                    // console.info('Current Path', currentPath);
+
+                    // Remove parts of the path by "popping" more items with each iteration
+                    const iteratedFolderPath = currentPath.splice(0, x + 1);
+                    // console.info('Iterated Folder Path', iteratedFolderPath);
+
+                    // Start constructing the MongoDB query
+                    const sizeExpression = {
+                        path: { $size: iteratedFolderPath.length }
+                    }
+
+                    // Will need to make an array for the $and expressions
+                    let andExpressionsForPaths = [sizeExpression];
+
+                    /**
+                     * @function getIteratedFolderArrayElementExpression
+                     * @description Loop through the iterated folder path to create a MongoDB query
+                     * @author J. Trpka <jtrpka0912@gmail.com>
+                     * @todo Would rather if this was an anonomous function inside the concat
+                     * @param { string[] } iteratedFolderPath 
+                     * @returns { object }
+                     */
+                    const getIteratedFolderArrayElementExpression = (iteratedFolderPath) => {
+                        let expressions = [];
+
+                        iteratedFolderPath.forEach((folder, index) => {
+                            // Queries need to be in the form of objects
+                            let partialExpression = {};
+                            
+                            // Dynamically add a property with a variable
+                            partialExpression[`path.${index}`] = {
+                                $eq: folder
+                            };
+                    
+                            expressions.push(partialExpression);    
+                        });
+
+                        return expressions;
+                    };
+
+                    // Then construct the iterated path index query
+                    andExpressionsForPaths = andExpressionsForPaths.concat(
+                        getIteratedFolderArrayElementExpression(iteratedFolderPath)
+                    );
+                    
+                    query = {
+                        $and: andExpressionsForPaths
+                    };
+
+                    // console.info('Query', andExpressionsForPaths);
+
+                    // Finally, find the folder with the same path, and then push it into the breadcrumbs.
+                    const directory = await Folder.findOne(query).exec(); // Should only get one folder
+
+                    // console.info('Found directory', directory);
+
+                    breadcrumbs.push(directory);
+                }
+            } // Otherwise, do not add the current folder to the breadcrumbs
+            
+            return breadcrumbs;
+        } else {
+            // Since no current folder; just return an empty array;
+            return [];
+        }
+    } catch(err) {
+        throw err;
+    }
+}
+
+
+/**
  * @function retrieveFiles
  * @description Retrieve files from the shelf's collection with an optional folder.
  * @param { object } shelf 
@@ -229,6 +337,7 @@ const getCurrentFolderArrayElementExpression = (currentFolder, shelfLength) => {
 // TODO: Figure out a way to test the helper functions without exporting.
 module.exports = {
     retrieveDirectories,
+    retrieveBreadcrumbs,
     retrieveFiles,
     // Only for testing purposes
     isCurrentFolderCompatible,
