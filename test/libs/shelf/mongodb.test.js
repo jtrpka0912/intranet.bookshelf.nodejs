@@ -7,8 +7,7 @@ chai.use(chaiString);
 const assert = chai.assert;
 
 // Mongoose / MongoDB Mock
-const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
+const setup = require('../../../libs/helpers/mocha/mongoose');
 
 // Models
 const Shelf = require('../../../models/shelf.model');
@@ -26,27 +25,15 @@ const {
 
 // TODO: Maybe figure out a way to allow not exporting some of those functions above.
 
-// Global Variables
-let mongoServer;
 
 describe('(mongodb.test.js) Retrieve Files and Folders from MongoDB', () => {
+    
     before(async () => {
-        // Set up an in-memory MongoDB server
-        mongoServer = new MongoMemoryServer();
-
-        // Retrieve the URI from the mock database
-        const mongoUri = await mongoServer.getUri();
-        await mongoose.connect(mongoUri, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useCreateIndex: true
-        });
+        await setup.mongooseTestConnection();
     });
 
     after(async () => {
-        // Disconnect mongoose and stop the mock database.
-        await mongoose.disconnect();
-        await mongoServer.stop();
+        await setup.mongoooseTestDisconnection();        
     });
 
     describe('Retrieve Folders from MongoDB', () => {

@@ -9,8 +9,7 @@ chai.use(chaiString); // Allow Chai to use Chai String plugin
 const assert = chai.assert; // Assert Style
 
 // Mongoose / MongoDB Mock
-const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
+const setup = require('../../libs/helpers/mocha/mongoose');
 
 // App
 const { app } = require('../../index'); // Get the Express app
@@ -30,7 +29,6 @@ const {
 } = require('../../libs/helpers/mocha/express/assert'); // Helper Mocha Assert Tests
 
 // Global Variables
-let mongoServer;
 const endpointURI = '/api/v1/ebooks';
 const shelfOneId = '5ec73853788ef556ecc225dd';
 const shelfTwoId = '5f3e762dbc0d6f00200404b2';
@@ -41,26 +39,11 @@ const folderThreeId = '5f3eaf75dd9ede497015699c';
 
 describe('(ebooks.test.js) eBooks Router', () => {
     before(async () => {
-        // TODO: Need to figure out how to do connections with MongoDB and Mongoose.
-        mongoose.disconnect(); // Some reason there is already a connection being made.
-
-        // Set up an in-memory MongoDB server
-        mongoServer = new MongoMemoryServer();
-
-        // Retrieve the URI from the mock database
-        const mongoUri = await mongoServer.getUri();
-        console.log('URI');
-        await mongoose.connect(mongoUri, {
-            useNewUrlParser: true
-        });
-
-        console.log('Mongoose');
+        await setup.mongooseTestConnection();
     });
 
     after(async () => {
-        // Disconnect mongoose and stop the mock database.
-        await mongoose.disconnect();
-        await mongoServer.stop();
+        await setup.mongoooseTestDisconnection();
     });
 
     describe(`GET - ${endpointURI}/shelf/:shelfId`, () => {
