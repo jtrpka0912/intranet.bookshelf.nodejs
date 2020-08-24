@@ -9,8 +9,7 @@ chai.use(chaiString); // Allow Chai to use Chai String plugin.
 const assert = chai.assert; // Assert Style
 
 // Mongoose / MongoDB Mock
-const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
+const setup = require('../../libs/helpers/mocha/mongoose');
 
 // App
 const { app } = require('../../index'); // Get the Express app
@@ -29,25 +28,15 @@ const {
 } = require('../../libs/helpers/mocha/express/assert'); // Helper Mocha Assert Tests
 
 // Global Variables
-let mongoServer;
 const endpointURI = '/api/v1/shelves';
 
-describe('Shelves Router', () => {
+describe('(shelves.test.js) Shelves Router', () => {
     before(async () => {
-        // Set up an in-memory MongoDB server
-        mongoServer = new MongoMemoryServer();
-
-        // Retrieve the URI from the mock database
-        const mongoUri = await mongoServer.getUri();
-        await mongoose.connect(mongoUri, {
-            useNewUrlParser: true
-        });
+        await setup.mongooseTestConnection();
     });
 
     after(async () => {
-        // Disconnect mongoose and stop the mock database.
-        await mongoose.disconnect();
-        await mongoServer.stop();
+        await setup.mongoooseTestDisconnection();        
     });
 
     describe(`GET - ${endpointURI}`, () => {

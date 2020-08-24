@@ -10,8 +10,7 @@ chai.use(chaiString)
 const assert = chai.assert;
 
 // Mongoose / MongoDB Mock
-const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
+const setup = require('../../../libs/helpers/mocha/mongoose');
 
 // Models
 const Shelf = require('../../../models/shelf.model');
@@ -21,24 +20,12 @@ const File = require('../../../models/file.model');
 // Libs
 const { retrieveFilesFolders, createFolderToMongoDB, createFileToMongoDB } = require('../../../libs/shelf/server');
 
-// Global Variables
-let mongoServer;
-
 describe('(server.test.js) Create and Retrieve Files and Folders through Server to MongoDB', () => {
     let unknownShelf;
     let bookShelf;
 
     before(async () => {
-        // Set up an in-memory MongoDB server
-        mongoServer = new MongoMemoryServer();
-
-        // Retrieve the URI from the mock database
-        const mongoUri = await mongoServer.getUri();
-        await mongoose.connect(mongoUri, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useCreateIndex: true
-        });
+        await setup.mongooseTestConnection();
 
         // Create some shelves
         // ===================
@@ -67,9 +54,7 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
         // Remove documents from collections
         await Shelf.deleteMany({});
 
-        // Disconnect mongoose and stop the mock database
-        await mongoose.disconnect();
-        await mongoServer.stop();
+        await setup.mongoooseTestDisconnection();
     });
 
     describe('retrieveFilesFolders()', () => {
