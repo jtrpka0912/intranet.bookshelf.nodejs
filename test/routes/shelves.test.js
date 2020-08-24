@@ -431,4 +431,64 @@ describe('(shelves.test.js) Shelves Router', () => {
             });
         });
     });
+
+    describe(`GET - ${endpointURI}/:shelfId/refresh`, () => {
+        const bookShelfId = '5f440bf9e3475949849c292e';
+
+        before(async () => {
+
+            let bookShelf = new Shelf({
+                _id: bookShelfId,
+                name: 'Book Shelf',
+                // You will need to adjust the path accordingly
+                root: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Books'],
+                showDirectories: true,
+                multiFile: false
+            });
+            
+            await bookShelf.save();
+        });
+
+        it('Bad request with a too short ID string (12 characters minimum)', (done) => {
+            chai.request(app).get(`${endpointURI}/blah/refresh`).end((err, res) => {
+                assert.isNotNull(res);
+                // TODO: This is subject to change once I am able to parse MongoDB errors.
+                recognize400(res);
+                recognizeErrorMessage(res, 'Cast to ObjectId failed');
+                done();
+            });
+        });
+
+        it('Fail request because it could not find Shelf', (done) => {
+            chai.request(app).get(`${endpointURI}/blahblahblah/refresh`).end((err, res) => {
+                assert.isNotNull(res);
+                recognize404(res);
+                recognizeErrorMessage(res, 'Unable to find shelf with id');
+                done();
+            });
+        });
+
+        it('Respond with no content if successful', (done) => {
+            chai.request(app).get(`${endpointURI}/${bookShelfId}/refresh`).end((err, res) => {
+                assert.isEmpty(res.body);
+                recognize204(res);
+
+                // Then retrieve a response to get the results from the database
+                chai.request(app).get(`/api/v1/ebooks/shelf/${bookShelfId}`).end((err, res) => {
+                    assert.lengthOf(res.body.breadcrumbs, 0);
+                    assert.lengthOf(res.body.directories, 1);
+                    assert.lengthOf(res.body.files, 0);
+
+                    // Then dive into the folder to get its response
+                    chai.request(app).get(`/api/v1/ebooks/shelf/${bookShelfId}/folder/${res.body.directories[0]._id}`).end((err, res) => {
+                        assert.lengthOf(res.body.breadcrumbs, 1);
+                        assert.lengthOf(res.body.directories, 0);
+                        assert.lengthOf(res.body.files, 2);
+
+                        done();
+                    });
+                });
+            });
+        });
+    });
 });
