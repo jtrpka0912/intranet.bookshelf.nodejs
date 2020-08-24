@@ -431,4 +431,40 @@ describe('(shelves.test.js) Shelves Router', () => {
             });
         });
     });
+
+    describe(`GET - ${endpointURI}/:shelfId/refresh`, () => {
+        let bookShelf;
+
+        before(async () => {
+
+            bookShelf = new Shelf({
+                name: 'Book Shelf',
+                // You will need to adjust the path accordingly
+                root: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Books'],
+                showDirectories: true,
+                multiFile: false
+            });
+
+            await bookShelf.save();
+        });
+
+        it('Bad request with a too short ID string (12 characters minimum)', (done) => {
+            chai.request(app).get(`${endpointURI}/blah/refresh`).end((err, res) => {
+                assert.isNotNull(res);
+                // TODO: This is subject to change once I am able to parse MongoDB errors.
+                recognize400(res);
+                recognizeErrorMessage(res, 'Cast to ObjectId failed');
+                done();
+            });
+        });
+
+        it('Fail request because it could not find Shelf', (done) => {
+            chai.request(app).get(`${endpointURI}/blahblahblah/refresh`).end((err, res) => {
+                assert.isNotNull(res);
+                recognize404(res);
+                recognizeErrorMessage(res, 'Unable to find shelf with id');
+                done();
+            });
+        });
+    });
 });

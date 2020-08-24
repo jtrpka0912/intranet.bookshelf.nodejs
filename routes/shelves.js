@@ -175,4 +175,24 @@ router.route('/:shelfId').delete((req, res) => {
     });
 });
 
+/**
+ * @summary Refresh a single shelf
+ */
+router.route('/:shelfId/refresh').get((req, res) => {
+    // Retrieve the shelfId parameter.
+    const shelfId = req.params.shelfId;
+
+    Shelf.findById(shelfId, (mongoError, mongoResponse) => {
+        if(foundMongoError(mongoError, res)) return;
+
+        if(mongoResponse) {
+            // No content
+            res.sendStatus(204);
+        } else {
+            shelfNotFound(shelfId, res);
+        }
+        
+    });
+})
+
 module.exports = router;
