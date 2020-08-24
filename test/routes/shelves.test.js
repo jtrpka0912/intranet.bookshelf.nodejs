@@ -433,18 +433,19 @@ describe('(shelves.test.js) Shelves Router', () => {
     });
 
     describe(`GET - ${endpointURI}/:shelfId/refresh`, () => {
-        let bookShelf;
+        const bookShelfId = '5f440bf9e3475949849c292e';
 
         before(async () => {
 
-            bookShelf = new Shelf({
+            let bookShelf = new Shelf({
+                _id: bookShelfId,
                 name: 'Book Shelf',
                 // You will need to adjust the path accordingly
                 root: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Books'],
                 showDirectories: true,
                 multiFile: false
             });
-
+            
             await bookShelf.save();
         });
 
@@ -464,6 +465,29 @@ describe('(shelves.test.js) Shelves Router', () => {
                 recognize404(res);
                 recognizeErrorMessage(res, 'Unable to find shelf with id');
                 done();
+            });
+        });
+
+        it('Respond with no content if successful', (done) => {
+            chai.request(app).get(`${endpointURI}/${bookShelfId}/refresh`).end((err, res) => {
+                assert.isEmpty(res.body);
+                recognize204(res);
+
+                // Then retrieve a response to get the results from the database
+                chai.request(app).get(`/api/v1/ebooks/shelf/${bookShelfId}`).end((err, res) => {
+                    assert.lengthOf(res.body.breadcrumbs, 0);
+                    assert.lengthOf(res.body.directories, 1);
+                    assert.lengthOf(res.body.files, 0);
+
+                    // Then dive into the folder to get its response
+                    chai.request(app).get(`/api/v1/ebooks/shelf/${bookShelfId}/folder/${res.body.directories[0]._id}`).end((err, res) => {
+                        assert.lengthOf(res.body.breadcrumbs, 1);
+                        assert.lengthOf(res.body.directories, 0);
+                        assert.lengthOf(res.body.files, 2);
+
+                        done();
+                    });
+                });
             });
         });
     });

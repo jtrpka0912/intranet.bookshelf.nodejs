@@ -4,6 +4,9 @@ const router = require('express').Router();
 // Models
 const Shelf = require('../models/shelf.model');
 
+// Libs
+const shelfLibrary = require('../libs/shelf/server');
+
 // Helpers
 const { foundMongoError, pathArrayToString, pathStringToArray, shelfNotFound } = require('../libs/helpers/routes');
 
@@ -182,12 +185,21 @@ router.route('/:shelfId/refresh').get((req, res) => {
     // Retrieve the shelfId parameter.
     const shelfId = req.params.shelfId;
 
-    Shelf.findById(shelfId, (mongoError, mongoResponse) => {
+    Shelf.findById(shelfId, async (mongoError, mongoResponse) => {
         if(foundMongoError(mongoError, res)) return;
 
         if(mongoResponse) {
-            // No content
-            res.sendStatus(204);
+            try {
+                await shelfLibrary.retrieveFilesFolders(mongoResponse);
+                // No content
+                res.sendStatus(204);
+            } catch(err) {
+                return res.status(500).json({
+                    errorCode: 500,
+                    errorCodeMessage: 'Internal Server Error',
+                    errorMessage: err.message
+                });
+            }
         } else {
             shelfNotFound(shelfId, res);
         }
