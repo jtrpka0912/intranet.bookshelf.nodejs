@@ -28,6 +28,7 @@ mongoose.connect(uri, {
     useCreateIndex: true
 });
 
+// Connect to MongoDB
 const connection = mongoose.connection;
 connection.once('open', () => {
     console.info('\x1b[34m%s', 'MongoDB database connection established successfully.')
@@ -37,6 +38,7 @@ connection.once('open', () => {
 app.use('/api/v1/shelves', shelvesRouter);
 app.use('/api/v1/ebooks', ebooksRouter);
 
+// Connect node to a part
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
 });
