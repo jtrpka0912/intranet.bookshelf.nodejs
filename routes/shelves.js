@@ -71,6 +71,9 @@ router.route('/').post((req, res) => {
     });
 
     newShelf.save().then((mongoResponse) => {
+        // Refresh the shelf to populate the MongoDB
+        shelfLibrary.retrieveFilesFolders(mongoResponse._id);
+
         // Convert from Mongo Object to JavaScript Object
         mongoResponse = mongoResponse.toObject();
 
