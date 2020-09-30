@@ -53,7 +53,7 @@ describe('(shelves.test.js) Shelves Router', () => {
 
             const shelfTwo = new Shelf({
                 name: 'Shelf Two',
-                root: ['books/publishers'],
+                root: ['books', 'publishers'],
                 showDirectories: true,
                 multiFile: true
             });
@@ -161,6 +161,26 @@ describe('(shelves.test.js) Shelves Router', () => {
             request.send({
                 name: 'From Test',
                 root: '/example/foo/bar',
+                showDirectories: true,
+                multiFile: false
+            }).end((err, res) => {
+                const response = res.body;
+
+                assert.isNotNull(res);
+                recognize201(res);
+
+                assert.containIgnoreCase(response.name, 'From Test');
+                assert.isNotArray(response.root); // We make it an array in mongo, but should return back as string
+                assert.equal(response.root, '/example/foo/bar');
+                done();
+            });
+        });
+
+        // FIXME: Get this test working for windows 'backslashes' paths.
+        it('Successfully create a new shelf with Windows path', (done) => {
+            request.send({
+                name: 'From Test',
+                root: '\\example\\foo\\bar', // Windows have the other slashes
                 showDirectories: true,
                 multiFile: false
             }).end((err, res) => {

@@ -6,6 +6,8 @@
  * @returns { string[] }
  */
 const pathStringToArray = (pathString) => {
+    pathString.replace('\\', '/'); // Replace back slashes with forward slashes
+    
     // Will need to remove the first '/' that starts the path.
     if(pathString.indexOf('/') === 0) {
         pathString = pathString.substr(1);
