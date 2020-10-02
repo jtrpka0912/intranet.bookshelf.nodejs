@@ -59,7 +59,7 @@ const retrieveDirectories = async (shelf, currentFolder) => {
 /**
  * @function retrieveBreadcrumbs
  * @description Retrieve the folders that led from the shelf to the current folder
- * @author J. Trpka <jtrpka0912@gmail.com>
+ * @author J.T.
  * @param { object } shelf 
  * @param { object } currentFolder 
  * @returns { object[] }
@@ -110,7 +110,7 @@ const retrieveBreadcrumbs = async (shelf, currentFolder) => {
                     /**
                      * @function getIteratedFolderArrayElementExpression
                      * @description Loop through the iterated folder path to create a MongoDB query
-                     * @author J. Trpka <jtrpka0912@gmail.com>
+                     * @author J.T.
                      * @todo Would rather if this was an anonomous function inside the concat
                      * @param { string[] } iteratedFolderPath 
                      * @returns { object }

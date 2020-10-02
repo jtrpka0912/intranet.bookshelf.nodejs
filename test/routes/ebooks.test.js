@@ -196,7 +196,7 @@ describe('(ebooks.test.js) eBooks Router', () => {
  * @async
  * @function createMongoItems
  * @description Create the items to use when testing the endpoints.
- * @author J. Trpka <jtrpka0912@gmail.com>
+ * @author J.T.
  */
 const createMongoItems = async () => {
     // Create a shelf
@@ -314,7 +314,7 @@ const createMongoItems = async () => {
  * @async
  * @function destroyMongoItems
  * @description Detroy the items that were used for testing the endpoints.
- * @author J. Trpka <jtrpka0912@gmail.com>
+ * @author J.T.
  */
 const destroyMongoItems = async () => {
     // Remove all shelves, files, and folders
