@@ -26,7 +26,7 @@ const folderSchema = new Schema({
  * @static
  * @function convertPathToString
  * @description Convert array path to a string path
- * @todo Need to do some testing
+ * @todo Do I really need this?
  * @param { string[] } path
  * @param { string } separator (default to /)
  * @returns { string }
@@ -39,7 +39,7 @@ folderSchema.statics.convertPathToString = function(path, separator = '/') {
  * @static
  * @function convertPathToArray
  * @description Convert string path to an array path
- * @todo Need to do some testing
+ * @todo Do I really need this?
  * @param { string } path 
  * @param { string } separator (default to /)
  * @returns { string[] }

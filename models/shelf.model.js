@@ -39,7 +39,7 @@ const shelfSchema = new Schema({
  * @static
  * @function convertRootToString
  * @description Convert root array path to a string path
- * @todo Need to do some testing
+ * @todo Do I really need this?
  * @param { string[] } root
  * @param { string } separator (default to /)
  * @returns { string }
@@ -52,7 +52,7 @@ shelfSchema.statics.convertRootToString = function(root, separator = '/') {
  * @static
  * @function convertPathToArray
  * @description Convert root string path to an array path
- * @todo Need to do some testing
+ * @todo Do I really need this?
  * @param { string } root 
  * @param { string } separator (default to /)
  * @returns { string[] }

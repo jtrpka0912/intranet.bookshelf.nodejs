@@ -1,3 +1,5 @@
+const separator = '/';
+
 /**
  * @function pathStringToArray
  * @summary Convert a string path to an array for MongoDB.
@@ -6,15 +8,13 @@
  * @returns { string[] }
  */
 const pathStringToArray = (pathString) => {
-    pathString.replace('\\', '/'); // Replace back slashes with forward slashes
-    
     // Will need to remove the first '/' that starts the path.
-    if(pathString.indexOf('/') === 0) {
+    if(pathString.indexOf(separator) === 0) {
         pathString = pathString.substr(1);
     }
     
-    return pathString.split('/');
-}
+    return pathString.split(separator);
+};
 
 /**
  * @function pathArrayToString
@@ -24,7 +24,8 @@ const pathStringToArray = (pathString) => {
  * @returns { string }
  */
 const pathArrayToString = (pathArray) => {
-    return '/' + pathArray.join('/');
+    // NOTE: I originally prepend it with an additional forward slash
+    return pathArray.join(separator);
 };
 
 /**

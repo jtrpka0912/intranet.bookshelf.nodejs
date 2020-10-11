@@ -97,6 +97,23 @@ const recognizeErrorMessage = (res, partialMessage) => {
     assert.containIgnoreCase(res.body.errorMessage, partialMessage);
 };
 
+/**
+ * @function pathShouldBeString
+ * @description Check if the path is a string instead of an array
+ * @author J.T.
+ * @param { array } items (Can be either breadcrumbs, directories, or files)
+ */
+const pathShouldBeString = (items) => {
+    if(items.length > 0) {
+        for(let item of items) {        
+            assert.isNotArray(item.path, 'Should be a string');
+            assert.isString(item.path, 'This is not a string');
+        }
+    }
+}
+
+// TODO: Add @author to comment blocks
+
 module.exports = {
     recognize200,
     recognize201,
@@ -104,5 +121,6 @@ module.exports = {
     recognize400,
     recognize404,
     recognize500,
-    recognizeErrorMessage
+    recognizeErrorMessage,
+    pathShouldBeString
 };

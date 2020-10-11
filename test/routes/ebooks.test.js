@@ -26,6 +26,7 @@ const {
     recognize400,
     recognize404,
     recognize500,
+    pathShouldBeString,
 } = require('../../libs/helpers/mocha/express/assert'); // Helper Mocha Assert Tests
 
 // Global Variables
@@ -88,11 +89,19 @@ describe('(ebooks.test.js) eBooks Router', () => {
                 assert.isNotNull(res);
                 recognize200(res);
 
+                // TODO: Need to do this for the shelf/folder tests
+
                 // Only expecting one folder, from directories, to arrive
                 assert.lengthOf(res.body.directories, 1, 'Incorrect folder count');
 
+                // Check if directory paths are strings
+                pathShouldBeString(res.body.directories);
+
                 // Expecting two files to arrive
                 assert.lengthOf(res.body.files, 2, 'Incorrect file count');
+                
+                // Check if file paths are strings
+                pathShouldBeString(res.body.files);
 
                 done();
             });
@@ -105,6 +114,8 @@ describe('(ebooks.test.js) eBooks Router', () => {
 
                 // Expects one folder though that folder does have another folder
                 assert.lengthOf(res.body.directories, 1);
+                pathShouldBeString(res.body.directories);
+
                 assert.lengthOf(res.body.files, 0);
 
                 done();

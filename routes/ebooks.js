@@ -9,7 +9,7 @@ const Folder = require('../models/folder.model');
 const { retrieveDirectories, retrieveFiles, retrieveBreadcrumbs } = require('../libs/shelf/mongodb');
 
 // Helpers
-const { foundMongoError, shelfNotFound, folderNotFound } = require('../libs/helpers/routes');
+const { foundMongoError, shelfNotFound, folderNotFound, pathArrayToString } = require('../libs/helpers/routes');
 
 /**
  * @description Throw an error since this is a dead endpoint.
@@ -48,7 +48,30 @@ router.route('/shelf/:shelfId').get((req, res) => {
 
             try {
                 directories = await retrieveDirectories(mongoShelfResponse);
+
+                // TODO: Need to do this when fetching with active folder
+                const updatedDirectories = directories.map((directory) => {
+                    // Convert to a JavaScript Object
+                    directory = directory.toObject();
+                    directory.path = pathArrayToString(directory.path);
+
+                    return directory;
+                });
+
                 files = await retrieveFiles(mongoShelfResponse);
+                const updatedFiles = files.map((file) => {
+                    // Convert to a JavaScript Object
+                    file = file.toObject();
+                    file.path = pathArrayToString(file.path);
+
+                    return file;
+                });
+
+                res.status(200).json({
+                    breadcrumbs: [], // We are at the root of the shelf
+                    directories: updatedDirectories,
+                    files: updatedFiles
+                });
             } catch(err) {
                 return res.status(500).json({
                     errorCode: 500,
@@ -56,12 +79,6 @@ router.route('/shelf/:shelfId').get((req, res) => {
                     errorMessage: err.message
                 });
             }
-
-            res.status(200).json({
-                breadcrumbs: [], // We are at the root of the shelf
-                directories,
-                files
-            });
         } else {
             return shelfNotFound(shelfId, res);
         }

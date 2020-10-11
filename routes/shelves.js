@@ -72,7 +72,7 @@ router.route('/').post((req, res) => {
 
     newShelf.save().then((mongoResponse) => {
         // Refresh the shelf to populate the MongoDB
-        shelfLibrary.retrieveFilesFolders(mongoResponse._id);
+        shelfLibrary.retrieveFilesFolders(mongoResponse);
 
         // Convert from Mongo Object to JavaScript Object
         mongoResponse = mongoResponse.toObject();
@@ -143,6 +143,7 @@ router.route('/:shelfId').put((req, res) => {
     }
 
     // Retrieve the existing Shelf and update
+    // TODO: Refresh the MongoDB
     Shelf.findByIdAndUpdate(shelfId, shelfUpdate, {
         new: true // Send the updated shelf data instead of original
     }, (mongoError, mongoResponse) => {
