@@ -175,11 +175,14 @@ describe('(ebooks.test.js) eBooks Router', () => {
                 recognize200(res);
 
                 assert.isArray(res.body.directories);
-                assert.lengthOf(res.body.directories, 0)
+                assert.lengthOf(res.body.directories, 0);
+                pathShouldBeString(res.body.directories);
                 assert.isArray(res.body.files);
                 assert.lengthOf(res.body.files, 1);
+                pathShouldBeString(res.body.files);
                 assert.isArray(res.body.breadcrumbs);
                 assert.lengthOf(res.body.breadcrumbs, 1);
+                pathShouldBeString(res.body.breadcrumbs);
 
                 done();
             });
@@ -191,11 +194,14 @@ describe('(ebooks.test.js) eBooks Router', () => {
                 recognize200(res);
 
                 assert.isArray(res.body.directories);
-                assert.lengthOf(res.body.directories, 0)
+                assert.lengthOf(res.body.directories, 0);
+                pathShouldBeString(res.body.directories);
                 assert.isArray(res.body.files);
                 assert.lengthOf(res.body.files, 4);
+                pathShouldBeString(res.body.files);
                 assert.isArray(res.body.breadcrumbs);
                 assert.lengthOf(res.body.breadcrumbs, 1);
+                pathShouldBeString(res.body.breadcrumbs);
 
                 done();
             });

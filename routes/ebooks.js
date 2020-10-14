@@ -44,13 +44,13 @@ router.route('/shelf/:shelfId').get((req, res) => {
 
         if(mongoShelfResponse) {
             let directories = [];
+            let updatedDirectories = [];
             let files = [];
+            let updatedFiles = [];
 
             try {
                 directories = await retrieveDirectories(mongoShelfResponse);
-
-                // TODO: Need to do this when fetching with active folder
-                const updatedDirectories = directories.map((directory) => {
+                updatedDirectories = directories.map((directory) => {
                     // Convert to a JavaScript Object
                     directory = directory.toObject();
                     directory.path = pathArrayToString(directory.path);
@@ -59,7 +59,7 @@ router.route('/shelf/:shelfId').get((req, res) => {
                 });
 
                 files = await retrieveFiles(mongoShelfResponse);
-                const updatedFiles = files.map((file) => {
+                updatedFiles = files.map((file) => {
                     // Convert to a JavaScript Object
                     file = file.toObject();
                     file.path = pathArrayToString(file.path);
@@ -67,11 +67,7 @@ router.route('/shelf/:shelfId').get((req, res) => {
                     return file;
                 });
 
-                res.status(200).json({
-                    breadcrumbs: [], // We are at the root of the shelf
-                    directories: updatedDirectories,
-                    files: updatedFiles
-                });
+                
             } catch(err) {
                 return res.status(500).json({
                     errorCode: 500,
@@ -79,6 +75,12 @@ router.route('/shelf/:shelfId').get((req, res) => {
                     errorMessage: err.message
                 });
             }
+
+            res.status(200).json({
+                breadcrumbs: [], // We are at the root of the shelf
+                directories: updatedDirectories,
+                files: updatedFiles
+            });
         } else {
             return shelfNotFound(shelfId, res);
         }
@@ -103,14 +105,54 @@ router.route('/shelf/:shelfId/folder/:folderId').get((req, res) => {
 
                 if(mongoShelfResponse) {
                     let breadcrumbs = [];
+                    let updatedBreadcrumbs = [];
                     let directories = [];
+                    let updatedDirectories = [];
                     let files = [];
+                    let updatedFiles = [];
 
                     try{
                         directories = await retrieveDirectories(mongoShelfResponse, mongoFolderResponse);
-                        breadcrumbs = await retrieveBreadcrumbs(mongoShelfResponse, mongoFolderResponse);
-                        files = await retrieveFiles(mongoShelfResponse, mongoFolderResponse);
+                        updatedDirectories = directories.map((directory) => {
+                            // Convert to a JavaScript Object
+                            directory = directory.toObject();
+                            directory.path = pathArrayToString(directory.path);
+        
+                            return directory;
+                        });
 
+                        // NOTE: The breadcrumbs generates a shelf as the first item then folders thereafter
+                        breadcrumbs = await retrieveBreadcrumbs(mongoShelfResponse, mongoFolderResponse);
+                        updatedBreadcrumbs = breadcrumbs.map((breadcrumb, index) => {
+                            // First item is a shelf
+                            if(index === 0) {
+                                // Convert to a folder-like object
+                                let convertedFolder = {
+                                    _id: breadcrumb.id,
+                                    name: breadcrumb.name,
+                                    path: pathArrayToString(breadcrumb.root),
+                                    createdAt: breadcrumb.createdAt,
+                                    updatedAt: breadcrumb.updatedAt
+                                };
+
+                                breadcrumb = convertedFolder;
+                            } else {
+                                // Convert to a JavaScript Object
+                                breadcrumb = breadcrumb.toObject();
+                                breadcrumb.path = pathArrayToString(breadcrumb.path);
+                            }
+
+                            return breadcrumb;
+                        });
+                        
+                        files = await retrieveFiles(mongoShelfResponse, mongoFolderResponse);
+                        updatedFiles = files.map((file) => {
+                            // Convert to a JavaScript Object
+                            file = file.toObject();
+                            file.path = pathArrayToString(file.path);
+        
+                            return file;
+                        });
                     } catch(err) {
                         return res.status(500).json({
                             errorCode: 500,
@@ -120,9 +162,9 @@ router.route('/shelf/:shelfId/folder/:folderId').get((req, res) => {
                     }
 
                     res.status(200).json({
-                        breadcrumbs,
-                        directories,
-                        files
+                        breadcrumbs: updatedBreadcrumbs,
+                        directories: updatedDirectories,
+                        files: updatedFiles
                     });
                 } else {
                     return shelfNotFound(shelfId, res);
