@@ -124,21 +124,14 @@ router.route('/shelf/:shelfId/folder/:folderId').get((req, res) => {
                         // NOTE: The breadcrumbs generates a shelf as the first item then folders thereafter
                         breadcrumbs = await retrieveBreadcrumbs(mongoShelfResponse, mongoFolderResponse);
                         updatedBreadcrumbs = breadcrumbs.map((breadcrumb, index) => {
+                            breadcrumb = breadcrumb.toObject();
+
                             // First item is a shelf
                             if(index === 0) {
-                                // Convert to a folder-like object
-                                let convertedFolder = {
-                                    _id: breadcrumb.id,
-                                    name: breadcrumb.name,
-                                    path: pathArrayToString(breadcrumb.root),
-                                    createdAt: breadcrumb.createdAt,
-                                    updatedAt: breadcrumb.updatedAt
-                                };
-
-                                breadcrumb = convertedFolder;
+                                // Convert to a JavaScript Object
+                                breadcrumb.root = pathArrayToString(breadcrumb.root);
                             } else {
                                 // Convert to a JavaScript Object
-                                breadcrumb = breadcrumb.toObject();
                                 breadcrumb.path = pathArrayToString(breadcrumb.path);
                             }
 

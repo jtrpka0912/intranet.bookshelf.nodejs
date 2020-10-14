@@ -102,12 +102,22 @@ const recognizeErrorMessage = (res, partialMessage) => {
  * @description Check if the path is a string instead of an array
  * @author J.T.
  * @param { array } items (Can be either breadcrumbs, directories, or files)
+ * @param { boolean } isBreadcrumb
  */
-const pathShouldBeString = (items) => {
+const pathShouldBeString = (items, isBreadcrumb = false) => {
     if(items.length > 0) {
-        for(let item of items) {        
-            assert.isNotArray(item.path, 'Should be a string');
-            assert.isString(item.path, 'This is not a string');
+        let counter = 0;
+        for(let item of items) {   
+            // If working with breadcrumb items; then the first item is a shelf
+            if(counter === 0 && isBreadcrumb) {
+                assert.isNotArray(item.root, 'Should be a string');
+                assert.isString(item.root, 'This is not a string');
+            } else {
+                assert.isNotArray(item.path, 'Should be a string');
+                assert.isString(item.path, 'This is not a string');
+            }
+            
+            counter++;
         }
     }
 }

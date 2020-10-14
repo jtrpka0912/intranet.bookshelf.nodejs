@@ -182,7 +182,7 @@ describe('(ebooks.test.js) eBooks Router', () => {
                 pathShouldBeString(res.body.files);
                 assert.isArray(res.body.breadcrumbs);
                 assert.lengthOf(res.body.breadcrumbs, 1);
-                pathShouldBeString(res.body.breadcrumbs);
+                pathShouldBeString(res.body.breadcrumbs, true);
 
                 done();
             });
@@ -201,7 +201,7 @@ describe('(ebooks.test.js) eBooks Router', () => {
                 pathShouldBeString(res.body.files);
                 assert.isArray(res.body.breadcrumbs);
                 assert.lengthOf(res.body.breadcrumbs, 1);
-                pathShouldBeString(res.body.breadcrumbs);
+                pathShouldBeString(res.body.breadcrumbs, true);
 
                 done();
             });
