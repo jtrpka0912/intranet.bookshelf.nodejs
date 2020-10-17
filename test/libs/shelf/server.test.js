@@ -19,6 +19,7 @@ const File = require('../../../models/file.model');
 
 // Libs
 const { retrieveFilesFolders, createFolderToMongoDB, createFileToMongoDB } = require('../../../libs/shelf/server');
+const { pathArrayToString, pathStringToArray } = require('../../../libs/helpers/routes');
 
 describe('(server.test.js) Create and Retrieve Files and Folders through Server to MongoDB', () => {
     let unknownShelf;
@@ -81,6 +82,8 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             const count = await Folder.find().countDocuments().exec();
             assert.equal(count, 1);
 
+            console.log(await Folder.find({}));
+
             // Retrieve the folder that was created
             const sampleFolder = await Folder.findOne({ 
                 name: 'Samples', 
@@ -88,7 +91,7 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             }).exec();
             assert.isObject(sampleFolder, 'Unable to find sampleFolder');
             assert.equal(sampleFolder.name, 'Samples');
-            assert.equal(Folder.convertPathToString(sampleFolder.path), 'd:/Backend/Nodejs/intranet.bookshelf.nodejs/test/sample-server/Books/Samples');
+            assert.equal(pathArrayToString(sampleFolder.path), 'd:/Backend/Nodejs/intranet.bookshelf.nodejs/test/sample-server/Books/Samples');
 
             // Count the files that were created
             const fileCount = await File.find({}).countDocuments().exec();
@@ -142,7 +145,7 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
 
         it.skip('Throw an error if folder does not exist in server', async () => {
             const node = 'FooBar';
-            const rootStringPath = Shelf.convertRootToString(bookShelf.root);
+            const rootStringPath = pathArrayToString(bookShelf.root);
             const nodePath = path.join(rootStringPath, node);
 
             const error = await createFolderToMongoDB(node, nodePath);
@@ -152,7 +155,7 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
 
         it('Return back the Folder MongoDB document', async () => {
             const node = 'Samples';
-            const rootStringPath = Shelf.convertRootToString(bookShelf.root);
+            const rootStringPath = pathArrayToString(bookShelf.root);
             const nodePath = path.join(rootStringPath, node);
 
             const response = await createFolderToMongoDB(node, nodePath);
@@ -164,7 +167,7 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
 
         it('Prevent duplicated folders from being created', async () => {
             const node = 'Samples';
-            const rootStringPath = Shelf.convertRootToString(bookShelf.root);
+            const rootStringPath = pathArrayToString(bookShelf.root);
             const nodePath = path.join(rootStringPath, node);
 
             await createFolderToMongoDB(node, nodePath);
@@ -195,7 +198,7 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
 
         it.skip('Throw an error if file does not exist in server', async () => {
             const node = 'Samples/foobar.pdf';
-            const rootStringPath = Shelf.convertRootToString(bookShelf.root);
+            const rootStringPath = pathArrayToString(bookShelf.root);
             const nodePath = path.join(rootStringPath, node);
 
             const error = await createFolderToMongoDB(node, nodePath);
@@ -205,7 +208,7 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
 
         it('Return back the File MongoDB document', async () => {
             const node = 'Samples/sample.pdf';
-            const rootStringPath = Shelf.convertRootToString(bookShelf.root);
+            const rootStringPath = pathArrayToString(bookShelf.root);
             const nodePath = path.join(rootStringPath, node);
 
             const response = await createFileToMongoDB(node, nodePath);
@@ -220,7 +223,7 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
 
         it('Prevent duplicated files from being created', async () => {
             const node = 'Samples/sample.pdf';
-            const rootStringPath = Shelf.convertRootToString(bookShelf.root);
+            const rootStringPath = pathArrayToString(bookShelf.root);
             const nodePath = path.join(rootStringPath, node);
 
             await createFileToMongoDB(node, nodePath);

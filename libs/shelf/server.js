@@ -75,10 +75,11 @@ const createFolderToMongoDB = async (node, nodePath) => {
 
         // Check if folder exists in server
         await fs.promises.access(nodePath, fs.constants.F_OK);
-
+        console.info('Folder path', nodePath);
         const query = {
             name: node,
-            path: pathStringToArray(nodePath)
+            // Need to replace any back slashes with forward slashes
+            path: pathStringToArray(nodePath.replace(/\\/g, '/'))
         };
 
         // Then check if the folder already exists
@@ -121,7 +122,8 @@ const createFileToMongoDB = async (node, nodePath) => {
         // Create the file with just these properties to check if it already exists in MongoDB
         const query = {
             name: name,
-            path: pathStringToArray(nodePath),
+            // Need to replace any back slashes with forward slashes
+            path: pathStringToArray(nodePath.replace(/\\/g, '/')),
         }; // Add any other properties; like cover, after creation.
 
         // Then check if the file already exists
