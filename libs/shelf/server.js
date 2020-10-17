@@ -78,7 +78,7 @@ const createFolderToMongoDB = async (node, nodePath) => {
 
         const query = {
             name: node,
-            path: pathStringToArray(nodePath);
+            path: pathStringToArray(nodePath)
         };
 
         // Then check if the folder already exists
