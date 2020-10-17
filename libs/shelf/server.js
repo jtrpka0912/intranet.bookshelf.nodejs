@@ -3,6 +3,9 @@ const Shelf = require('../../models/shelf.model');
 const Folder = require('../../models/folder.model');
 const File = require('../../models/file.model');
 
+// Helpers
+const { pathStringToArray, pathArrayToString } = require('../helpers/routes');
+
 // Packages
 const fs = require('fs');
 const path = require('path');
@@ -20,7 +23,7 @@ const retrieveFilesFolders = async (shelf, previousNode) => {
             throw new Error('Shelf was missing in call');
         }
 
-        let rootStringPath = Shelf.convertRootToString(shelf.root);
+        let rootStringPath = pathArrayToString(shelf.root);
         
         if(previousNode) {
             rootStringPath = path.join(rootStringPath, previousNode);
@@ -75,7 +78,7 @@ const createFolderToMongoDB = async (node, nodePath) => {
 
         const query = {
             name: node,
-            path: Folder.convertPathToArray(nodePath, '\\')
+            path: pathStringToArray(nodePath);
         };
 
         // Then check if the folder already exists
@@ -118,7 +121,7 @@ const createFileToMongoDB = async (node, nodePath) => {
         // Create the file with just these properties to check if it already exists in MongoDB
         const query = {
             name: name,
-            path: File.convertPathToArray(nodePath, '\\'),
+            path: pathStringToArray(nodePath),
         }; // Add any other properties; like cover, after creation.
 
         // Then check if the file already exists
