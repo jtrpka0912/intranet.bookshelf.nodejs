@@ -82,8 +82,6 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             const count = await Folder.find().countDocuments().exec();
             assert.equal(count, 1);
 
-            console.log(await Folder.find({}));
-
             // Retrieve the folder that was created
             const sampleFolder = await Folder.findOne({ 
                 name: 'Samples', 

@@ -75,7 +75,6 @@ const createFolderToMongoDB = async (node, nodePath) => {
 
         // Check if folder exists in server
         await fs.promises.access(nodePath, fs.constants.F_OK);
-        console.info('Folder path', nodePath);
         const query = {
             name: node,
             // Need to replace any back slashes with forward slashes
