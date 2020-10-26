@@ -76,7 +76,9 @@ const retrieveBreadcrumbs = async (shelf, currentFolder) => {
 
         if(currentFolder) {
             // Start the breadcrumbs with the shelf.
-            let breadcrumbs = [shelf];
+            // let breadcrumbs = [shelf];
+            let breadcrumbs = [];
+
             // console.info('Paths', shelf.root, currentFolder.path);
             const lengthOfShelfRoot = shelf.root.length;
             const lengthOfCurrentFolder = currentFolder.path.length;
@@ -152,7 +154,7 @@ const retrieveBreadcrumbs = async (shelf, currentFolder) => {
                     breadcrumbs.push(directory);
                 }
             } // Otherwise, do not add the current folder to the breadcrumbs
-            
+
             return breadcrumbs;
         } else {
             // Since no current folder; just return an empty array;

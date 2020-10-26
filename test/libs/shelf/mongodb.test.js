@@ -23,9 +23,6 @@ const {
     getSizeExpression // Really shouldn't be exported, but doing it for testing reasons.
 } = require('../../../libs/shelf/mongodb');
 
-// TODO: Maybe figure out a way to allow not exporting some of those functions above.
-
-
 describe('(mongodb.test.js) Retrieve Files and Folders from MongoDB', () => {
     
     before(async () => {
@@ -241,38 +238,31 @@ describe('(mongodb.test.js) Retrieve Files and Folders from MongoDB', () => {
                 assert.lengthOf(breadcrumbs, 0);
             });
 
-            it('Return an array of one breadcrumb from book shelf', async () => {
+            it('Though the breadcrumb would include the SHELF root, but return none since we are not deep enough.', async () => {
                 const breadcrumbs = await retrieveBreadcrumbs(bookShelf, bookExample);
+                assert.isArray(breadcrumbs);
+                assert.lengthOf(breadcrumbs, 0);
+            });
+
+            it('Return an array of breadcrumb folder(s) from the magazine shelf', async () => {
+                const breadcrumbs = await retrieveBreadcrumbs(magazineShelf, magazineExampleIssues);
                 assert.isArray(breadcrumbs);
                 assert.lengthOf(breadcrumbs, 1);
 
                 assert.isObject(breadcrumbs[0]);
-                assert.equal(breadcrumbs[0].name, 'Book Shelf');
-            });
-
-            it('Return an array of breadcrumb folders from the magazine shelf', async () => {
-                const breadcrumbs = await retrieveBreadcrumbs(magazineShelf, magazineExampleIssues);
-                assert.isArray(breadcrumbs);
-                assert.lengthOf(breadcrumbs, 2); // First item should be shelf, second should be a folder
-
-                assert.isObject(breadcrumbs[0]);
-                assert.equal(breadcrumbs[0].name, 'Magazine Shelf');
-                assert.isObject(breadcrumbs[1]);
-                assert.equal(breadcrumbs[1].name, 'Magazine Example');
+                assert.equal(breadcrumbs[0].name, 'Magazine Example');
             });
 
             it('Return three breadcrumbs from the long shelf', async () => {
                 // Mostly to test longer root paths
                 const breadcrumbs = await retrieveBreadcrumbs(longShelf, longExampleSamplePath);
                 assert.isArray(breadcrumbs);
-                assert.lengthOf(breadcrumbs, 3);
+                assert.lengthOf(breadcrumbs, 2);
 
                 assert.isObject(breadcrumbs[0]);
-                assert.equal(breadcrumbs[0].name, 'Long Shelf');
+                assert.equal(breadcrumbs[0].name, 'Long Example');
                 assert.isObject(breadcrumbs[1]);
-                assert.equal(breadcrumbs[1].name, 'Long Example');
-                assert.isObject(breadcrumbs[2]);
-                assert.equal(breadcrumbs[2].name, 'Long Example Sample');
+                assert.equal(breadcrumbs[1].name, 'Long Example Sample');
             });
         });
 
