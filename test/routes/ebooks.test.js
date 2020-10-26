@@ -89,7 +89,12 @@ describe('(ebooks.test.js) eBooks Router', () => {
                 assert.isNotNull(res);
                 recognize200(res);
 
-                // TODO: Need to do this for the shelf/folder tests
+                // Expect the shelf to return back
+                assert.isObject(res.body.shelf, 'This is not an object');
+
+                // Though the shelf is not inside an array.
+                //    Put it inside the array just to let this assertion function to do its job.
+                pathShouldBeString([res.body.shelf]); 
 
                 // Only expecting one folder, from directories, to arrive
                 assert.lengthOf(res.body.directories, 1, 'Incorrect folder count');
@@ -111,6 +116,13 @@ describe('(ebooks.test.js) eBooks Router', () => {
             chai.request(app).get(`${endpointURI}/shelf/${shelfTwoId}`).end((err, res) => {
                 assert.isNotNull(res);
                 recognize200(res);
+
+                // Expect the shelf to return back
+                assert.isObject(res.body.shelf, 'This is not an object');
+                
+                // Though the shelf is not inside an array.
+                //    Put it inside the array just to let this assertion function to do its job.
+                pathShouldBeString([res.body.shelf]); 
 
                 // Expects one folder though that folder does have another folder
                 assert.lengthOf(res.body.directories, 1);
@@ -174,14 +186,22 @@ describe('(ebooks.test.js) eBooks Router', () => {
                 assert.isNotNull(res);
                 recognize200(res);
 
+                assert.isObject(res.body.shelf, 'This is not an object');
+                // Though the shelf is not inside an array.
+                //    Put it inside the array just to let this assertion function to do its job.
+                pathShouldBeString([res.body.shelf]);
+
                 assert.isArray(res.body.directories);
                 assert.lengthOf(res.body.directories, 0);
                 pathShouldBeString(res.body.directories);
+                
                 assert.isArray(res.body.files);
                 assert.lengthOf(res.body.files, 1);
                 pathShouldBeString(res.body.files);
+                
+                // Though SHELF root will be part of breadcrumbs, but the folder only array will have none.
                 assert.isArray(res.body.breadcrumbs);
-                assert.lengthOf(res.body.breadcrumbs, 1);
+                assert.lengthOf(res.body.breadcrumbs, 0);
                 pathShouldBeString(res.body.breadcrumbs, true);
 
                 done();
@@ -193,14 +213,22 @@ describe('(ebooks.test.js) eBooks Router', () => {
                 assert.isNotNull(res);
                 recognize200(res);
 
+                assert.isObject(res.body.shelf, 'This is not an object');
+                // Though the shelf is not inside an array.
+                //    Put it inside the array just to let this assertion function to do its job.
+                pathShouldBeString([res.body.shelf]);
+
                 assert.isArray(res.body.directories);
                 assert.lengthOf(res.body.directories, 0);
                 pathShouldBeString(res.body.directories);
+                
                 assert.isArray(res.body.files);
                 assert.lengthOf(res.body.files, 4);
                 pathShouldBeString(res.body.files);
+                
+                // Though SHELF root will be part of breadcrumbs, but the folder only array will have none.
                 assert.isArray(res.body.breadcrumbs);
-                assert.lengthOf(res.body.breadcrumbs, 1);
+                assert.lengthOf(res.body.breadcrumbs, 0);
                 pathShouldBeString(res.body.breadcrumbs, true);
 
                 done();

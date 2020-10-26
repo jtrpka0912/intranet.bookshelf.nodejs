@@ -43,6 +43,9 @@ router.route('/shelf/:shelfId').get((req, res) => {
         if(foundMongoError(mongoError, res)) return;
 
         if(mongoShelfResponse) {
+            let shelf = mongoShelfResponse.toObject();
+            shelf.path = pathArrayToString(shelf.root);
+
             let directories = [];
             let updatedDirectories = [];
             let files = [];
@@ -77,6 +80,7 @@ router.route('/shelf/:shelfId').get((req, res) => {
             }
 
             res.status(200).json({
+                shelf,
                 breadcrumbs: [], // We are at the root of the shelf
                 directories: updatedDirectories,
                 files: updatedFiles
@@ -104,6 +108,9 @@ router.route('/shelf/:shelfId/folder/:folderId').get((req, res) => {
                 if(foundMongoError(mongoError, res)) return;
 
                 if(mongoShelfResponse) {
+                    let shelf = mongoShelfResponse.toObject();
+                    shelf.path = pathArrayToString(shelf.root);
+
                     let breadcrumbs = [];
                     let updatedBreadcrumbs = [];
                     let directories = [];
@@ -155,6 +162,7 @@ router.route('/shelf/:shelfId/folder/:folderId').get((req, res) => {
                     }
 
                     res.status(200).json({
+                        shelf,
                         breadcrumbs: updatedBreadcrumbs,
                         directories: updatedDirectories,
                         files: updatedFiles
