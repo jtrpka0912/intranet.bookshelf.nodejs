@@ -142,13 +142,15 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
         });
 
         it('Remove all of the files and folders no longer found in the Delete shelf directory.', async () => {
+            await removeFilesFolders(deleteShelf);
+
             const folders = await Folder.find({}).countDocuments().exec();
             const files = await File.find({}).countDocuments().exec();
             
             assert.isNumber(folders, 'Not a number.');
             assert.isNumber(files, 'Not a number.');
             assert.equal(folders, 0, 'There should be nothing left.');
-            assert.equal(folders, 0, 'There should be nothing left.');
+            assert.equal(files, 0, 'There should be nothing left.');
         });
     });
     

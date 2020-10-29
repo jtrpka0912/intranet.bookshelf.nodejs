@@ -176,14 +176,14 @@ const retrieveBreadcrumbs = async (shelf, currentFolder) => {
 const retrieveFiles = async (shelf, currentFolder) => {
     try {
         if(!shelf) {
-            // Need to throw it in an object with message for the try/catch to get the message. Little hacky.
+            // TODO: Need to throw it in an object with message for the try/catch to get the message. Little hacky.
             throw {
                 message: 'Shelf was missing in call.'
             };
         }
 
         if(isCurrentFolderCompatible(shelf, currentFolder) === false) {
-            // Need to throw it in an object with message for the try/catch to get the message. Little hacky.
+            // TODO: Need to throw it in an object with message for the try/catch to get the message. Little hacky.
             throw {
                 message: 'Shelf and current folder are not compatible.'
             };
@@ -341,6 +341,7 @@ module.exports = {
     retrieveDirectories,
     retrieveBreadcrumbs,
     retrieveFiles,
+    getShelfArrayElementExpression,
     // Only for testing purposes
     isCurrentFolderCompatible,
     getSizeExpression

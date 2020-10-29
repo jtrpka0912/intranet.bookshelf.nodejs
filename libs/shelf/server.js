@@ -5,6 +5,7 @@ const File = require('../../models/file.model');
 
 // Helpers
 const { pathStringToArray, pathArrayToString } = require('../helpers/routes');
+const { getShelfArrayElementExpression } = require('../shelf/mongodb');
 
 // Packages
 const fs = require('fs');
@@ -15,10 +16,9 @@ const path = require('path');
  * @function removeFilesFolders
  * @description Go through the shelf's folders and files and check if they exist otherwise remove from Mongodb.
  * @author J.T.
- * @param { object } shelf 
- * @param { string } previousNode 
+ * @param { object } shelf
  */
-const removeFilesFolders = async (shelf, previousNode) => {
+const removeFilesFolders = async (shelf) => {
     try {
         if(!shelf) throw new Error('Shelf was missing in call');
 
@@ -26,7 +26,37 @@ const removeFilesFolders = async (shelf, previousNode) => {
 
         await fs.promises.readdir(rootStringPath);
 
-        
+        // Retrieve the folders
+        const query = {
+            $and: getShelfArrayElementExpression(shelf)
+        };
+
+        const folders = await Folder.find(query);
+        const files = await File.find(query);
+
+        // Check if folders still exist, if not then remove.
+        for(let folder of folders) {
+            const pathToString = pathArrayToString(folder.path);
+            try {
+                // If it does not find the folder; it throws an exception.
+                await fs.promises.access(pathToString, fs.constants.F_OK);
+            } catch (notFound) {
+                // Catch the thrown exceptions from fs.promises.access
+                folder.deleteOne();
+            }
+        }
+
+        // Check if files still exist, if not then remove.
+        for(let file of files) {
+            const pathToString = pathArrayToString(file.path);
+            try {
+                // If it does not find the file; it throws an exception.
+                await fs.promises.access(pathToString, fs.constants.F_OK);
+            } catch (notFound) {
+                // Catch the thrown exceptions from fs.promises.access
+                file.deleteOne();
+            }
+        }
     } catch (err) {
         throw err;
     }
