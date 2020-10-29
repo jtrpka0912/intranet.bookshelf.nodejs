@@ -194,6 +194,7 @@ router.route('/:shelfId/refresh').get((req, res) => {
 
         if(mongoResponse) {
             try {
+                await shelfLibrary.removeFilesFolders(mongoResponse);
                 await shelfLibrary.retrieveFilesFolders(mongoResponse);
                 // No content
                 res.sendStatus(204);

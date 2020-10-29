@@ -3,7 +3,9 @@
 // Chai
 const chai = require('chai');
 const chaiString = require('chai-string');
+const chaiPromise = require('chai-as-promised');
 chai.use(chaiString);
+chai.use(chaiPromise);
 const assert = chai.assert;
 
 // Mongoose / MongoDB Mock
@@ -160,18 +162,8 @@ describe('(mongodb.test.js) Retrieve Files and Folders from MongoDB', () => {
         });
 
         describe('retrieveDirectories()', () => {
-            it.skip('Throw an error because its missing a shelf', async () => {
-                
-                /*
-                const error = await retrieveDirectories();
-                console.info('Thrown error', error);
-                // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
-                // assert.isObject(error); // TODO: typeof identifies it as object, but fails
-                assert.containIgnoreCase(error.message, 'Shelf was missing in call.');
-                */
-                assert.throws(() => {
-                    retrieveDirectories();
-                }, Error);
+            it('Throw an error because its missing a shelf', async () => {
+                assert.isRejected(retrieveDirectories());
             });
     
             it('Find the one folder from magazine shelf root directory.', async () => {
@@ -195,11 +187,8 @@ describe('(mongodb.test.js) Retrieve Files and Folders from MongoDB', () => {
                 assert.equal(folders[0].name, 'Issues');
             });
     
-            it.skip('Return an error message that shelf and folder do not belong to each other', async () => {
-                const error = await retrieveDirectories(magazineShelf, rootExample);
-                // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
-                // assert.isObject(error); // TODO: typeof identifies it as object, but fails
-                assert.containIgnoreCase(error.message, 'Shelf and current folder are not compatible.');
+            it('Return an error message that shelf and folder do not belong to each other', async () => {
+                assert.isRejected(retrieveDirectories(magazineShelf, magazineExample));
             });
     
             it('Return nothing back if we are not going to show directories', async () => {
@@ -211,25 +200,13 @@ describe('(mongodb.test.js) Retrieve Files and Folders from MongoDB', () => {
         });
 
         describe('retrieveBreadcrumbs()', () => {
-            it.skip('Throw an error because its missing the shelf', async () => {
-                
-                /*
-                const error = await retrieveBreadcrumbs();
-                console.info('Thrown error', error);
-                // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
-                // assert.isObject(error); // TODO: typeof identifies it as object, but fails
-                assert.containIgnoreCase(error.message, 'Shelf was missing in call.');
-                */
-                assert.throws(() => {
-                    retrieveBreadcrumbs();
-                }, Error);
+            it('Throw an error because its missing the shelf', async () => {
+                // FIXME: This is being fulfilled.
+                assert.isRejected(retrieveBreadcrumbs());
             });
 
-            it.skip('Return an error message that shelf and folder do not belong to each other', async () => {
-                const error = await retrieveBreadcrumbs(magazineShelf, rootExample);
-                // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
-                // assert.isObject(error); // TODO: typeof identifies it as object, but fails
-                assert.containIgnoreCase(error.message, 'Shelf and current folder are not compatible.');
+            it('Throw an error message that shelf and folder do not belong to each other', async () => {
+                assert.isRejected(retrieveBreadcrumbs(magazineShelf, rootExample));
             });
 
             it('Return an empty array if we do not pass the current folder', async () => {
@@ -420,10 +397,8 @@ describe('(mongodb.test.js) Retrieve Files and Folders from MongoDB', () => {
                 assert.lengthOf(files, 2);
             });
 
-            it.skip('Throw error with folder being incompatible with shelf', async () => {
-                const error = await retrieveFiles(novelShelf, blahFolder);
-                assert.isObject(error);
-                assert.containIgnoreCase(error.errorMessage, 'Shelf and current folder are not compatible.');
+            it('Throw error with folder being incompatible with shelf', async () => {
+                assert.isRejected(retrieveFiles(novelShelf, blahFolder));
             });
         });
 

@@ -66,9 +66,7 @@ const retrieveDirectories = async (shelf, currentFolder) => {
  */
 const retrieveBreadcrumbs = async (shelf, currentFolder) => {
     try {
-        if(!shelf) {
-            throw new Error('Shelf was missing in call.');
-        }
+        if(!shelf) throw new Error('Shelf was missing in call.');
 
         if(isCurrentFolderCompatible(shelf, currentFolder) === false) {
             throw new Error('Shelf and current folder are not compatible.');
