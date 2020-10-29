@@ -73,16 +73,12 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             await File.deleteMany(); // NOTE: Why was this left out?
         });
 
-        it.skip('Throw error if no shelf was passed', async () => {
-            const error = await retrieveFilesFolders();
-            // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
-            assert.containIgnoreCase(error.message, 'Shelf was missing in call');
+        it('Throw error if no shelf was passed', async () => {
+            assert.isRejected(retrieveFilesFolders())
         });
 
-        it.skip('Throw error if shelf root directory was not found', async () => {
-            const error = await retrieveFilesFolders(unknownShelf);
-            // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
-            assert.containIgnoreCase(error.message, 'no such file or directory');
+        it('Throw error if shelf root directory was not found', async () => {
+            assert.isRejected(retrieveFilesFolders(unknownShelf));
         });
 
         it('Find the new nodes from the book shelf in MongoDB', async () => {
@@ -139,26 +135,19 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             await Folder.deleteMany();
         });
 
-        it.skip('Throw an error because it is missing node', async () => {
-            const error = await createFolderToMongoDB();
-            // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
-            assert.containIgnoreCase(error.message, 'Missing node argument');
+        it('Throw an error because it is missing node', async () => {
+            assert.isRejected(createFolderToMongoDB());
         });
 
-        it.skip('Throw an error because it is missing node path', async () => {
-            const error = await createFolderToMongoDB('foo/bar');
-            // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
-            assert.containIgnoreCase(error.message, 'Missing node path argument');
+        it('Throw an error because it is missing node path', async () => {
+            assert.isRejected(createFolderToMongoDB('foo/bar'));
         });
 
-        it.skip('Throw an error if folder does not exist in server', async () => {
+        it('Throw an error if folder does not exist in server', async () => {
             const node = 'FooBar';
             const rootStringPath = pathArrayToString(bookShelf.root);
             const nodePath = path.join(rootStringPath, node);
-
-            const error = await createFolderToMongoDB(node, nodePath);
-            // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
-            assert.containIgnoreCase(error.message, 'no such file or directory'); // From FS library
+            assert.isRejected(createFolderToMongoDB(node, nodePath));
         });
 
         it('Return back the Folder MongoDB document', async () => {
@@ -192,26 +181,19 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             await File.deleteMany();
         });
 
-        it.skip('Throw an error because it is missing node', async () => {
-            const error = await createFileToMongoDB();
-            // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
-            assert.containIgnoreCase(error.message, 'Missing node argument');
+        it('Throw an error because it is missing node', async () => {
+            assert.isRejected(createFileToMongoDB());
         });
 
-        it.skip('Throw an error because it is missing node path', async () => {
-            const error = await createFileToMongoDB('foo/bar');
-            // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
-            assert.containIgnoreCase(error.message, 'Missing node path argument');
+        it('Throw an error because it is missing node path', async () => {
+            assert.isRejected(createFileToMongoDB('foo/bar'));
         });
 
-        it.skip('Throw an error if file does not exist in server', async () => {
+        it('Throw an error if file does not exist in server', async () => {
             const node = 'Samples/foobar.pdf';
             const rootStringPath = pathArrayToString(bookShelf.root);
             const nodePath = path.join(rootStringPath, node);
-
-            const error = await createFolderToMongoDB(node, nodePath);
-            // TODO: Should try to add more error testing; prove that error is an error, or something was thrown.
-            assert.containIgnoreCase(error.message, 'no such file or directory'); // From FS library
+            assert.isRejected(createFolderToMongoDB(node, nodePath));
         });
 
         it('Return back the File MongoDB document', async () => {
