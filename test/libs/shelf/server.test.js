@@ -65,12 +65,11 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
         let deleteOneFolder, deleteTwoFolder, deleteOneIchiFolder;
         let deleteFile, deleteFileTwoYi, deleteFileTwoEr, deleteFileIchiYi;
 
-
         before(async () => {
             // Create the shelf
             deleteShelf = new Shelf({
                 name: 'Delete Shelf',
-                root: ['sample-server', 'Delete'],
+                root: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Delete'],
                 showDirectories: true,
                 multiFile: false
             });
@@ -78,38 +77,38 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             // Create the folders
             deleteOneFolder = new Folder({
                 name: 'Delete Folder One',
-                path: ['sample-server', 'Delete', 'Delete Folder One']
+                path: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Delete', 'Delete Folder One']
             });
 
             deleteTwoFolder = new Folder({
                 name: 'Delete Folder Two',
-                path: ['sample-server', 'Delete', 'Delete Folder Two']
+                path: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Delete', 'Delete Folder Two']
             });
 
             deleteOneIchiFolder = new Folder({
                 name: 'Delete Folder Ichi',
-                path: ['sample-server', 'Delete', 'Delete Folder One', 'Delete Folder Ichi']
+                path: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Delete', 'Delete Folder One', 'Delete Folder Ichi']
             });
 
             // Create the files
             deleteFile = new File({
                 name: 'Delete File',
-                path: ['sample-server', 'Delete', 'Delete File.pdf']
+                path: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Delete', 'Delete File.pdf']
             });
 
             deleteFileTwoYi = new File({
                 name: 'Delete File Yi',
-                path: ['sample-server', 'Delete', 'Delete Folder Two', 'Delete File Yi.pdf']
+                path: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Delete', 'Delete Folder Two', 'Delete File Yi.pdf']
             });
 
             deleteFileTwoEr = new File({
                 name: 'Delete File Er',
-                path: ['sample-server', 'Delete', 'Delete Folder Two', 'Delete File Er.pdf']
+                path: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Delete', 'Delete Folder Two', 'Delete File Er.pdf']
             });
 
             deleteFileIchiYi = new File({
                 name: 'Delete File Ichi Yi',
-                path: ['sample-server', 'Delete', 'Delete Folder One', 'Delete Folder Ichi', 'Delete File Ichi Yi.pdf']
+                path: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Delete', 'Delete Folder One', 'Delete Folder Ichi', 'Delete File Ichi Yi.pdf']
             });
 
             // Save the shelf
@@ -127,12 +126,29 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             await deleteFileIchiYi.save();
         });
 
+        after(async () => {
+            // Remove documents from collections
+            await Shelf.deleteMany({});
+            await Folder.deleteMany({});
+            await File.deleteMany({});
+        });
+
         it('Throw error if no shelf was passed.', async () => {
             assert.isRejected(removeFilesFolders());
         });
 
         it('Throw error if shelf root directory was not found', async () => {
             assert.isRejected(retrieveFilesFolders(unknownShelf));
+        });
+
+        it('Remove all of the files and folders no longer found in the Delete shelf directory.', async () => {
+            const folders = await Folder.find({}).countDocuments().exec();
+            const files = await File.find({}).countDocuments().exec();
+            
+            assert.isNumber(folders, 'Not a number.');
+            assert.isNumber(files, 'Not a number.');
+            assert.equal(folders, 0, 'There should be nothing left.');
+            assert.equal(folders, 0, 'There should be nothing left.');
         });
     });
     
@@ -143,7 +159,7 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
         });
 
         it('Throw error if no shelf was passed', async () => {
-            assert.isRejected(retrieveFilesFolders())
+            assert.isRejected(retrieveFilesFolders());
         });
 
         it('Throw error if shelf root directory was not found', async () => {
@@ -193,8 +209,6 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             assert.isArray(anotherPdf.path);
             assert.isArray(anotherPdf.cover);
             assert.isFalse(anotherPdf.didRead);
-
-            // TODO: Figure out how to check how many times createFolderToMongoDB and createFileToMongoDB were called.
         });
     });
 

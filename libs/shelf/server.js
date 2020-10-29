@@ -24,11 +24,9 @@ const removeFilesFolders = async (shelf, previousNode) => {
 
         let rootStringPath = pathArrayToString(shelf.root);
 
-        const nodes = await fs.promises.readdir(rootStringPath);
+        await fs.promises.readdir(rootStringPath);
 
-        if(nodes.length > 0) {
-            
-        }
+        
     } catch (err) {
         throw err;
     }
