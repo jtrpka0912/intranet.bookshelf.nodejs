@@ -21,6 +21,14 @@ const path = require('path');
 const removeFilesFolders = async (shelf, previousNode) => {
     try {
         if(!shelf) throw new Error('Shelf was missing in call');
+
+        let rootStringPath = pathArrayToString(shelf.root);
+
+        const nodes = await fs.promises.readdir(rootStringPath);
+
+        if(nodes.length > 0) {
+            
+        }
     } catch (err) {
         throw err;
     }
@@ -68,7 +76,6 @@ const retrieveFilesFolders = async (shelf, previousNode) => {
             }
         }
     } catch(err) {
-        // if(previousNode) throw err;
         throw err;
     }
 }

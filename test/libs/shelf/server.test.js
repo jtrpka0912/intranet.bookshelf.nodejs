@@ -65,6 +65,10 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
         it('Throw error if no shelf was passed.', async () => {
             assert.isRejected(removeFilesFolders());
         });
+
+        it('Throw error if shelf root directory was not found', async () => {
+            assert.isRejected(retrieveFilesFolders(unknownShelf));
+        });
     });
     
     describe('retrieveFilesFolders()', () => {
