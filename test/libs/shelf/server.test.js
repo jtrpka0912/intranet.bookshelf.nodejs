@@ -25,8 +25,7 @@ const { removeFilesFolders, retrieveFilesFolders, createFolderToMongoDB, createF
 const { pathArrayToString, pathStringToArray } = require('../../../libs/helpers/routes');
 
 describe('(server.test.js) Create and Retrieve Files and Folders through Server to MongoDB', () => {
-    let unknownShelf;
-    let bookShelf;
+    let unknownShelf, bookShelf;
 
     before(async () => {
         await setup.mongooseTestConnection();
@@ -48,7 +47,7 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             multiFile: false
         });
 
-        // TODO Add magazine shelf
+        // TODO: Add magazine shelf
 
         await unknownShelf.save();
         await bookShelf.save();
@@ -62,6 +61,72 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
     });
 
     describe('removeFilesFolders()', () => {
+        let deleteShelf;
+        let deleteOneFolder, deleteTwoFolder, deleteOneIchiFolder;
+        let deleteFile, deleteFileTwoYi, deleteFileTwoEr, deleteFileIchiYi;
+
+
+        before(async () => {
+            // Create the shelf
+            deleteShelf = new Shelf({
+                name: 'Delete Shelf',
+                root: ['sample-server', 'Delete'],
+                showDirectories: true,
+                multiFile: false
+            });
+
+            // Create the folders
+            deleteOneFolder = new Folder({
+                name: 'Delete Folder One',
+                path: ['sample-server', 'Delete', 'Delete Folder One']
+            });
+
+            deleteTwoFolder = new Folder({
+                name: 'Delete Folder Two',
+                path: ['sample-server', 'Delete', 'Delete Folder Two']
+            });
+
+            deleteOneIchiFolder = new Folder({
+                name: 'Delete Folder Ichi',
+                path: ['sample-server', 'Delete', 'Delete Folder One', 'Delete Folder Ichi']
+            });
+
+            // Create the files
+            deleteFile = new File({
+                name: 'Delete File',
+                path: ['sample-server', 'Delete', 'Delete File.pdf']
+            });
+
+            deleteFileTwoYi = new File({
+                name: 'Delete File Yi',
+                path: ['sample-server', 'Delete', 'Delete Folder Two', 'Delete File Yi.pdf']
+            });
+
+            deleteFileTwoEr = new File({
+                name: 'Delete File Er',
+                path: ['sample-server', 'Delete', 'Delete Folder Two', 'Delete File Er.pdf']
+            });
+
+            deleteFileIchiYi = new File({
+                name: 'Delete File Ichi Yi',
+                path: ['sample-server', 'Delete', 'Delete Folder One', 'Delete Folder Ichi', 'Delete File Ichi Yi.pdf']
+            });
+
+            // Save the shelf
+            await deleteShelf.save();
+
+            // Save the folders
+            await deleteOneFolder.save();
+            await deleteTwoFolder.save();
+            await deleteOneIchiFolder.save();
+
+            // Save the files
+            await deleteFile.save();
+            await deleteFileTwoYi.save();
+            await deleteFileTwoEr.save();
+            await deleteFileIchiYi.save();
+        });
+
         it('Throw error if no shelf was passed.', async () => {
             assert.isRejected(removeFilesFolders());
         });
