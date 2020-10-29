@@ -12,6 +12,22 @@ const path = require('path');
 
 /**
  * @async
+ * @function removeFilesFolders
+ * @description Go through the shelf's folders and files and check if they exist otherwise remove from Mongodb.
+ * @author J.T.
+ * @param { object } shelf 
+ * @param { string } previousNode 
+ */
+const removeFilesFolders = async (shelf, previousNode) => {
+    try {
+        if(!shelf) throw new Error('Shelf was missing in call');
+    } catch (err) {
+        throw err;
+    }
+}
+
+/**
+ * @async
  * @function retrieveFilesFolders
  * @description Recursively go through each folder and file and create a MongoDB document for each of them
  * @param { object } shelf 
@@ -19,9 +35,7 @@ const path = require('path');
  */
 const retrieveFilesFolders = async (shelf, previousNode) => {
     try {
-        if(!shelf) {
-            throw new Error('Shelf was missing in call');
-        }
+        if(!shelf) throw new Error('Shelf was missing in call');
 
         let rootStringPath = pathArrayToString(shelf.root);
         
@@ -147,6 +161,7 @@ const createFileToMongoDB = async (node, nodePath) => {
 }
 
 module.exports = {
+    removeFilesFolders,
     retrieveFilesFolders,
     createFolderToMongoDB,
     createFileToMongoDB

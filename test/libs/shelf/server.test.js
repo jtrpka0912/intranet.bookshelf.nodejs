@@ -6,8 +6,11 @@ const path = require('path');
 // Chai
 const chai = require('chai');
 const chaiString = require('chai-string');
-chai.use(chaiString)
+const chaiAsPromised = require('chai-as-promised');
+chai.use(chaiString); // String libary
+chai.use(chaiAsPromised); // Promise library
 const assert = chai.assert;
+
 
 // Mongoose / MongoDB Mock
 const setup = require('../../../libs/helpers/mocha/mongoose');
@@ -18,7 +21,7 @@ const Folder = require('../../../models/folder.model');
 const File = require('../../../models/file.model');
 
 // Libs
-const { retrieveFilesFolders, createFolderToMongoDB, createFileToMongoDB } = require('../../../libs/shelf/server');
+const { removeFilesFolders, retrieveFilesFolders, createFolderToMongoDB, createFileToMongoDB } = require('../../../libs/shelf/server');
 const { pathArrayToString, pathStringToArray } = require('../../../libs/helpers/routes');
 
 describe('(server.test.js) Create and Retrieve Files and Folders through Server to MongoDB', () => {
@@ -58,9 +61,16 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
         await setup.mongoooseTestDisconnection();
     });
 
+    describe('removeFilesFolders()', () => {
+        it('Throw error if no shelf was passed.', async () => {
+            assert.isRejected(removeFilesFolders());
+        });
+    });
+    
     describe('retrieveFilesFolders()', () => {
         afterEach(async () => {
             await Folder.deleteMany();
+            await File.deleteMany(); // NOTE: Why was this left out?
         });
 
         it.skip('Throw error if no shelf was passed', async () => {
