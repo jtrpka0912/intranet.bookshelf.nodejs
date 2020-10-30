@@ -173,9 +173,9 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
 
             // Retrieve the folder count
             const count = await Folder.find().countDocuments().exec();
-            assert.equal(count, 1);
+            assert.equal(count, 2);
 
-            // Retrieve the folder that was created
+            // Retrieve one of the folders that was created
             const sampleFolder = await Folder.findOne({ 
                 name: 'Samples', 
                 path: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Books', 'Samples'] 
@@ -186,9 +186,9 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
 
             // Count the files that were created
             const fileCount = await File.find({}).countDocuments().exec();
-            assert.equal(fileCount, 2);
+            assert.equal(fileCount, 4);
 
-            // Check the sample pdf file
+            // Check one of the sample pdf file
             const samplePdf = await File.findOne({ 
                 name: 'sample', 
                 path: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Books', 'Samples', 'sample.pdf']
@@ -198,19 +198,21 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             assert.equal(samplePdf.name, 'sample');
             assert.isArray(samplePdf.path);
             assert.isArray(samplePdf.cover);
+            assert.equal(samplePdf.cover[samplePdf.length -1], 'sample.jpg');
             assert.isFalse(samplePdf.didRead);
 
             // Check the another sample pdf file
-            const anotherPdf = await File.findOne({ 
-                name: 'another-sample', 
-                path: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Books', 'Samples', 'another-sample.pdf']
+            const moreMobi = await File.findOne({ 
+                name: 'Random Mobi', 
+                path: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Books', 'More', 'Random Mobi.mobi']
             }).exec();
-            assert.isObject(anotherPdf, 'Unable to find anotherPdf');
-            assert.equal(anotherPdf.type, 'book');
-            assert.equal(anotherPdf.name, 'another-sample');
-            assert.isArray(anotherPdf.path);
-            assert.isArray(anotherPdf.cover);
-            assert.isFalse(anotherPdf.didRead);
+            assert.isObject(moreMobi, 'Unable to find the mobi one');
+            assert.equal(moreMobi.type, 'book');
+            assert.equal(moreMobi.name, 'Random Mobi');
+            assert.isArray(moreMobi.path);
+            assert.isArray(moreMobi.cover);
+            // TODO: Special case for epubs/mobis
+            assert.isFalse(moreMobi.didRead);
         });
     });
 

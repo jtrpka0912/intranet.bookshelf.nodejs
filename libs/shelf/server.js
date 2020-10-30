@@ -209,7 +209,7 @@ const createFileToMongoDB = async (node, nodePath) => {
  * @param { File } file 
  */
 const retrieveCoverImage = async (file) => {
-    console.info('Hi', file);
+    // console.info('Hi', file);
 }
 
 module.exports = {
