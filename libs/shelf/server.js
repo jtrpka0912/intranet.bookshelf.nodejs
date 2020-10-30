@@ -209,7 +209,12 @@ const createFileToMongoDB = async (node, nodePath) => {
  * @param { File } file 
  */
 const retrieveCoverImage = async (file) => {
-    // console.info('Hi', file);
+    console.info('Hi', file);
+    try {
+        if(!file) throw new Error('Missing file argument');
+    } catch(err) {
+        throw err;
+    }
 }
 
 module.exports = {

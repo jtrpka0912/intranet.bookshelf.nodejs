@@ -21,7 +21,7 @@ const Folder = require('../../../models/folder.model');
 const File = require('../../../models/file.model');
 
 // Libs
-const { removeFilesFolders, retrieveFilesFolders, createFolderToMongoDB, createFileToMongoDB } = require('../../../libs/shelf/server');
+const { removeFilesFolders, retrieveFilesFolders, createFolderToMongoDB, createFileToMongoDB, retrieveCoverImage } = require('../../../libs/shelf/server');
 const { pathArrayToString, pathStringToArray } = require('../../../libs/helpers/routes');
 
 describe('(server.test.js) Create and Retrieve Files and Folders through Server to MongoDB', () => {
@@ -168,7 +168,7 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             assert.isRejected(retrieveFilesFolders(unknownShelf));
         });
 
-        it('Find the new nodes from the book shelf in MongoDB', async () => {
+        it.skip('Find the new nodes from the book shelf in MongoDB', async () => {
             await retrieveFilesFolders(bookShelf);
 
             // Retrieve the folder count
@@ -310,4 +310,37 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             assert.equal(count, 1);
         });
     });
+
+    describe('retrieveCoverImage', () => {
+        afterEach(async () => {
+            // TODO: Look through, and remove all folders and files from the public/images/cover folder
+
+            // Remove any of the files created here
+            await File.deleteMany();
+        });
+
+        it('Throw an error because it is missing the file', async () => {
+            // FIXME: Without the thrown error; it still passes the test case even with error log messages stating it was expecting a rejected promise instead of being fulfilled.
+            assert.isRejected(retrieveCoverImage());
+        });
+
+        it('Return the expected file path for a PDF file.', async () => {
+            // Create a sample file document
+            const node = 'Samples/sample.pdf';
+            const rootStringPath = pathArrayToString(bookShelf.root);
+            const nodePath = path.join(rootStringPath, node);
+            const sampleFile = await createFileToMongoDB(node, nodePath);
+
+            await retrieveCoverImage(sampleFile);
+
+            const updatedSampleFile = await File.findOne({_id: sampleFile._id});
+
+            // 3 (public/images/cover) + 8 (d:/Backend/Nodejs/intranet.bookshelf.nodejs/test/sample-server/Books/Samples) + 1(sample.jpg)
+            const expectedArrayLength = 12;
+
+            assert.isArray(updatedSampleFile.cover);
+            assert.lengthOf(updatedSampleFile.cover, expectedArrayLength);
+            assert.equal(updatedSampleFile[expectedArrayLength - 1], 'sample.jpg');
+        });
+    })
 });
