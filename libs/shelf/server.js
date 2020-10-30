@@ -10,6 +10,9 @@ const { getShelfArrayElementExpression } = require('../shelf/mongodb');
 // Packages
 const fs = require('fs');
 const path = require('path');
+const pdfjs = require('pdfjs-dist');
+
+
 
 /**
  * @async
@@ -54,6 +57,7 @@ const removeFilesFolders = async (shelf) => {
                 await fs.promises.access(pathToString, fs.constants.F_OK);
             } catch (notFound) {
                 // Catch the thrown exceptions from fs.promises.access
+                // TODO: Remove the cover image affiliated first
                 file.deleteOne();
             }
         }
@@ -96,7 +100,8 @@ const retrieveFilesFolders = async (shelf, previousNode) => {
                     // Recursively call this function again.
                     await retrieveFilesFolders(shelf, nextNode);
                 } else if(nodeDetails.isFile()) {
-                    await createFileToMongoDB(node, nodePath);
+                    const createdFile = await createFileToMongoDB(node, nodePath);
+                    await retrieveCoverImage(createdFile);
                 } else {
                     // TODO: Should I throw error?
                     console.warn('Unknown Node');
@@ -195,9 +200,22 @@ const createFileToMongoDB = async (node, nodePath) => {
     }
 }
 
+/**
+ * @async
+ * @function retrieveCoverImage
+ * @description Retrieve the cover image from the PDF file
+ * @author J.T.
+ * @uses pdfjs
+ * @param { File } file 
+ */
+const retrieveCoverImage = async (file) => {
+    console.info('Hi', file);
+}
+
 module.exports = {
     removeFilesFolders,
     retrieveFilesFolders,
     createFolderToMongoDB,
-    createFileToMongoDB
+    createFileToMongoDB,
+    retrieveCoverImage
 };
