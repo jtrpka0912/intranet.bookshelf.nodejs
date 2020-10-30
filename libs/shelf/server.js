@@ -10,9 +10,9 @@ const { getShelfArrayElementExpression } = require('../shelf/mongodb');
 // Packages
 const fs = require('fs');
 const path = require('path');
-const pdfjs = require('pdfjs-dist');
 
-
+// Need to use the ES5 build due to lack of ReadableStream functionaliy with Node.js
+const pdfjs = require('pdfjs-dist/es5/build/pdf');
 
 /**
  * @async
@@ -212,6 +212,35 @@ const retrieveCoverImage = async (file) => {
     console.info('Hi', file);
     try {
         if(!file) throw new Error('Missing file argument');
+        
+        const fullFileName = file.path[file.path.length - 1];
+        const stringPath = pathArrayToString(file.path);
+        // console.info('Filename', fullFileName);
+        // console.info('String path', stringPath);
+
+        // Retrieve the extension and then act accordingly
+        const fileExtension = path.extname(fullFileName);
+        switch(fileExtension) {
+            case '.pdf':
+                const pdfLoadingTask = pdfjs.getDocument(stringPath);
+
+                const pdf = await pdfLoadingTask.promise;
+                // console.info('PDF', pdf);
+                const pageOne = await pdf.getPage(1);
+                // console.info('Page One', pageOne);
+
+                const scale = 1.0;
+                const viewport = pageOne.getViewport({ scale: scale, });
+                console.info('Viewport', viewport);
+
+                break;
+            // TODO: Retrieve the first page for these files.
+            case '.mobi':
+            case '.epub':
+            default:
+                break;
+        }
+
     } catch(err) {
         throw err;
     }
