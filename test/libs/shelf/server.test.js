@@ -324,6 +324,16 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             assert.isRejected(retrieveCoverImage());
         });
 
+        it('Throw an error because the original file does not exist.', async () => {
+            const runawayBook = new File({
+                name: 'Does not exist',
+                path: 'c:/not/here.pdf'
+            });
+
+            await runawayBook.save();
+            assert.isRejected(retrieveCoverImage(runawayBook));
+        });
+
         it('Return the expected file path for a PDF file.', async () => {
             // Create a sample file document
             const node = 'Samples/sample.pdf';

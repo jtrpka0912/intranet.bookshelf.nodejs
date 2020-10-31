@@ -99,6 +99,7 @@ const retrieveFilesFolders = async (shelf, previousNode) => {
                     await retrieveFilesFolders(shelf, nextNode);
                 } else if(nodeDetails.isFile()) {
                     const createdFile = await createFileToMongoDB(node, nodePath);
+
                     await retrieveCoverImage(createdFile);
                 } else {
                     // TODO: Should I throw error?
@@ -184,9 +185,6 @@ const createFileToMongoDB = async (node, nodePath) => {
             // Create new file
             const folderMongoDB = new File(query);
             await folderMongoDB.save();
-
-            // TODO: Any other properties like cover
-
             return folderMongoDB;
         } else {
             // Return it, but do not create it.
@@ -207,16 +205,21 @@ const createFileToMongoDB = async (node, nodePath) => {
  * @param { File } file 
  */
 const retrieveCoverImage = async (file) => {
-    console.info('Hi', file);
+    // console.info('Hi', file);
     try {
         if(!file) throw new Error('Missing file argument');
 
-        // TODO: Check if file still exists.
-        // TODO: Check if image was already created.
-        
         // Retrieve the file information
         const fullFileName = file.path[file.path.length - 1];
         const fileStringPath = pathArrayToString(file.path);
+
+        // Check if file exists in server
+        await fs.promises.access(fileStringPath, fs.constants.F_OK);
+
+        // TODO: Check if image was already created and still exists
+        
+        
+        
 
         // TODO: Create the cover array path to update the File MongoDB document
         // TODO: Create the cover string path for the new image
