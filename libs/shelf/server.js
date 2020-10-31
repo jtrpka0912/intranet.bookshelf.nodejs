@@ -10,9 +10,7 @@ const { getShelfArrayElementExpression } = require('../shelf/mongodb');
 // Packages
 const fs = require('fs');
 const path = require('path');
-
-// Need to use the ES5 build due to lack of ReadableStream functionaliy with Node.js
-const pdfjs = require('pdfjs-dist/es5/build/pdf');
+const { pdf2png } = require('./pdf2png');
 
 /**
  * @async
@@ -212,26 +210,25 @@ const retrieveCoverImage = async (file) => {
     console.info('Hi', file);
     try {
         if(!file) throw new Error('Missing file argument');
+
+        // TODO: Check if file still exists.
+        // TODO: Check if image was already created.
         
+        // Retrieve the file information
         const fullFileName = file.path[file.path.length - 1];
-        const stringPath = pathArrayToString(file.path);
-        // console.info('Filename', fullFileName);
-        // console.info('String path', stringPath);
+        const fileStringPath = pathArrayToString(file.path);
+
+        // TODO: Create the cover array path to update the File MongoDB document
+        // TODO: Create the cover string path for the new image
 
         // Retrieve the extension and then act accordingly
         const fileExtension = path.extname(fullFileName);
         switch(fileExtension) {
             case '.pdf':
-                const pdfLoadingTask = pdfjs.getDocument(stringPath);
+                // Allow the PDF first page to be converted to an image.
 
-                const pdf = await pdfLoadingTask.promise;
-                // console.info('PDF', pdf);
-                const pageOne = await pdf.getPage(1);
-                // console.info('Page One', pageOne);
-
-                const scale = 1.0;
-                const viewport = pageOne.getViewport({ scale: scale, });
-                console.info('Viewport', viewport);
+                // TODO: Second argument should be the cover string path
+                await pdf2png(fileStringPath, 'public/images/covers/output.png');
 
                 break;
             // TODO: Retrieve the first page for these files.

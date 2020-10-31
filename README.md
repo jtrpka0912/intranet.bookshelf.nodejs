@@ -45,6 +45,8 @@ This project is a **(M)ongoDB (E)xpress (R)eact (N)ode.js** stack with React bei
 
 + **PDF.js**: A JavaScript library to help work with the PDF files like retrieving the first page to act as the cover of an eBook entry.  
   `npm install pdfjs-dist`
++ **Canvas**: Replicates the <canvas> HTML tag, and exclusively used with *PDF.js*.
+  `npm install canvas`
 
 ## Directory Structure
 
@@ -60,7 +62,7 @@ This project is a **(M)ongoDB (E)xpress (R)eact (N)ode.js** stack with React bei
 + **node_modules** - All of the NPM dependency packages
 + **public** - All of the public assets (images, etc...) are stored
   + **images** - Storage of all images to be used
-    + **covers** - All of the eBook cover images are stored here
+    + **covers** - All of the eBook cover images are stored here based on their location path
 + **routes** - All of the *express.js* routers are stored
 + **test** - *Mocha* test files (it mirrors the *Node.js* directory structure)
 
@@ -76,5 +78,3 @@ After the loop is completed, it will return the results to the front-end.
 ## Coming Soon
 
 + User Login: Allow a user to make their own `Shelves` and flag the `Files` as read. Furthermore, the users will be stored outside of the MongoDB database, and it will be in its own user database.
-
-+ File Upload: Allow a user to upload a file (and folders) to the server. They will only upload inside the `Shelf` directory if inside a collection.
