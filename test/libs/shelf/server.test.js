@@ -327,7 +327,7 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
         it('Throw an error because the original file does not exist.', async () => {
             const runawayBook = new File({
                 name: 'Does not exist',
-                path: 'c:/not/here.pdf'
+                path: ['c:', 'not', 'here.pdf']
             });
 
             await runawayBook.save();
@@ -336,14 +336,16 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
 
         it('Return the expected file path for a PDF file.', async () => {
             // Create a sample file document
-            const node = 'Samples/sample.pdf';
-            const rootStringPath = pathArrayToString(bookShelf.root);
-            const nodePath = path.join(rootStringPath, node);
-            const sampleFile = await createFileToMongoDB(node, nodePath);
+            const sampleBook = new File({
+                name: 'Sample',
+                path: bookShelf.root.concat(['Samples', 'sample.pdf'])
+            });
 
-            await retrieveCoverImage(sampleFile);
+            const sampleBookMongo = await sampleBook.save();
 
-            const updatedSampleFile = await File.findOne({_id: sampleFile._id});
+            await retrieveCoverImage(sampleBookMongo);
+
+            const updatedSampleFile = await File.findOne({_id: sampleBookMongo._id});
 
             // 3 (public/images/cover) + 8 (d:/Backend/Nodejs/intranet.bookshelf.nodejs/test/sample-server/Books/Samples) + 1(sample.jpg)
             const expectedArrayLength = 12;
@@ -352,5 +354,26 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             assert.lengthOf(updatedSampleFile.cover, expectedArrayLength);
             assert.equal(updatedSampleFile[expectedArrayLength - 1], 'sample.jpg');
         });
-    })
+    
+        it('Return the expected file path when it had a fault cover path.', async () => {
+            // Create a sample file document
+            const badCoverBook = new File({
+                name: 'Another Sample',
+                path: bookShelf.root.concat(['Samples', 'sample.pdf']),
+                cover: ['c:', 'does', 'not', 'exist.png']
+            });
+
+            const badCoverBookMongo = await badCoverBook.save();
+
+            await retrieveCoverImage(badCoverBookMongo);
+
+            const goodCoverBook = await File.findOne({_id: badCoverBookMongo._id});
+
+            const expectedArrayLength = 12;
+
+            assert.isArray(goodCoverBook.cover);
+            assert.lengthOf(goodCoverBook.cover, expectedArrayLength);
+            assert.equal(goodCoverBook[expectedArrayLength - 1], 'another-sample.jpg');
+        });
+    });
 });

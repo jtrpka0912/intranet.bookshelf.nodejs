@@ -217,7 +217,15 @@ const retrieveCoverImage = async (file) => {
         await fs.promises.access(fileStringPath, fs.constants.F_OK);
 
         // TODO: Check if image was already created and still exists
-        
+        if(file.cover.length > 0) {
+            try {
+                const coverStringPath = pathArrayToString(file.cover);
+                await fs.promises.access(coverStringPath, fs.constants.F_OK);
+            } catch (err) {
+                console.warn('Image no longer exists');
+                
+            }
+        }
         
         
 
