@@ -212,6 +212,7 @@ const retrieveCoverImage = async (file) => {
         // Retrieve the file information
         const fullFileName = file.path[file.path.length - 1];
         const fileStringPath = pathArrayToString(file.path);
+        const fileExtension = path.extname(fullFileName);
 
         // Check if file exists in server
         await fs.promises.access(fileStringPath, fs.constants.F_OK);
@@ -222,24 +223,36 @@ const retrieveCoverImage = async (file) => {
                 const coverStringPath = pathArrayToString(file.cover);
                 await fs.promises.access(coverStringPath, fs.constants.F_OK);
             } catch (err) {
-                console.warn('Image no longer exists');
-                
+                // Image no longer exists; reset the cover.
+                file.cover = [];
+                file = await file.save();
             }
         }
-        
-        
 
-        // TODO: Create the cover array path to update the File MongoDB document
-        // TODO: Create the cover string path for the new image
+        const fileArrayPath = file.path;
+        const poppedFile = file.path.pop();
+        // FIXME: Windows does not like the d: as a folder name.
+        const coverArrayPath = ['public', 'images', 'covers'].concat(fileArrayPath);
 
-        // Retrieve the extension and then act accordingly
-        const fileExtension = path.extname(fullFileName);
+        console.info('Cover Path', pathArrayToString(coverArrayPath));
+
+        // TODO: Create the directories.
+        await fs.mkdir(coverStringPath, {
+            recursive: true
+        }, (err) => {
+            console.info('Something', err);
+        });
+
+        // TODO: Update the MongoDB document
+        // TODO: Add the file to the cover array path
+        const imageFilename = path.basename(poppedFile, fileExtension);
+        
         switch(fileExtension) {
             case '.pdf':
                 // Allow the PDF first page to be converted to an image.
 
                 // TODO: Second argument should be the cover string path
-                await pdf2png(fileStringPath, 'public/images/covers/output.png');
+                // await pdf2png(fileStringPath, 'public/images/covers/output.png');
 
                 break;
             // TODO: Retrieve the first page for these files.
