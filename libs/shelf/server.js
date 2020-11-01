@@ -267,18 +267,18 @@ const retrieveCoverImage = async (file) => {
             }
 
             // Add the file to the cover array path with image extension
-            const imageExtension = '.png';
+            const imageExtension = '.jpg';
             const imageFilename = path.basename(poppedFile, fileExtension); // foo.png
 
             // Add the file name after creating directories
             coverArrayPath.push(imageFilename + imageExtension);
-
-            // Update the MongoDB document with the new cover array path
-            file.cover = coverArrayPath;
-            await file.save();
             
             switch(fileExtension) {
                 case '.pdf':
+                    // Update the MongoDB document with the new cover array path
+                    file.cover = coverArrayPath;
+                    await file.save();
+
                     // Allow the PDF first page to be converted to an image.
                     await pdf2png(fileStringPath, pathArrayToString(coverArrayPath));
 
@@ -287,6 +287,10 @@ const retrieveCoverImage = async (file) => {
                 case '.mobi':
                 case '.epub':
                 default:
+                    // Update the MongoDB document with a placeholder cover
+                    file.cover = ['public', 'images', 'covers', '_placeholder', '_placeholder.png'];
+                    await file.save();
+
                     break;
             }
         }

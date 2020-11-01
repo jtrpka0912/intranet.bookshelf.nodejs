@@ -342,17 +342,15 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             });
 
             const sampleBookMongo = await sampleBook.save();
-
             await retrieveCoverImage(sampleBookMongo);
-
             const updatedSampleFile = await File.findOne({_id: sampleBookMongo._id});
 
-            // 3 (public/images/cover) + 8 (d:/Backend/Nodejs/intranet.bookshelf.nodejs/test/sample-server/Books/Samples) + 1(sample.jpg)
+            // 3 (public/images/cover) + 8 (d/Backend/Nodejs/intranet.bookshelf.nodejs/test/sample-server/Books/Samples) + 1(sample.jpg)
             const expectedArrayLength = 12;
 
             assert.isArray(updatedSampleFile.cover);
             assert.lengthOf(updatedSampleFile.cover, expectedArrayLength);
-            assert.equal(updatedSampleFile.cover[expectedArrayLength - 1], 'sample.png');
+            assert.equal(updatedSampleFile.cover[expectedArrayLength - 1], 'sample.jpg');
         });
     
         it('Return the expected file path when it had a fault cover path.', async () => {
@@ -364,16 +362,36 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             });
 
             const badCoverBookMongo = await badCoverBook.save();
-
             await retrieveCoverImage(badCoverBookMongo);
-
-            const goodCoverBook = await File.findOne({_id: badCoverBookMongo._id});
+            const goodCoverBook = await File.findOne({ _id: badCoverBookMongo._id });
 
             const expectedArrayLength = 12;
 
             assert.isArray(goodCoverBook.cover);
             assert.lengthOf(goodCoverBook.cover, expectedArrayLength);
-            assert.equal(goodCoverBook.cover[expectedArrayLength - 1], 'another-sample.png');
+            assert.equal(goodCoverBook.cover[expectedArrayLength - 1], 'another-sample.jpg');
+        });
+
+        // NOTE: If I added proper support for .epub files then change this to mobi or vice versa.
+        it('Return the expected file path, but with unsupported file types (epub).', async () => {
+            // Create a sample file document
+            const epubCoverBook = new File({
+                name: 'Random Epub',
+                path: bookShelf.root.concat(['More', 'Random Epub.epub']),
+                cover: []
+            });
+
+            const epubCoverBookMongo = await epubCoverBook.save();
+            await retrieveCoverImage(epubCoverBookMongo);
+            const updatedEpubCoverBook = await File.findOne({ _id: epubCoverBookMongo._id });
+
+            // 3 (public/images/cover) + 2 (/_placeholder/_placeholder.png)
+            const expectedArrayLength = 5;
+
+            assert.isArray(updatedEpubCoverBook.cover);
+            assert.lengthOf(updatedEpubCoverBook.cover, expectedArrayLength);
+            assert.equal(updatedEpubCoverBook.cover[expectedArrayLength - 2], '_placeholder');
+            assert.equal(updatedEpubCoverBook.cover[expectedArrayLength - 1], '_placeholder.png');
         });
     });
 });
