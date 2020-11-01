@@ -352,14 +352,14 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
 
             assert.isArray(updatedSampleFile.cover);
             assert.lengthOf(updatedSampleFile.cover, expectedArrayLength);
-            assert.equal(updatedSampleFile[expectedArrayLength - 1], 'sample.jpg');
+            assert.equal(updatedSampleFile.cover[expectedArrayLength - 1], 'sample.png');
         });
     
         it('Return the expected file path when it had a fault cover path.', async () => {
             // Create a sample file document
             const badCoverBook = new File({
                 name: 'Another Sample',
-                path: bookShelf.root.concat(['Samples', 'sample.pdf']),
+                path: bookShelf.root.concat(['Samples', 'another-sample.pdf']),
                 cover: ['c:', 'does', 'not', 'exist.png']
             });
 
@@ -373,7 +373,7 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
 
             assert.isArray(goodCoverBook.cover);
             assert.lengthOf(goodCoverBook.cover, expectedArrayLength);
-            assert.equal(goodCoverBook[expectedArrayLength - 1], 'another-sample.jpg');
+            assert.equal(goodCoverBook.cover[expectedArrayLength - 1], 'another-sample.png');
         });
     });
 });

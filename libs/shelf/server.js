@@ -209,59 +209,87 @@ const retrieveCoverImage = async (file) => {
     try {
         if(!file) throw new Error('Missing file argument');
 
-        // Retrieve the file information
-        const fullFileName = file.path[file.path.length - 1];
-        const fileStringPath = pathArrayToString(file.path);
-        const fileExtension = path.extname(fullFileName);
-
-        // Check if file exists in server
+        // Check if file exists in server and have it ready for conversion
+        const fileStringPath = pathArrayToString(file.path); // /path/to/foo.bar
         await fs.promises.access(fileStringPath, fs.constants.F_OK);
 
-        // TODO: Check if image was already created and still exists
+        // Check if cover already exists
+        let isCoverValid = false; // State that the cover is not valid
         if(file.cover.length > 0) {
             try {
-                const coverStringPath = pathArrayToString(file.cover);
-                await fs.promises.access(coverStringPath, fs.constants.F_OK);
+                // If it does not exist then it throws an error
+                // NOTE: Should I use try/catch to handle a falsey at this level?
+                await fs.promises.access(pathArrayToString(file.cover), fs.constants.F_OK);
+                isCoverValid; // Cover is valid and exists
             } catch (err) {
-                // Image no longer exists; reset the cover.
+                // Cover no longer exists; reset the cover property.
                 file.cover = [];
                 file = await file.save();
+                // Resume the cover process. Do not throw error!
             }
         }
 
-        const fileArrayPath = file.path;
-        const poppedFile = file.path.pop();
-        // FIXME: Windows does not like the d: as a folder name.
-        const coverArrayPath = ['public', 'images', 'covers'].concat(fileArrayPath);
+        if(!isCoverValid) {
+            // Retrieve the file name information from the path
+            const fullFileName = file.path[file.path.length - 1]; // foo.bar
+            const fileExtension = path.extname(fullFileName); // .bar
+            
+            // Create the directories for the new image in the following steps
+            const fileArrayPath = []; // Need to reconstruct it item by item
+            for(const item of file.path) {
+                fileArrayPath.push(item);
+            }
 
-        console.info('Cover Path', pathArrayToString(coverArrayPath));
+            // Step One: Remove the last item from the file array path (filename)
+            const poppedFile = fileArrayPath.pop(); // foo.bar
 
-        // TODO: Create the directories.
-        await fs.mkdir(coverStringPath, {
-            recursive: true
-        }, (err) => {
-            console.info('Something', err);
-        });
+            // Step Two: Check if : is in the first directory from file path (Windows)
+            if(fileArrayPath[0].includes(':')) {
+                fileArrayPath[0] = fileArrayPath[0].replace(':', ''); // Remove the colon
+            }
 
-        // TODO: Update the MongoDB document
-        // TODO: Add the file to the cover array path
-        const imageFilename = path.basename(poppedFile, fileExtension);
-        
-        switch(fileExtension) {
-            case '.pdf':
-                // Allow the PDF first page to be converted to an image.
+            // Step Three: Convert array to string
+            const coverArrayPath = ['public', 'images', 'covers'].concat(fileArrayPath);
 
-                // TODO: Second argument should be the cover string path
-                // await pdf2png(fileStringPath, 'public/images/covers/output.png');
+            // Step Four: Check if directories already exists. If not create it.
+            try {
+                // If it does not exist then it throws an error
+                // NOTE: Should I use try/catch to handle a falsey at this level?
+                await fs.promises.access(pathArrayToString(coverArrayPath), fs.constants.F_OK);
+            } catch (err) {
+                // Create the directories
+                await fs.mkdir(pathArrayToString(coverArrayPath), {
+                    recursive: true
+                }, (err) => {
+                    console.info('Something', err);
+                });
+                // Resume the cover process. Do not throw error!
+            }
 
-                break;
-            // TODO: Retrieve the first page for these files.
-            case '.mobi':
-            case '.epub':
-            default:
-                break;
+            // Add the file to the cover array path with image extension
+            const imageExtension = '.png';
+            const imageFilename = path.basename(poppedFile, fileExtension); // foo.png
+
+            // Add the file name after creating directories
+            coverArrayPath.push(imageFilename + imageExtension);
+
+            // Update the MongoDB document with the new cover array path
+            file.cover = coverArrayPath;
+            await file.save();
+            
+            switch(fileExtension) {
+                case '.pdf':
+                    // Allow the PDF first page to be converted to an image.
+                    await pdf2png(fileStringPath, pathArrayToString(coverArrayPath));
+
+                    break;
+                // TODO: Retrieve the first page for these files.
+                case '.mobi':
+                case '.epub':
+                default:
+                    break;
+            }
         }
-
     } catch(err) {
         throw err;
     }
