@@ -29,6 +29,11 @@ const {
     recognize404,
 } = require('../../libs/helpers/mocha/express/assert'); // Helper Mocha Assert Tests
 
+const {
+    bookShelf,
+    magazineShelf
+} = require('../../libs/fake-data/mock-objects');
+
 // Global Variables
 const endpointURI = '/api/v1/shelves';
 
@@ -45,21 +50,8 @@ describe('(shelves.test.js) Shelves Router', () => {
         let request;
 
         before(async () => {
+            // FIXME: Fake shelves are returning undefined.
             // Create some shelves
-            const bookShelf = new Shelf({
-                name: 'Book Shelf',
-                root: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Books'],
-                showDirectories: true,
-                multiFile: true
-            });
-
-            const magazineShelf = new Shelf({
-                name: 'Magazine Shelf',
-                root: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Magazines'],
-                showDirectories: true,
-                multiFile: false
-            });
-
             await bookShelf.save();
             await magazineShelf.save();
         });
