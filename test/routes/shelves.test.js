@@ -15,7 +15,9 @@ const setup = require('../../libs/helpers/mocha/mongoose');
 const { app } = require('../../index'); // Get the Express app
 
 // Models
-const Shelf = require('../../models/shelf.model'); // Shelf model
+const File = require('../../models/file.model');
+const Folder = require('../../models/folder.model');
+const Shelf = require('../../models/shelf.model');
 
 // Helpers
 const {
@@ -53,7 +55,7 @@ describe('(shelves.test.js) Shelves Router', () => {
 
             const magazineShelf = new Shelf({
                 name: 'Magazine Shelf',
-                root: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Magazine'],
+                root: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Magazines'],
                 showDirectories: true,
                 multiFile: false
             });
@@ -75,21 +77,14 @@ describe('(shelves.test.js) Shelves Router', () => {
 
             // Check paths
             assert.equal(res.body[0].root, 'd:/Backend/Nodejs/intranet.bookshelf.nodejs/test/sample-server/Books');
-            assert.equal(res.body[1].root, 'd:/Backend/Nodejs/intranet.bookshelf.nodejs/test/sample-server/Magazine');
+            assert.equal(res.body[1].root, 'd:/Backend/Nodejs/intranet.bookshelf.nodejs/test/sample-server/Magazines');
         });
     });
 
     describe(`POST - ${endpointURI}`, () => {
-        let request;
-
-        beforeEach(() => {
-            // Set up request variable
-            request = chai.request(app).post(endpointURI);
-        });
-
-        afterEach(() => {
-            // Need to reset the request variable for each test.
-            request = null;
+        afterEach(async () => {
+            await Folder.deleteMany({});
+            await File.deleteMany({});
         });
 
         after(async () => {
@@ -97,80 +92,52 @@ describe('(shelves.test.js) Shelves Router', () => {
             await Shelf.deleteMany({});
         });
 
-        it('Fail request with empty body', (done) => {
-            request.send({}).end((err, res) => {
-                assert.isNotNull(res);
-                recognize400(res);
-                recognizeErrorMessage(res, 'is required.');
-                done();
-            });
+        it('Fail request with empty body', async () => {
+            const res = await chai.request(app).post(endpointURI).send({});
+            assert.isNotNull(res);
+            recognize400(res);
+            recognizeErrorMessage(res, 'is required.');
         });
 
-        it('Fail request because of short name', (done) => {
-            request.send({
+        it('Fail request because of short name', async () => {
+            const res = await chai.request(app).post(endpointURI).send({
                 name: 'Yo', // Need to be three or more
                 root: '/',
                 showDirectories: true,
                 multiFile: false
-            }).end((err, res) => {
-                assert.isNotNull(res);
-                recognize400(res);
-                recognizeErrorMessage(res, 'is shorter than the minimum allowed');
-                done();
             });
+            assert.isNotNull(res);
+            recognize400(res);
+            recognizeErrorMessage(res, 'is shorter than the minimum allowed');
         });
 
-        it('Fail request because of conflicts with show directories and multi-files.', (done) => {
-            request.send({
-                name: 'Sample', // Need to be three or more
+        it('Fail request because of conflicts with show directories and multi-files.', async () => {
+            const res = await chai.request(app).post(endpointURI).send({
+                name: 'Sample',
                 root: '/',
                 showDirectories: false,
                 multiFile: true
-            }).end((err, res) => {
-                assert.isNotNull(res);
-                recognize400(res);
-                recognizeErrorMessage(res, 'you can not use multi-file directories');
-                done();
             });
+            assert.isNotNull(res);
+            recognize400(res);
+            recognizeErrorMessage(res, 'you can not use multi-file directories');
         });
 
-        it('Successfully create a new shelf', (done) => {
-            request.send({
+        it('Successfully create a new shelf', async () => {
+            const res = await chai.request(app).post(endpointURI).send({
                 name: 'From Test',
-                root: '/example/foo/bar',
+                root: 'd:/Backend/Nodejs/intranet.bookshelf.nodejs/test/sample-server/Magazines',
                 showDirectories: true,
                 multiFile: false
-            }).end((err, res) => {
-                const response = res.body;
-
-                assert.isNotNull(res);
-                recognize201(res);
-
-                assert.containIgnoreCase(response.name, 'From Test');
-                assert.isNotArray(response.root); // We make it an array in mongo, but should return back as string
-                assert.equal(response.root, '/example/foo/bar');
-                done();
             });
-        });
 
-        // FIXME: Get this test working for windows 'backslashes' paths.
-        it('Successfully create a new shelf with Windows path', (done) => {
-            request.send({
-                name: 'From Test',
-                root: '\\example\\foo\\bar', // Windows have the other slashes
-                showDirectories: true,
-                multiFile: false
-            }).end((err, res) => {
-                const response = res.body;
+            const response = res.body;
+            assert.isNotNull(res);
+            recognize201(res);
 
-                assert.isNotNull(res);
-                recognize201(res);
-
-                assert.containIgnoreCase(response.name, 'From Test');
-                assert.isNotArray(response.root); // We make it an array in mongo, but should return back as string
-                assert.equal(response.root, '/example/foo/bar');
-                done();
-            });
+            assert.containIgnoreCase(response.name, 'From Test');
+            assert.isNotArray(response.root); // We make it an array in mongo, but should return back as string
+            assert.equal(response.root, 'd:/Backend/Nodejs/intranet.bookshelf.nodejs/test/sample-server/Magazines');
         });
     });
 

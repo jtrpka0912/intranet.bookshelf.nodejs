@@ -38,7 +38,7 @@ router.route('/').get(async (req, res) => {
 /**
  * @summary Create new shelf
  */
-router.route('/').post((req, res) => {
+router.route('/').post(async (req, res) => {
     // Retrieve the request from the front-end
     const shelfName             = req.body.name;
     const shelfRoot             = req.body.root;
@@ -71,30 +71,35 @@ router.route('/').post((req, res) => {
         multiFile: shelfMultiFile
     });
 
-    newShelf.save().then((mongoResponse) => {
-        // Refresh the shelf to populate the MongoDB
-        shelfLibrary.retrieveFilesFolders(mongoResponse).then(() => {
+    try {
+        const newShelfMongo = await newShelf.save();
+
+        try {
+            // Retrieve the files and folders for the newly created shelf.
+            await shelfLibrary.retrieveFilesFolders(newShelfMongo);
+
             // Convert from Mongo Object to JavaScript Object
-            mongoResponse = mongoResponse.toObject();
+            newShelfJson = newShelfMongo.toObject();
 
             // Convert to a string path.
-            mongoResponse.root = pathArrayToString(mongoResponse.root);
+            newShelfJson.root = pathArrayToString(newShelfJson.root);
 
-            return res.status(201).json(mongoResponse);
-        }).catch((err) => {
+            return res.status(201).json(newShelfJson);
+        } catch(err) {
+            console.error(err);
             return res.status(500).json({
                 errorCode: 500,
                 errorCodeMessage: 'Internal Server Error',
                 errorMessage: err.message
             });
-        });
-    }).catch(err => {
+        }
+    } catch(err) {
         return res.status(400).json({
             errorCode: 400,
             errorCodeMessage: 'Bad Request',
             errorMessage: err.message
         });
-    });
+    }
 });
 
 /**
