@@ -2,6 +2,7 @@
 // ========
 // NodeJS
 const path = require('path');
+const fs = require('fs');
 
 // Chai
 const chai = require('chai');
@@ -313,10 +314,11 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
 
     describe('retrieveCoverImage', () => {
         afterEach(async () => {
-            // TODO: Look through, and remove all folders and files from the public/images/cover folder
-
             // Remove any of the files created here
             await File.deleteMany();
+        });
+
+        after(async () => {
         });
 
         it('Throw an error because it is missing the file', async () => {
@@ -351,6 +353,8 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             assert.isArray(updatedSampleFile.cover);
             assert.lengthOf(updatedSampleFile.cover, expectedArrayLength);
             assert.equal(updatedSampleFile.cover[expectedArrayLength - 1], 'sample.jpg');
+
+            cleanupCoverImageTests(updatedSampleFile);
         });
     
         it('Return the expected file path when it had a fault cover path.', async () => {
@@ -370,6 +374,8 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             assert.isArray(goodCoverBook.cover);
             assert.lengthOf(goodCoverBook.cover, expectedArrayLength);
             assert.equal(goodCoverBook.cover[expectedArrayLength - 1], 'another-sample.jpg');
+
+            cleanupCoverImageTests(goodCoverBook);
         });
 
         // NOTE: If I added proper support for .epub files then change this to mobi or vice versa.
@@ -395,3 +401,34 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
         });
     });
 });
+
+/**
+ * @async
+ * @function cleanupCoverImageTests
+ * @description Delete the files that were created from file cover image tests
+ * @author J.T.
+ * @param { File } file 
+ */
+const cleanupCoverImageTests = async (file) => {
+    try {
+        const coverArrayPath = file.cover;
+
+        // First check if the cover image exists
+        await fs.promises.access(pathArrayToString(coverArrayPath));
+        await fs.promises.rm(pathArrayToString(coverArrayPath));
+
+        // Remove the directories from public/images/covers
+        const coversRootDirectory = 'public/images/covers';
+        const directories = await fs.promises.readdir(coversRootDirectory);
+
+        for(let directory of directories) {
+            if(directory !== '_placeholder') {
+                await fs.promises.rmdir(coversRootDirectory + '/' + directory, {
+                    recursive: true
+                });
+            }
+        }
+    } catch (err) {
+        console.error('cleanupCoverImageTests', err);
+    }
+}
