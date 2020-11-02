@@ -44,40 +44,22 @@ describe('(shelves.test.js) Shelves Router', () => {
 
         before(async () => {
             // Create some shelves
-            const shelfOne = new Shelf({
-                name: 'Shelf One',
-                root: [],
-                showDirectories: false,
-                multiFile: false
-            });
-
-            const shelfTwo = new Shelf({
-                name: 'Shelf Two',
-                root: ['books', 'publishers'],
+            const bookShelf = new Shelf({
+                name: 'Book Shelf',
+                root: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Books'],
                 showDirectories: true,
                 multiFile: true
             });
 
-            const shelfThree = new Shelf({
-                name: 'Shelf Three',
-                root: ['magazines'],
+            const magazineShelf = new Shelf({
+                name: 'Magazine Shelf',
+                root: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Magazine'],
                 showDirectories: true,
                 multiFile: false
             });
 
-            await shelfOne.save();
-            await shelfTwo.save();
-            await shelfThree.save();
-        });
-
-        beforeEach(() => {
-            // Set up request variable
-            request = chai.request(app).get(endpointURI);
-        });
-
-        afterEach(() => {
-            // Need to reset the request variable for each test.
-            request = null;
+            await bookShelf.save();
+            await magazineShelf.save();
         });
         
         after(async () => {
@@ -85,20 +67,15 @@ describe('(shelves.test.js) Shelves Router', () => {
             await Shelf.deleteMany({});
         });
 
-        it('Return three shelves', (done) => {
-            request.end((err, res) => {
-                recognize200(res);
-                const shelfCount = res.body.length;
-                assert.equal(shelfCount, 3, 'Should return only three from mock MongoDB.');
-                assert.isAbove(shelfCount, 2);
-                assert.isBelow(shelfCount, 5);
+        it('Return two shelves', async () => {
+            const res = await chai.request(app).get(endpointURI);
+            recognize200(res);
+            const shelfCount = res.body.length;
+            assert.equal(shelfCount, 2, 'Should return only two from database.');
 
-                // Check paths
-                assert.equal(res.body[0].root, '/');
-                assert.equal(res.body[1].root, '/books/publishers');
-                assert.equal(res.body[2].root, '/magazines');
-                done();
-            });
+            // Check paths
+            assert.equal(res.body[0].root, 'd:/Backend/Nodejs/intranet.bookshelf.nodejs/test/sample-server/Books');
+            assert.equal(res.body[1].root, 'd:/Backend/Nodejs/intranet.bookshelf.nodejs/test/sample-server/Magazine');
         });
     });
 

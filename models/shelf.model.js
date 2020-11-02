@@ -16,7 +16,6 @@ const shelfSchema = new Schema({
         type: [String], // Each folder will be an array item
         required: true,
         unique: false,
-        trim: true,
         minlength: 0
     },
     showDirectories: {

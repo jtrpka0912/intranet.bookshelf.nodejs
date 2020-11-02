@@ -105,16 +105,11 @@ const pdf2png = async (fromPath, toPath) => {
         var image = canvasAndContext.canvas.toBuffer();
 
         fs.writeFile(toPath, image, function (error) {
-            if (error) {
-                console.error("Error: " + error);
-            } else {
-                console.log("Finished converting first page of PDF file to a PNG image.");
-            }
+            if (error) throw new Error(error);
         });
     } catch (err) {
         throw err;
     }
-    
 };
 
 module.exports = {

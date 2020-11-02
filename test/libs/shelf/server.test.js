@@ -421,6 +421,7 @@ const cleanupCoverImageTests = async (file) => {
         const coversRootDirectory = 'public/images/covers';
         const directories = await fs.promises.readdir(coversRootDirectory);
 
+        // NOTE: Might not be a safe approach in production environment.
         for(let directory of directories) {
             if(directory !== '_placeholder') {
                 await fs.promises.rmdir(coversRootDirectory + '/' + directory, {

@@ -261,7 +261,7 @@ const retrieveCoverImage = async (file) => {
                 await fs.mkdir(pathArrayToString(coverArrayPath), {
                     recursive: true
                 }, (err) => {
-                    console.info('Something', err);
+                    if(err) console.error('retrieveCoverImage error:', err);
                 });
                 // Resume the cover process. Do not throw error!
             }

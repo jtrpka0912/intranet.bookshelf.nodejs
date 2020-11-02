@@ -13,9 +13,10 @@ const { foundMongoError, pathArrayToString, pathStringToArray, shelfNotFound } =
 /**
  * @summary Retrieve all shelves
  */
-router.route('/').get((req, res) => {
-    // TODO: Do some validation if no shelves were found.
-    Shelf.find().then(shelves => {
+router.route('/').get(async (req, res) => {
+    try {
+        const shelves = await Shelf.find({});
+        
         const updatedShelves = shelves.map((shelf) => {
             // Convert to a JavaScript Object
             shelf = shelf.toObject();
@@ -25,13 +26,13 @@ router.route('/').get((req, res) => {
         });
 
         res.json(updatedShelves);
-    }).catch(err => {
+    } catch (err) {
         res.status(400).json({
             errorCode: 400,
             errorCodeMessage: 'Bad Request',
             errorMessage: 'Something bad happened retrieving all shelves.'
         });
-    });
+    }
 });
 
 /**
@@ -72,15 +73,21 @@ router.route('/').post((req, res) => {
 
     newShelf.save().then((mongoResponse) => {
         // Refresh the shelf to populate the MongoDB
-        shelfLibrary.retrieveFilesFolders(mongoResponse);
+        shelfLibrary.retrieveFilesFolders(mongoResponse).then(() => {
+            // Convert from Mongo Object to JavaScript Object
+            mongoResponse = mongoResponse.toObject();
 
-        // Convert from Mongo Object to JavaScript Object
-        mongoResponse = mongoResponse.toObject();
+            // Convert to a string path.
+            mongoResponse.root = pathArrayToString(mongoResponse.root);
 
-        // Convert to a string path.
-        mongoResponse.root = pathArrayToString(mongoResponse.root);
-
-        return res.status(201).json(mongoResponse);
+            return res.status(201).json(mongoResponse);
+        }).catch((err) => {
+            return res.status(500).json({
+                errorCode: 500,
+                errorCodeMessage: 'Internal Server Error',
+                errorMessage: err.message
+            });
+        });
     }).catch(err => {
         return res.status(400).json({
             errorCode: 400,
