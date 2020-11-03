@@ -30,7 +30,7 @@ const {
 } = require('../../libs/helpers/mocha/express/assert'); // Helper Mocha Assert Tests
 
 // Global Variables
-const endpointURI = '/api/v1/ebooks';
+const endpointURI = '/api/v1/contents';
 const shelfOneId = '5ec73853788ef556ecc225dd';
 const shelfTwoId = '5f3e762dbc0d6f00200404b2';
 
@@ -38,7 +38,7 @@ const folderOneId = '5f3eaf75dd9ede497015699a';
 const folderTwoId = '5f3eaf75dd9ede497015699b';
 const folderThreeId = '5f3eaf75dd9ede497015699c';
 
-describe('(ebooks.test.js) eBooks Router', () => {
+describe('(contents.test.js) Contents Router', () => {
     before(async () => {
         await setup.mongooseTestConnection();
     });

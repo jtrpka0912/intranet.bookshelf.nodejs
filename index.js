@@ -7,7 +7,7 @@ require('dotenv').config();
 
 // Routes
 const shelvesRouter = require('./routes/shelves');
-const ebooksRouter = require('./routes/ebooks')
+const contentsRouter = require('./routes/contents')
 
 // Initialize express
 const app = express();
@@ -36,7 +36,7 @@ connection.once('open', () => {
 
 // Express Routes
 app.use('/api/v1/shelves', shelvesRouter);
-app.use('/api/v1/ebooks', ebooksRouter);
+app.use('/api/v1/contents', contentsRouter);
 
 // Connect node to a part
 app.listen(port, () => {

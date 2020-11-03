@@ -11,8 +11,6 @@ const { retrieveDirectories, retrieveFiles, retrieveBreadcrumbs } = require('../
 // Helpers
 const { foundMongoError, shelfNotFound, folderNotFound, pathArrayToString } = require('../libs/helpers/routes');
 
-// TODO: Rename this entire route as /v1/api/contents
-
 /**
  * @description Throw an error since this is a dead endpoint.
  * @note Is this best practice?
