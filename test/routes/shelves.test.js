@@ -30,8 +30,10 @@ const {
 } = require('../../libs/helpers/mocha/express/assert'); // Helper Mocha Assert Tests
 
 const {
-    bookShelf,
-    magazineShelf
+    bookShelfArray,
+    bookShelfString,
+    magazineShelfArray,
+    magazineShelfString
 } = require('../../libs/fake-data/mock-objects');
 
 // Global Variables
@@ -48,10 +50,9 @@ describe('(shelves.test.js) Shelves Router', () => {
 
     describe(`GET - ${endpointURI}`, () => {
         before(async () => {
-            // FIXME: Fake shelves are returning undefined.
             // Create some shelves
-            await bookShelf.save();
-            await magazineShelf.save();
+            await Shelf(bookShelfArray).save();
+            await Shelf(magazineShelfArray).save();
         });
         
         after(async () => {
@@ -114,18 +115,13 @@ describe('(shelves.test.js) Shelves Router', () => {
         });
 
         it('Successfully create a new shelf', async () => {
-            const res = await chai.request(app).post(endpointURI).send({
-                name: 'From Test',
-                root: 'd:/Backend/Nodejs/intranet.bookshelf.nodejs/test/sample-server/Magazines',
-                showDirectories: true,
-                multiFile: false
-            });
+            const res = await chai.request(app).post(endpointURI).send(magazineShelfString);
 
             const response = res.body;
             assert.isNotNull(res);
             recognize201(res);
 
-            assert.containIgnoreCase(response.name, 'From Test');
+            assert.containIgnoreCase(response.name, 'Magazine');
             assert.isNotArray(response.root); // We make it an array in mongo, but should return back as string
             assert.equal(response.root, 'd:/Backend/Nodejs/intranet.bookshelf.nodejs/test/sample-server/Magazines');
         });
