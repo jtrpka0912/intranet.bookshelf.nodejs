@@ -71,13 +71,13 @@ const pdf2png = async (fromPath, toPath) => {
 
         // Load the PDF file.
         var loadingTask = pdfjsLib.getDocument({
-        data: data,
-            cMapUrl: CMAP_URL,
-            cMapPacked: CMAP_PACKED,
+          data: data,
+          cMapUrl: CMAP_URL,
+          cMapPacked: CMAP_PACKED,
+          verbosity: pdfjsLib.VerbosityLevel.ERRORS // Adjust if you want to show warnings
         });
 
         const pdfDocument = await loadingTask.promise;
-        console.log("# PDF document loaded.");
 
         // Get the first page.
         const page = await pdfDocument.getPage(1);

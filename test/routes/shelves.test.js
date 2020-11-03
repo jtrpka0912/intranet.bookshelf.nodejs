@@ -47,8 +47,6 @@ describe('(shelves.test.js) Shelves Router', () => {
     });
 
     describe(`GET - ${endpointURI}`, () => {
-        let request;
-
         before(async () => {
             // FIXME: Fake shelves are returning undefined.
             // Create some shelves
