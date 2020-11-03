@@ -48,8 +48,6 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             multiFile: false
         });
 
-        // TODO: Add magazine shelf
-
         await unknownShelf.save();
         await bookShelf.save();
     });

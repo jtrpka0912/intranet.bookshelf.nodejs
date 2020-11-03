@@ -10,6 +10,7 @@ const assert = chai.assert; // Assert Style
  * @function recognize200
  * @summary Check if OK Response (200)
  * @description A reusable test to simply check the actual status of the response if its OK (200).
+ * @author J.T.
  * @param { * } res 
  */
 const recognize200 = (res) => {
@@ -21,6 +22,7 @@ const recognize200 = (res) => {
  * @function recognize201
  * @summary Check if Created Response (201)
  * @description A reusable test to simply check the actual status of the response if its Created (201).
+ * @author J.T.
  * @param { * } res 
  */
 const recognize201 = (res) => {
@@ -32,6 +34,7 @@ const recognize201 = (res) => {
  * @function recognize204
  * @summary Check if No Content Response (204)
  * @description A reusable test to simply check the actual status of the response if its No Content (204).
+ * @author J.T.
  * @param { * } res 
  */
 const recognize204 = (res) => {
@@ -43,7 +46,7 @@ const recognize204 = (res) => {
  * @function recognize400
  * @summary Check if Bad Request (400)
  * @description A reusable assertion test to see if route had a 400 Bad Request.
- * @todo Create a testing helper and export it to other future route test files.
+ * @author J.T.
  * @param { * } res 
  */
 const recognize400 = (res) => {
@@ -59,6 +62,7 @@ const recognize400 = (res) => {
  * @function recognize404
  * @summary Check if Not Found (404)
  * @description A reusable assertion test to check if route had a 404 Not Found.
+ * @author J.T.
  * @param { * } res 
  */
 const recognize404 = (res) => {
@@ -74,6 +78,7 @@ const recognize404 = (res) => {
  * @function recognize500
  * @summary Check if Internal Server Error (500)
  * @description A reusable assertion test to check if route had an Internal Server Error (500).
+ * @author J.T.
  * @param { * } res 
  */
 const recognize500 = (res) => {
@@ -89,6 +94,7 @@ const recognize500 = (res) => {
  * @function recognizeErrorMessage
  * @summary Check for contents of error message.
  * @description A reusable assertion test to check for a sub-string of the error message.
+ * @author J.T.
  * @param { * } res 
  * @param { string } partialMessage 
  */
@@ -121,8 +127,6 @@ const pathShouldBeString = (items, isBreadcrumb = false) => {
         }
     }
 }
-
-// TODO: Add @author to comment blocks
 
 module.exports = {
     recognize200,

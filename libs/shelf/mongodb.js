@@ -174,18 +174,10 @@ const retrieveBreadcrumbs = async (shelf, currentFolder) => {
  */
 const retrieveFiles = async (shelf, currentFolder) => {
     try {
-        if(!shelf) {
-            // TODO: Need to throw it in an object with message for the try/catch to get the message. Little hacky.
-            throw {
-                message: 'Shelf was missing in call.'
-            };
-        }
+        if(!shelf) throw new Error('Shelf was missing in call.');
 
         if(isCurrentFolderCompatible(shelf, currentFolder) === false) {
-            // TODO: Need to throw it in an object with message for the try/catch to get the message. Little hacky.
-            throw {
-                message: 'Shelf and current folder are not compatible.'
-            };
+            throw new Error('Shelf and current folder are not compatible.');
         }
 
         let query = {}; // By default, return all.
@@ -335,7 +327,6 @@ const getCurrentFolderArrayElementExpression = (currentFolder, shelfLength) => {
     return expressions;
 }
 
-// TODO: Figure out a way to test the helper functions without exporting.
 module.exports = {
     retrieveDirectories,
     retrieveBreadcrumbs,
