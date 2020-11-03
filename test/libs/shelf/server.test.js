@@ -169,7 +169,7 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             assert.isRejected(retrieveFilesFolders(unknownShelf));
         });
 
-        it.skip('Find the new nodes from the book shelf in MongoDB', async () => {
+        it('Find the new nodes from the book shelf in MongoDB', async () => {
             await retrieveFilesFolders(bookShelf);
 
             // Retrieve the folder count
@@ -194,12 +194,12 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
                 name: 'sample', 
                 path: ['d:', 'Backend', 'Nodejs', 'intranet.bookshelf.nodejs', 'test', 'sample-server', 'Books', 'Samples', 'sample.pdf']
             }).exec();
-            assert.isObject(samplePdf, 'Unable to find samplePdf');
+            assert.isObject(samplePdf);
             assert.equal(samplePdf.type, 'book');
             assert.equal(samplePdf.name, 'sample');
             assert.isArray(samplePdf.path);
             assert.isArray(samplePdf.cover);
-            assert.equal(samplePdf.cover[samplePdf.length -1], 'sample.jpg');
+            assert.equal(samplePdf.cover[samplePdf.cover.length -1], 'sample.jpg');
             assert.isFalse(samplePdf.didRead);
 
             // Check the another sample pdf file
@@ -353,8 +353,6 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             assert.isArray(updatedSampleFile.cover);
             assert.lengthOf(updatedSampleFile.cover, expectedArrayLength);
             assert.equal(updatedSampleFile.cover[expectedArrayLength - 1], 'sample.jpg');
-
-            cleanupCoverImageTests(updatedSampleFile);
         });
     
         it('Return the expected file path when it had a fault cover path.', async () => {
@@ -374,8 +372,6 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             assert.isArray(goodCoverBook.cover);
             assert.lengthOf(goodCoverBook.cover, expectedArrayLength);
             assert.equal(goodCoverBook.cover[expectedArrayLength - 1], 'another-sample.jpg');
-
-            cleanupCoverImageTests(goodCoverBook);
         });
 
         // NOTE: If I added proper support for .epub files then change this to mobi or vice versa.
@@ -401,35 +397,3 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
         });
     });
 });
-
-/**
- * @async
- * @function cleanupCoverImageTests
- * @description Delete the files that were created from file cover image tests
- * @author J.T.
- * @param { File } file 
- */
-const cleanupCoverImageTests = async (file) => {
-    try {
-        const coverArrayPath = file.cover;
-
-        // First check if the cover image exists
-        await fs.promises.access(pathArrayToString(coverArrayPath));
-        await fs.promises.rm(pathArrayToString(coverArrayPath));
-
-        // Remove the directories from public/images/covers
-        const coversRootDirectory = 'public/images/covers';
-        const directories = await fs.promises.readdir(coversRootDirectory);
-
-        // NOTE: Might not be a safe approach in production environment.
-        for(let directory of directories) {
-            if(directory !== '_placeholder') {
-                await fs.promises.rmdir(coversRootDirectory + '/' + directory, {
-                    recursive: true
-                });
-            }
-        }
-    } catch (err) {
-        console.error('cleanupCoverImageTests', err);
-    }
-}
