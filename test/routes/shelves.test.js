@@ -164,43 +164,34 @@ describe('(shelves.test.js) Shelves Router', () => {
             await Shelf.deleteMany({});
         });
 
-        it('Bad request with a too short ID string (12 characters minimum)', (done) => {
-            chai.request(app).get(`${endpointURI}/blah`).end((err, res) => {
-                assert.isNotNull(res);
-                // TODO: This is subject to change once I am able to parse MongoDB errors.
-                recognize400(res);
-                recognizeErrorMessage(res, 'Cast to ObjectId failed');
-                done();
-            });
+        it('Bad request with a too short ID string (12 characters minimum)', async() => {
+            const res = await chai.request(app).get(`${endpointURI}/blah`);
+            assert.isNotNull(res);
+            recognize400(res);
+            recognizeErrorMessage(res, 'Cast to ObjectId failed');
         });
 
-        it('Unable to find shelf with bad ID', (done) => {
-            chai.request(app).get(`${endpointURI}/blahblahblah`).end((err, res) => {
-                assert.isNotNull(res);
-                recognize404(res);
-                recognizeErrorMessage(res, 'Unable to find shelf with id:');
-                done();
-            });
+        it('Unable to find shelf with bad ID', async() => {
+            const res = await chai.request(app).get(`${endpointURI}/blahblahblah`);
+            assert.isNotNull(res);
+            recognize404(res);
+            recognizeErrorMessage(res, 'Unable to find shelf with id:');
         });
 
-        it('Find a shelf with ID (Shelf Two)', (done) => {
-            chai.request(app).get(`${endpointURI}/5ec5df19ed30ea2b80ef14ae`).end((err, res) => {
-                assert.isNotNull(res);
-                recognize200(res);
-                assert.equal(res.body.name, 'Shelf Two');
-                assert.containIgnoreCase(res.body.root, '/books');
-                done();
-            });
+        it('Find a shelf with ID (Shelf Two)', async() => {
+            const res = await chai.request(app).get(`${endpointURI}/5ec5df19ed30ea2b80ef14ae`);
+            assert.isNotNull(res);
+            recognize200(res);
+            assert.equal(res.body.name, 'Shelf Two');
+            assert.containIgnoreCase(res.body.root, 'books');
         });
 
-        it('Find the magazine shelf (Shelf Three)', (done) => {
-            chai.request(app).get(`${endpointURI}/5ec739cdc8bcdc4a1c74e75e`).end((err, res) => {
-                assert.isNotNull(res);
-                recognize200(res);
-                assert.equal(res.body.name, 'Shelf Three');
-                assert.containIgnoreCase(res.body.root, '/magazines/issues');
-                done();
-            });
+        it('Find the magazine shelf (Shelf Three)', async() => {
+            const res = await chai.request(app).get(`${endpointURI}/5ec739cdc8bcdc4a1c74e75e`);
+            assert.isNotNull(res);
+            recognize200(res);
+            assert.equal(res.body.name, 'Shelf Three');
+            assert.containIgnoreCase(res.body.root, 'magazines/issues');
         });
     });
 
