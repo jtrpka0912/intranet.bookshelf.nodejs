@@ -188,7 +188,7 @@ describe('(mongodb.test.js) Retrieve Files and Folders from MongoDB', () => {
             });
     
             it('Return an error message that shelf and folder do not belong to each other', async () => {
-                assert.isRejected(retrieveDirectories(magazineShelf, magazineExample));
+                assert.isRejected(retrieveDirectories(magazineShelf, rootExample));
             });
     
             it('Return nothing back if we are not going to show directories', async () => {

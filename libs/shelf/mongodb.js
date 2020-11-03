@@ -65,6 +65,7 @@ const retrieveDirectories = async (shelf, currentFolder) => {
  * @returns { object[] }
  */
 const retrieveBreadcrumbs = async (shelf, currentFolder) => {
+    // console.log('*************************');
     try {
         if(!shelf) throw new Error('Shelf was missing in call.');
 
