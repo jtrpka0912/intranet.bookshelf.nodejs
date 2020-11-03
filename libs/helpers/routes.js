@@ -24,7 +24,6 @@ const pathStringToArray = (pathString) => {
  * @returns { string }
  */
 const pathArrayToString = (pathArray) => {
-    // NOTE: I originally prepend it with an additional forward slash
     return pathArray.join(separator);
 };
 

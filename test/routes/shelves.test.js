@@ -237,94 +237,84 @@ describe('(shelves.test.js) Shelves Router', () => {
             await Shelf.deleteMany({});
         });
 
-        it('Fail request with empty body', (done) => {
-            request.send({}).end((err, res) => {
-                assert.isNotNull(res);
-                recognize400(res);
-                recognizeErrorMessage(res, 'You did not send any information');
-                done();
-            });
+        it('Fail request with empty body', async() => {
+            const res = await request.send({});
+            assert.isNotNull(res);
+            recognize400(res);
+            recognizeErrorMessage(res, 'You did not send any information');
         });
 
-        it('Bad request with a too short ID string (12 characters minimum)', (done) => {
-            chai.request(app).get(`${endpointURI}/blah`).send({
+        it('Bad request with a too short ID string (12 characters minimum)', async() => {
+            const res = await chai.request(app).get(`${endpointURI}/blah`).send({
                 name: 'Shelf Derp',
                 root: '/derp',
                 showDirectories: true,
                 multiFile: false
-            }).end((err, res) => {
-                assert.isNotNull(res);
-                // TODO: This is subject to change once I am able to parse MongoDB errors.
-                recognize400(res);
-                recognizeErrorMessage(res, 'Cast to ObjectId failed');
-                done();
             });
+            assert.isNotNull(res);
+            recognize400(res);
+            recognizeErrorMessage(res, 'Cast to ObjectId failed');
         });
 
-        it('Fail request because it could not find Shelf', (done) => {
-            chai.request(app).put(`${endpointURI}/blahblahblah`).send({
+        it('Fail request because it could not find Shelf', async() => {
+            const res = await chai.request(app).put(`${endpointURI}/blahblahblah`).send({
                 name: 'Shelf Derp',
                 root: '/derp',
                 showDirectories: true,
                 multiFile: false
-            }).end((err, res) => {
-                assert.isNotNull(res);
-                recognize404(res);
-                recognizeErrorMessage(res, 'Unable to find shelf with id');
-                done();
             });
+            assert.isNotNull(res);
+            recognize404(res);
+            recognizeErrorMessage(res, 'Unable to find shelf with id');
         });
 
-        it('Successfully updated Shelf One', (done) => {
-            request.send({
+        it('Successfully updated Shelf One', async() => {
+            const res = await request.send({
                 name: 'Updated Shelf One',
                 root: '/books/updated',
                 showDirectories: true,
                 multiFile: true
-            }).end((err, res) => {
-                const updatedShelf = res.body;
-                assert.isNotNull(res);
-                recognize200(res);
-
-                // Test old and new values
-                assert.equal(updatedShelf.name, 'Updated Shelf One');
-                assert.notEqual(updatedShelf.name, 'Shelf One');
-                assert.isNotArray(updatedShelf.root);
-                assert.equal(updatedShelf.root, '/books/updated');
-                assert.notEqual(updatedShelf.root, '/books');
-                assert.isTrue(updatedShelf.showDirectories);
-                assert.isNotFalse(updatedShelf.showDirectories);
-                assert.isTrue(updatedShelf.multiFile);
-                assert.isNotFalse(updatedShelf.multiFile);
-                done();
             });
+
+            const updatedShelf = res.body;
+            assert.isNotNull(res);
+            recognize200(res);
+
+            // Test old and new values
+            assert.equal(updatedShelf.name, 'Updated Shelf One');
+            assert.notEqual(updatedShelf.name, 'Shelf One');
+            assert.isNotArray(updatedShelf.root);
+            assert.equal(updatedShelf.root, 'books/updated');
+            assert.notEqual(updatedShelf.root, 'books');
+            assert.isTrue(updatedShelf.showDirectories);
+            assert.isNotFalse(updatedShelf.showDirectories);
+            assert.isTrue(updatedShelf.multiFile);
+            assert.isNotFalse(updatedShelf.multiFile);
         });
 
         // Technically, this should be more of a PATCH, but not sure...
-        it('Successfully updated Shelf Three with partial data', (done) => {
-            chai.request(app).put(`${endpointURI}/${shelfThreeId}`).send({
+        it('Successfully updated Shelf Three with partial data', async() => {
+            const res = await chai.request(app).put(`${endpointURI}/${shelfThreeId}`).send({
                 showDirectories: false,
-            }).end((err, res) => {
-                const updatedShelf = res.body;
-                assert.isNotNull(res);
-                recognize200(res);
-
-                // Test old and new values
-                assert.equal(updatedShelf.name, 'Shelf Three');
-                assert.isNotArray(updatedShelf.root);
-                assert.equal(updatedShelf.root, '/magazines');
-                assert.isFalse(updatedShelf.multiFile);
-
-                // Updated data
-                assert.isFalse(updatedShelf.showDirectories);
-                assert.isNotTrue(updatedShelf.showDirectories);
-                done();
             });
+            
+            const updatedShelf = res.body;
+            assert.isNotNull(res);
+            recognize200(res);
+
+            // Test old and new values
+            assert.equal(updatedShelf.name, 'Shelf Three');
+            assert.isNotArray(updatedShelf.root);
+            assert.equal(updatedShelf.root, 'magazines');
+            assert.isFalse(updatedShelf.multiFile);
+
+            // Updated data
+            assert.isFalse(updatedShelf.showDirectories);
+            assert.isNotTrue(updatedShelf.showDirectories);
         });
     });
 
     describe(`DELETE - ${endpointURI}/:shelfId`, () => {
-        let request;
         const shelfOneId = '5ec73853788ef556ecc225dd';
 
         before(async () => {
@@ -345,31 +335,24 @@ describe('(shelves.test.js) Shelves Router', () => {
             await Shelf.deleteMany({});
         });
 
-        it('Bad request with a too short ID string (12 characters minimum)', (done) => {
-            chai.request(app).delete(`${endpointURI}/blah`).end((err, res) => {
-                assert.isNotNull(res);
-                // TODO: This is subject to change once I am able to parse MongoDB errors.
-                recognize400(res);
-                recognizeErrorMessage(res, 'Cast to ObjectId failed');
-                done();
-            });
+        it('Bad request with a too short ID string (12 characters minimum)', async() => {
+            const res = await chai.request(app).delete(`${endpointURI}/blah`);
+            assert.isNotNull(res);
+            recognize400(res);
+            recognizeErrorMessage(res, 'Cast to ObjectId failed');
         });
 
-        it('Fail request because it could not find Shelf', (done) => {
-            chai.request(app).delete(`${endpointURI}/blahblahblah`).end((err, res) => {
-                assert.isNotNull(res);
-                recognize404(res);
-                recognizeErrorMessage(res, 'Unable to find shelf with id');
-                done();
-            });
+        it('Fail request because it could not find Shelf', async() => {
+            const res = await chai.request(app).delete(`${endpointURI}/blahblahblah`);
+            assert.isNotNull(res);
+            recognize404(res);
+            recognizeErrorMessage(res, 'Unable to find shelf with id');
         });
 
-        it('Successfully delete a Shelf', (done) => {
-            chai.request(app).delete(`${endpointURI}/${shelfOneId}`).end((err, res) => {
-                assert.isNotNull(res);
-                recognize204(res);
-                done();
-            });
+        it('Successfully delete a Shelf', async() => {
+            const res = await chai.request(app).delete(`${endpointURI}/${shelfOneId}`)
+            assert.isNotNull(res);
+            recognize204(res);
         });
     });
 
