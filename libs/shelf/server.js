@@ -11,6 +11,7 @@ const { getShelfArrayElementExpression } = require('../shelf/mongodb');
 const fs = require('fs');
 const path = require('path');
 const { pdf2png } = require('./pdf2png');
+require('dotenv').config();
 
 /**
  * @async
@@ -205,7 +206,6 @@ const createFileToMongoDB = async (node, nodePath) => {
  * @param { File } file 
  */
 const retrieveCoverImage = async (file) => {
-    // console.info('Hi', file);
     try {
         if(!file) throw new Error('Missing file argument');
 
@@ -248,8 +248,8 @@ const retrieveCoverImage = async (file) => {
                 fileArrayPath[0] = fileArrayPath[0].replace(':', ''); // Remove the colon
             }
 
-            // Step Three: Convert array to string
-            const coverArrayPath = ['public', 'images', 'covers'].concat(fileArrayPath);
+            // Step Three: Convert array to string with a static folder
+            const coverArrayPath = [process.env.VIRTUAL_PUBLIC_FOLDER].concat(fileArrayPath);
 
             // Step Four: Check if directories already exists. If not create it.
             try {
@@ -287,8 +287,8 @@ const retrieveCoverImage = async (file) => {
                 case '.mobi':
                 case '.epub':
                 default:
-                    // Update the MongoDB document with a placeholder cover
-                    file.cover = ['public', 'images', 'covers', '_placeholder', '_placeholder.png'];
+                    // Update the MongoDB document with a placeholder cover using a static folder
+                    file.cover = [process.env.VIRTUAL_PUBLIC_FOLDER, '_placeholder', '_placeholder.png'];
                     await file.save();
 
                     break;

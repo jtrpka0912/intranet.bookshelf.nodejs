@@ -345,8 +345,8 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             await retrieveCoverImage(sampleBookMongo);
             const updatedSampleFile = await File.findOne({_id: sampleBookMongo._id});
 
-            // 3 (public/images/cover) + 8 (d/Backend/Nodejs/intranet.bookshelf.nodejs/test/sample-server/Books/Samples) + 1(sample.jpg)
-            const expectedArrayLength = 12;
+            // 1 (static) + 8 (d/Backend/Nodejs/intranet.bookshelf.nodejs/test/sample-server/Books/Samples) + 1(sample.jpg)
+            const expectedArrayLength = 10;
 
             assert.isArray(updatedSampleFile.cover);
             assert.lengthOf(updatedSampleFile.cover, expectedArrayLength);
@@ -365,7 +365,7 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             await retrieveCoverImage(badCoverBookMongo);
             const goodCoverBook = await File.findOne({ _id: badCoverBookMongo._id });
 
-            const expectedArrayLength = 12;
+            const expectedArrayLength = 10;
 
             assert.isArray(goodCoverBook.cover);
             assert.lengthOf(goodCoverBook.cover, expectedArrayLength);
@@ -385,8 +385,8 @@ describe('(server.test.js) Create and Retrieve Files and Folders through Server 
             await retrieveCoverImage(epubCoverBookMongo);
             const updatedEpubCoverBook = await File.findOne({ _id: epubCoverBookMongo._id });
 
-            // 3 (public/images/cover) + 2 (/_placeholder/_placeholder.png)
-            const expectedArrayLength = 5;
+            // 1 (static) + 2 (/_placeholder/_placeholder.png)
+            const expectedArrayLength = 3;
 
             assert.isArray(updatedEpubCoverBook.cover);
             assert.lengthOf(updatedEpubCoverBook.cover, expectedArrayLength);
