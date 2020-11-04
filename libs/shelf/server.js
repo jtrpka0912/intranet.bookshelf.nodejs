@@ -11,7 +11,6 @@ const { getShelfArrayElementExpression } = require('../shelf/mongodb');
 const fs = require('fs');
 const path = require('path');
 const { pdf2png } = require('./pdf2png');
-require('dotenv').config();
 
 /**
  * @async
@@ -206,6 +205,7 @@ const createFileToMongoDB = async (node, nodePath) => {
  * @param { File } file 
  */
 const retrieveCoverImage = async (file) => {
+    // console.info('Hi', file);
     try {
         if(!file) throw new Error('Missing file argument');
 
@@ -235,30 +235,34 @@ const retrieveCoverImage = async (file) => {
             const fileExtension = path.extname(fullFileName); // .bar
             
             // Create the directories for the new image in the following steps
-            const fileArrayPath = []; // Need to reconstruct it item by item
+            const relativeCoverArrayPath = []; // Need to reconstruct it item by item
             for(const item of file.path) {
-                fileArrayPath.push(item);
+                relativeCoverArrayPath.push(item);
             }
 
             // Step One: Remove the last item from the file array path (filename)
-            const poppedFile = fileArrayPath.pop(); // foo.bar
+            const poppedFile = relativeCoverArrayPath.pop(); // foo.bar
 
             // Step Two: Check if : is in the first directory from file path (Windows)
-            if(fileArrayPath[0].includes(':')) {
-                fileArrayPath[0] = fileArrayPath[0].replace(':', ''); // Remove the colon
+            if(relativeCoverArrayPath[0].includes(':')) {
+                relativeCoverArrayPath[0] = relativeCoverArrayPath[0].replace(':', ''); // Remove the colon
             }
 
-            // Step Three: Convert array to string with a static folder
-            const coverArrayPath = [process.env.VIRTUAL_PUBLIC_FOLDER].concat(fileArrayPath);
+            // Step Three: Create the public and static paths
+            // public: The file path where the image will reside in the backend
+            // static: The url path to find the image for the frontend
+            const publicCoverArrayPath = ['public', 'images', 'covers'].concat(relativeCoverArrayPath);
+            const staticCoverArrayPath = [process.env.VIRTUAL_PUBLIC_FOLDER].concat(relativeCoverArrayPath);
+            // NOTE: Possible DRY method for making a public and static directory paths?
 
             // Step Four: Check if directories already exists. If not create it.
             try {
                 // If it does not exist then it throws an error
                 // NOTE: Should I use try/catch to handle a falsey at this level?
-                await fs.promises.access(pathArrayToString(coverArrayPath), fs.constants.F_OK);
+                await fs.promises.access(pathArrayToString(publicCoverArrayPath), fs.constants.F_OK);
             } catch (err) {
                 // Create the directories
-                await fs.mkdir(pathArrayToString(coverArrayPath), {
+                await fs.mkdir(pathArrayToString(publicCoverArrayPath), {
                     recursive: true
                 }, (err) => {
                     if(err) console.error('retrieveCoverImage error:', err);
@@ -266,28 +270,31 @@ const retrieveCoverImage = async (file) => {
                 // Resume the cover process. Do not throw error!
             }
 
+            // Finally, lets create the image
+
             // Add the file to the cover array path with image extension
             const imageExtension = '.jpg';
             const imageFilename = path.basename(poppedFile, fileExtension); // foo.png
 
             // Add the file name after creating directories
-            coverArrayPath.push(imageFilename + imageExtension);
+            publicCoverArrayPath.push(imageFilename + imageExtension);
+            staticCoverArrayPath.push(imageFilename + imageExtension);
             
             switch(fileExtension) {
                 case '.pdf':
                     // Update the MongoDB document with the new cover array path
-                    file.cover = coverArrayPath;
+                    file.cover = staticCoverArrayPath; // The URL relative path
                     await file.save();
 
                     // Allow the PDF first page to be converted to an image.
-                    await pdf2png(fileStringPath, pathArrayToString(coverArrayPath));
+                    await pdf2png(fileStringPath, pathArrayToString(publicCoverArrayPath));
 
                     break;
                 // TODO: Retrieve the first page for these files.
                 case '.mobi':
                 case '.epub':
                 default:
-                    // Update the MongoDB document with a placeholder cover using a static folder
+                    // Update the MongoDB document with a placeholder cover
                     file.cover = [process.env.VIRTUAL_PUBLIC_FOLDER, '_placeholder', '_placeholder.png'];
                     await file.save();
 
