@@ -129,7 +129,7 @@ router.route('/shelf/:shelfId/folder/:folderId').get((req, res) => {
                         });
 
                         breadcrumbs = await retrieveBreadcrumbs(mongoShelfResponse, mongoFolderResponse);
-                        updatedBreadcrumbs = breadcrumbs.map((breadcrumb, index) => {
+                        updatedBreadcrumbs = breadcrumbs.map((breadcrumb) => {
                             // Convert to a JavaScript Object
                             breadcrumb = breadcrumb.toObject();
                             breadcrumb.path = pathArrayToString(breadcrumb.path);
@@ -142,10 +142,12 @@ router.route('/shelf/:shelfId/folder/:folderId').get((req, res) => {
                             // Convert to a JavaScript Object
                             file = file.toObject();
                             file.path = pathArrayToString(file.path);
+                            file.cover = pathArrayToString(file.cover);
         
                             return file;
                         });
                     } catch(err) {
+                        console.error('Error: ', err);
                         return res.status(500).json({
                             errorCode: 500,
                             errorCodeMessage: 'Internal Server Error',

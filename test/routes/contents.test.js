@@ -285,7 +285,7 @@ const createMongoItems = async () => {
         type: 'magazine',
         name: 'Magainze Issue 001',
         path: ['magazines', 'issues', '001.pdf'],
-        cover: null,
+        cover: [],
         didRead: false
     });
 
@@ -293,7 +293,7 @@ const createMongoItems = async () => {
         type: 'magazine',
         name: 'Magainze Issue 002',
         path: ['magazines', 'issues', '002.pdf'],
-        cover: null,
+        cover: [],
         didRead: false
     });
 
@@ -301,7 +301,7 @@ const createMongoItems = async () => {
         type: 'magazine',
         name: 'Magainze Issue 003',
         path: ['magazines', 'issues', '003.pdf'],
-        cover: null,
+        cover: [],
         didRead: false
     });
 
@@ -309,7 +309,7 @@ const createMongoItems = async () => {
         type: 'magazine',
         name: 'Magainze Issue 004',
         path: ['magazines', 'issues', '004.pdf'],
-        cover: null,
+        cover: [],
         didRead: false
     });
 
