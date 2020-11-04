@@ -38,8 +38,6 @@ const folderOneId = '5f3eaf75dd9ede497015699a';
 const folderTwoId = '5f3eaf75dd9ede497015699b';
 const folderThreeId = '5f3eaf75dd9ede497015699c';
 
-// TODO: Revert the DONEs into Async/Await
-
 describe('(contents.test.js) Contents Router', () => {
     before(async () => {
         await setup.mongooseTestConnection();
@@ -58,82 +56,69 @@ describe('(contents.test.js) Contents Router', () => {
             await destroyMongoItems();
         });
 
-        it('Should not be able to find endpoint with no shelfId.', (done) => {
-            chai.request(app).get(`${endpointURI}/shelf`).end((err, res) => {
-                assert.isNotNull(res);
-                recognize404(res);
-                recognizeErrorMessage(res, 'Missing Shelf ID.');
-                done();
-            });
+        it('Should not be able to find endpoint with no shelfId.', async() => {
+            const res = await chai.request(app).get(`${endpointURI}/shelf`);
+            assert.isNotNull(res);
+            recognize404(res);
+            recognizeErrorMessage(res, 'Missing Shelf ID.');
         });
 
-        it('Bad request with a too short ID string (12 characters minimum)', (done) => {
-            chai.request(app).get(`${endpointURI}/shelf/blah`).end((err, res) => {
-                assert.isNotNull(res);
-                // TODO: This is subject to change once I am able to parse MongoDB errors.
-                recognize400(res);
-                recognizeErrorMessage(res, 'Cast to ObjectId failed');
-                done();
-            });
+        it('Bad request with a too short ID string (12 characters minimum)', async() => {
+            const res = await chai.request(app).get(`${endpointURI}/shelf/blah`)
+            assert.isNotNull(res);
+            recognize400(res);
+            recognizeErrorMessage(res, 'Cast to ObjectId failed');
         });
 
-        it('Fail request because it could not find Shelf', (done) => {
-            chai.request(app).get(`${endpointURI}/shelf/blahblahblah`).end((err, res) => {
-                assert.isNotNull(res);
-                recognize404(res);
-                recognizeErrorMessage(res, 'Unable to find shelf with id');
-                done();
-            });
+        it('Fail request because it could not find Shelf', async() => {
+            const res = await chai.request(app).get(`${endpointURI}/shelf/blahblahblah`);
+            assert.isNotNull(res);
+            recognize404(res);
+            recognizeErrorMessage(res, 'Unable to find shelf with id');
         });
 
-        it('Successfully be able to find files and folders from book shelf', (done) => {
-            chai.request(app).get(`${endpointURI}/shelf/${shelfOneId}`).end((err, res) => {
-                assert.isNotNull(res);
-                recognize200(res);
+        it('Successfully be able to find files and folders from book shelf', async() => {
+            const res = await chai.request(app).get(`${endpointURI}/shelf/${shelfOneId}`)
+            assert.isNotNull(res);
+            recognize200(res);
 
-                // Expect the shelf to return back
-                assert.isObject(res.body.shelf, 'This is not an object');
+            // Expect the shelf to return back
+            assert.isObject(res.body.shelf, 'This is not an object');
 
-                // Though the shelf is not inside an array.
-                //    Put it inside the array just to let this assertion function to do its job.
-                pathShouldBeString([res.body.shelf]); 
+            // Though the shelf is not inside an array.
+            //    Put it inside the array just to let this assertion function to do its job.
+            pathShouldBeString([res.body.shelf]); 
 
-                // Only expecting one folder, from directories, to arrive
-                assert.lengthOf(res.body.directories, 1, 'Incorrect folder count');
+            // Only expecting one folder, from directories, to arrive
+            assert.lengthOf(res.body.directories, 1, 'Incorrect folder count');
 
-                // Check if directory paths are strings
-                pathShouldBeString(res.body.directories);
+            // Check if directory paths are strings
+            pathShouldBeString(res.body.directories);
 
-                // Expecting two files to arrive
-                assert.lengthOf(res.body.files, 2, 'Incorrect file count');
-                
-                // Check if file paths are strings
-                pathShouldBeString(res.body.files);
-
-                done();
-            });
+            // Expecting two files to arrive
+            assert.lengthOf(res.body.files, 2, 'Incorrect file count');
+            
+            // Check if file paths are strings
+            pathShouldBeString(res.body.files);
         });
 
-        it('Successfully be able to find no files, but one folder from magazine shelf', (done) => {
-            chai.request(app).get(`${endpointURI}/shelf/${shelfTwoId}`).end((err, res) => {
-                assert.isNotNull(res);
-                recognize200(res);
+        it('Successfully be able to find no files, but one folder from magazine shelf', async() => {
+            const res = await chai.request(app).get(`${endpointURI}/shelf/${shelfTwoId}`)
+            assert.isNotNull(res);
+            recognize200(res);
 
-                // Expect the shelf to return back
-                assert.isObject(res.body.shelf, 'This is not an object');
-                
-                // Though the shelf is not inside an array.
-                //    Put it inside the array just to let this assertion function to do its job.
-                pathShouldBeString([res.body.shelf]); 
+            // Expect the shelf to return back
+            assert.isObject(res.body.shelf, 'This is not an object');
+            
+            // Though the shelf is not inside an array.
+            //    Put it inside the array just to let this assertion function to do its job.
+            pathShouldBeString([res.body.shelf]); 
 
-                // Expects one folder though that folder does have another folder
-                assert.lengthOf(res.body.directories, 1);
-                pathShouldBeString(res.body.directories);
+            // Expects one folder though that folder does have another folder
+            assert.lengthOf(res.body.directories, 1);
+            pathShouldBeString(res.body.directories);
 
-                assert.lengthOf(res.body.files, 0);
-
-                done();
-            });
+            assert.lengthOf(res.body.files, 0);
         });
     });
 
@@ -146,95 +131,80 @@ describe('(contents.test.js) Contents Router', () => {
             await destroyMongoItems();
         });
 
-        it('Should not be able to find endpoint with no shelfId.', (done) => {
-            chai.request(app).get(`${endpointURI}/shelf/:shelfId/folder`).end((err, res) => {
-                assert.isNotNull(res);
-                recognize404(res);
-                recognizeErrorMessage(res, 'Missing Folder ID.');
-                done();
-            });
+        it('Should not be able to find endpoint with no shelfId.', async() => {
+            const res = await chai.request(app).get(`${endpointURI}/shelf/:shelfId/folder`);
+            assert.isNotNull(res);
+            recognize404(res);
+            recognizeErrorMessage(res, 'Missing Folder ID.');
         });
 
-        it('Bad request with a too short ID string (12 characters minimum)', (done) => {
-            chai.request(app).get(`${endpointURI}/shelf/${shelfOneId}/folder/meh`).end((err, res) => {
-                assert.isNotNull(res);
-                // TODO: This is subject to change once I am able to parse MongoDB errors.
-                recognize400(res);
-                recognizeErrorMessage(res, 'Cast to ObjectId failed');
-                done();
-            });
+        it('Bad request with a too short ID string (12 characters minimum)', async() => {
+            const res = await chai.request(app).get(`${endpointURI}/shelf/${shelfOneId}/folder/meh`);
+            assert.isNotNull(res);
+            recognize400(res);
+            recognizeErrorMessage(res, 'Cast to ObjectId failed');
         });
 
-        it('Fail request because it could not find Folder', (done) => {
-            chai.request(app).get(`${endpointURI}/shelf/${shelfOneId}/folder/blahblahblah`).end((err, res) => {
-                assert.isNotNull(res);
-                recognize404(res);
-                recognizeErrorMessage(res, 'Unable to find folder with id');
-                done();
-            });
+        it('Fail request because it could not find Folder', async() => {
+            const res = await chai.request(app).get(`${endpointURI}/shelf/${shelfOneId}/folder/blahblahblah`);
+            assert.isNotNull(res);
+            recognize404(res);
+            recognizeErrorMessage(res, 'Unable to find folder with id');
         });
 
-        it('Fail to find folder from book shelf.', (done) => {
-            chai.request(app).get(`${endpointURI}/shelf/${shelfOneId}/folder/${folderTwoId}`).end((err, res) => {
-                assert.isNotNull(res);
-                recognize500(res);
-                recognizeErrorMessage(res, 'Shelf and current folder are not compatible');
-                done();
-            });
+        it('Fail to find folder from book shelf.', async() => {
+            const res = await chai.request(app).get(`${endpointURI}/shelf/${shelfOneId}/folder/${folderTwoId}`);
+            assert.isNotNull(res);
+            recognize500(res);
+            recognizeErrorMessage(res, 'Shelf and current folder are not compatible');
         });
 
-        it('Find one file from the book shelf\'s example folder', (done) => {
-            chai.request(app).get(`${endpointURI}/shelf/${shelfOneId}/folder/${folderOneId}`).end((err, res) => {
-                assert.isNotNull(res);
-                recognize200(res);
+        it('Find one file from the book shelf\'s example folder', async() => {
+            const res = await chai.request(app).get(`${endpointURI}/shelf/${shelfOneId}/folder/${folderOneId}`);
+            assert.isNotNull(res);
+            recognize200(res);
 
-                assert.isObject(res.body.shelf, 'This is not an object');
-                // Though the shelf is not inside an array.
-                //    Put it inside the array just to let this assertion function to do its job.
-                pathShouldBeString([res.body.shelf]);
+            assert.isObject(res.body.shelf, 'This is not an object');
+            // Though the shelf is not inside an array.
+            //    Put it inside the array just to let this assertion function to do its job.
+            pathShouldBeString([res.body.shelf]);
 
-                assert.isArray(res.body.directories);
-                assert.lengthOf(res.body.directories, 0);
-                pathShouldBeString(res.body.directories);
-                
-                assert.isArray(res.body.files);
-                assert.lengthOf(res.body.files, 1);
-                pathShouldBeString(res.body.files);
-                
-                // Though SHELF root will be part of breadcrumbs, but the folder only array will have none.
-                assert.isArray(res.body.breadcrumbs);
-                assert.lengthOf(res.body.breadcrumbs, 0);
-                pathShouldBeString(res.body.breadcrumbs, true);
-
-                done();
-            });
+            assert.isArray(res.body.directories);
+            assert.lengthOf(res.body.directories, 0);
+            pathShouldBeString(res.body.directories);
+            
+            assert.isArray(res.body.files);
+            assert.lengthOf(res.body.files, 1);
+            pathShouldBeString(res.body.files);
+            
+            // Though SHELF root will be part of breadcrumbs, but the folder only array will have none.
+            assert.isArray(res.body.breadcrumbs);
+            assert.lengthOf(res.body.breadcrumbs, 0);
+            pathShouldBeString(res.body.breadcrumbs, true);
         });
 
-        it('Find all magazine issues from the example issues folder', (done) => {
-            chai.request(app).get(`${endpointURI}/shelf/${shelfTwoId}/folder/${folderThreeId}`).end((err, res) => {
-                assert.isNotNull(res);
-                recognize200(res);
+        it('Find all magazine issues from the example issues folder', async() => {
+            const res = await chai.request(app).get(`${endpointURI}/shelf/${shelfTwoId}/folder/${folderThreeId}`)
+            assert.isNotNull(res);
+            recognize200(res);
 
-                assert.isObject(res.body.shelf, 'This is not an object');
-                // Though the shelf is not inside an array.
-                //    Put it inside the array just to let this assertion function to do its job.
-                pathShouldBeString([res.body.shelf]);
+            assert.isObject(res.body.shelf, 'This is not an object');
+            // Though the shelf is not inside an array.
+            //    Put it inside the array just to let this assertion function to do its job.
+            pathShouldBeString([res.body.shelf]);
 
-                assert.isArray(res.body.directories);
-                assert.lengthOf(res.body.directories, 0);
-                pathShouldBeString(res.body.directories);
-                
-                assert.isArray(res.body.files);
-                assert.lengthOf(res.body.files, 4);
-                pathShouldBeString(res.body.files);
-                
-                // Though SHELF root will be part of breadcrumbs, but the folder only array will have none.
-                assert.isArray(res.body.breadcrumbs);
-                assert.lengthOf(res.body.breadcrumbs, 0);
-                pathShouldBeString(res.body.breadcrumbs, true);
-
-                done();
-            });
+            assert.isArray(res.body.directories);
+            assert.lengthOf(res.body.directories, 0);
+            pathShouldBeString(res.body.directories);
+            
+            assert.isArray(res.body.files);
+            assert.lengthOf(res.body.files, 4);
+            pathShouldBeString(res.body.files);
+            
+            // Though SHELF root will be part of breadcrumbs, but the folder only array will have none.
+            assert.isArray(res.body.breadcrumbs);
+            assert.lengthOf(res.body.breadcrumbs, 0);
+            pathShouldBeString(res.body.breadcrumbs, true);
         });
     });
 });
