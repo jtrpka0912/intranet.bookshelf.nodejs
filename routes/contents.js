@@ -147,7 +147,6 @@ router.route('/shelf/:shelfId/folder/:folderId').get((req, res) => {
                             return file;
                         });
                     } catch(err) {
-                        console.error('Error: ', err);
                         return res.status(500).json({
                             errorCode: 500,
                             errorCodeMessage: 'Internal Server Error',
