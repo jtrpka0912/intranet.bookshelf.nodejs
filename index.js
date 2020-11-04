@@ -21,7 +21,7 @@ app.use(cors());
 // Express will request and receive JSON content
 app.use(express.json());
 // Serve the static content inside the public folder pointing to /static
-app.use(process.env.VIRTUAL_PUBLIC_FOLDER, express.static('public'));
+app.use('/' + process.env.VIRTUAL_PUBLIC_FOLDER, express.static('public/images/covers'));
 
 // Connect to MongoDB with Mongoose
 const uri = process.env.MONGO_URI
