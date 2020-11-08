@@ -29,6 +29,8 @@ const {
 
 // Global Variables
 const endpointURI = '/api/v1/ebooks';
+const fileOneId = '5fa80bb8f4f44b073c7b0737';
+const fileTwoId = '5fa81b35579aed0d48253c45';
 
 describe('(ebooks.test.js) eBooks Router', () => {
     before(async () => {
@@ -57,10 +59,35 @@ describe('(ebooks.test.js) eBooks Router', () => {
         });
 
         it('Fail request because it could not find File', async() => {
-            const res = await chai.request(app).patch(`${endpointURI}/blahblahblah/did-read`);
+            const res = await chai.request(app).patch(`${endpointURI}/blahblahblah/did-read`).send({
+                didRead: false
+            });
+
             assert.isNotNull(res);
             recognize404(res);
             recognizeErrorMessage(res, 'Unable to find shelf with id.');
+        });
+
+        it('Fail request because the did read value is not a boolean.', async() => {
+            const res = await chai.request(app).patch(`${endpointURI}/${fileOneId}/did-read`).send({
+                didRead: 'abc'
+            });
+
+            assert.isNotNull(res);
+            recognize400(res);
+            recognizeErrorMessage(res, 'didRead is not a boolean value.');
+        });
+
+        it('Successfully change the file to be flagged read.', async() => {
+            const res = await chai.request(app).patch(`${endpointURI}/${fileOneId}/did-read`).send({
+                didRead: true
+            });
+
+            assert.isNotNull(res);
+            recognize200(res);
+            
+            const mongoFile = await File.findById(fileOneId);
+            assert.isTrue(mongoFile.didRead);
         });
     });
 });
@@ -73,7 +100,7 @@ describe('(ebooks.test.js) eBooks Router', () => {
  */
 const createMongoItems = async () => {
     const fileOne = new File({
-        _id: '5fa80bb8f4f44b073c7b0737',
+        _id: fileOneId,
         type: 'book',
         name: 'File One',
         path: ['path', 'to', 'file-one.pdf'],
@@ -81,7 +108,17 @@ const createMongoItems = async () => {
         didRead: false
     });
 
+    const fileTwo = new File({
+        _id: fileTwoId,
+        type: 'book',
+        name: 'File Two',
+        path: ['path', 'to', 'file-two.pdf'],
+        cover: [],
+        didRead: false
+    });
+
     await fileOne.save();
+    await fileTwo.save();
 }
 
 /**

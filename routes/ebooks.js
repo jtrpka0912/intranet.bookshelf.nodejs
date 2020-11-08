@@ -1,6 +1,7 @@
 // Packages
 const router = require('express').Router();
 
+const { pathArrayToString } = require('../libs/helpers/routes');
 // Models
 const File = require('../models/file.model');
 
@@ -10,7 +11,8 @@ router.route('/:fileId/did-read').patch(async (req, res) => {
 
         try {
             const mongoFileResponse = await File.findById(fileId);
-            
+
+            // Check if it found the file
             if(!mongoFileResponse) {
                 return res.status(404).json({
                     errorCode: 404,
@@ -18,6 +20,26 @@ router.route('/:fileId/did-read').patch(async (req, res) => {
                     errorMessage: 'Unable to find shelf with id.'
                 });
             }
+
+            const { didRead } = req.body;
+
+            // Check if the didRead is a proper value type
+            if(typeof didRead !== 'boolean') {
+                return res.status(400).json({
+                    errorCode: 400,
+                    errorCodeMessage: 'Bad Request',
+                    errorMessage: 'didRead is not a boolean value.'
+                })
+            }
+
+            mongoFileResponse.didRead = didRead;
+
+            await File.updateOne({ _id: mongoFileResponse._id }, { didRead });
+
+            const jsonFile = mongoFileResponse.toObject();
+            jsonFile.path = pathArrayToString(mongoFileResponse.path);
+
+            return res.status(200).json(jsonFile);
 
         } catch (err) {
             return res.status(400).json({

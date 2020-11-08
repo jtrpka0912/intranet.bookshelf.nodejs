@@ -135,8 +135,7 @@ router.route('/:shelfId').put((req, res) => {
     // Initialize shelf variables
     let shelfUpdate;
 
-    // Need to check if there any values in req.body
-    
+    // Check if there any values in req.body
     if(Object.keys(req.body).length > 0) {
         // Retrieve the request from the front-end
         shelfUpdate = req.body;
