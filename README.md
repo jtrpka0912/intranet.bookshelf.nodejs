@@ -1,6 +1,6 @@
 # intranet.bookshelf.nodejs
 
-#### The backend part of the Bookshelf project.
+#### The backend part of the SHELF project.
 
 This project is a **(M)ongoDB (E)xpress (R)eact (N)ode.js** stack with React being the front-end. 
 
@@ -13,30 +13,32 @@ This project is a **(M)ongoDB (E)xpress (R)eact (N)ode.js** stack with React bei
 + **Node.js**: The main backend for the project. Mostly everything in this project is build using JavaScript.
 
 + **DotEnv**: Allows the use of environment variables for the backend application.  
-  `npm install dotenv`
+  + `npm install dotenv`
 
 + **Express.js**: The REST API handler. This will allow REST requests coming from the front-end to communicate with the back-end (here).  
-  `npm install express`
+  + `npm install express`
 
 + **CORS**: Helps with Express, or other similiar packages, to make REQUEST calls to abide with CORS.  
-  `npm install cors`
+  + `npm install cors`
 
 #### Database
 
 + **Mongoose**: A library to easily communicate with the MongoDB database.  
-  `npm install mongoose`
+  + `npm install mongoose`
 
 #### Testing
 
 + **Mocha**: A test runner to perform assertion tests.  
-  `npm install mocha`
+  + `npm install mocha`
 
 + **Chai**: A test library, in-junction with Mocha, that will perform the tests.  
-  `npm install chai`
+  + `npm install chai`
   - *Chai-HTTP*: Chai Plugin that will help with performing HTTP requests with *Express*.  
-    `npm install chai-http`
-  - *Chai-String*: Chain Plugin that will perform string tests like sub-string finding.  
-    `npm install chai-string`
+    + `npm install chai-http`
+  - *Chai-String*: Chai Plugin that will perform string tests like sub-string finding.  
+    + `npm install chai-string`
+  - *Chai-As-Promised*: Chai Plugin that will help with testing promises or await/async functions.
+    + `npm install chai-as-promised`
 
 + **Mongo Memory Server**: An in-memory MongoDB database solely for the purpose of testing the database.  
   `npm install mongodb-memory-server`
