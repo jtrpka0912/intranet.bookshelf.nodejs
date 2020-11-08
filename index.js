@@ -7,7 +7,8 @@ require('dotenv').config();
 
 // Routes
 const shelvesRouter = require('./routes/shelves');
-const contentsRouter = require('./routes/contents')
+const contentsRouter = require('./routes/contents');
+const ebooksRouter = require('./routes/ebooks');
 
 // Initialize express
 const app = express();
@@ -20,6 +21,7 @@ app.use(cors());
 
 // Express will request and receive JSON content
 app.use(express.json());
+
 // Serve the static content inside the public folder pointing to /static
 app.use('/' + process.env.VIRTUAL_PUBLIC_FOLDER, express.static('public/images/covers'));
 
@@ -39,6 +41,7 @@ connection.once('open', () => {
 // Express Routes
 app.use('/api/v1/shelves', shelvesRouter);
 app.use('/api/v1/contents', contentsRouter);
+app.use('/api/v1/ebooks', ebooksRouter);
 
 // Connect node to a part
 app.listen(port, () => {

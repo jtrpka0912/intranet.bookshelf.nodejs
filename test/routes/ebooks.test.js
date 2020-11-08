@@ -17,6 +17,16 @@ const { app } = require('../../index'); // Get the Express app
 // Models
 const File = require('../../models/file.model'); // File model
 
+// Helpers
+const {
+    recognizeErrorMessage,
+    recognize200,
+    recognize400,
+    recognize404,
+    recognize500,
+    pathShouldBeString,
+} = require('../../libs/helpers/mocha/express/assert'); // Helper Mocha Assert Tests
+
 // Global Variables
 const endpointURI = '/api/v1/ebooks';
 
@@ -29,13 +39,28 @@ describe('(ebooks.test.js) eBooks Router', () => {
         await setup.mongoooseTestDisconnection();
     });
 
-    describe(`GET - ${endpointURI}/shelf/:shelfId`, () => {
+    describe(`GET - ${endpointURI}/:fileId/did-read`, () => {
         before(async() => {
             await createMongoItems();
         });
 
         after(async() => {
-            await destroyMongoObjects();
+            await destroyMongoItems();
+        });
+
+        it('Bad request with a too short ID string (12 characters minimum)', async() => {
+            const res = await chai.request(app).patch(`${endpointURI}/blah/did-read`);
+
+            assert.isNotNull(res);
+            recognize400(res); // TODO: Missing from REST Specifications
+            recognizeErrorMessage(res, 'Cast to ObjectId failed');
+        });
+
+        it('Fail request because it could not find File', async() => {
+            const res = await chai.request(app).patch(`${endpointURI}/blahblahblah/did-read`);
+            assert.isNotNull(res);
+            recognize404(res);
+            recognizeErrorMessage(res, 'Unable to find shelf with id.');
         });
     });
 });
@@ -48,7 +73,7 @@ describe('(ebooks.test.js) eBooks Router', () => {
  */
 const createMongoItems = async () => {
     const fileOne = new File({
-        _id: 'fileOne-abcd-efgh',
+        _id: '5fa80bb8f4f44b073c7b0737',
         type: 'book',
         name: 'File One',
         path: ['path', 'to', 'file-one.pdf'],

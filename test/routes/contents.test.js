@@ -64,9 +64,9 @@ describe('(contents.test.js) Contents Router', () => {
         });
 
         it('Bad request with a too short ID string (12 characters minimum)', async() => {
-            const res = await chai.request(app).get(`${endpointURI}/shelf/blah`)
+            const res = await chai.request(app).get(`${endpointURI}/shelf/blah`);
             assert.isNotNull(res);
-            recognize400(res);
+            recognize400(res); // TODO: Missing from REST Specifications
             recognizeErrorMessage(res, 'Cast to ObjectId failed');
         });
 
