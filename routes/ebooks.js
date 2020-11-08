@@ -38,6 +38,7 @@ router.route('/:fileId/did-read').patch(async (req, res) => {
 
             const jsonFile = mongoFileResponse.toObject();
             jsonFile.path = pathArrayToString(mongoFileResponse.path);
+            jsonFile.cover = pathArrayToString(mongoFileResponse.cover);
 
             return res.status(200).json(jsonFile);
 
