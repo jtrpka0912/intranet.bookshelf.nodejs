@@ -75,9 +75,6 @@ router.route('/').post(async (req, res) => {
         const newShelfMongo = await newShelf.save();
 
         try {
-            // Retrieve the files and folders for the newly created shelf.
-            await shelfLibrary.retrieveFilesFolders(newShelfMongo);
-
             // Convert from Mongo Object to JavaScript Object
             newShelfJson = newShelfMongo.toObject();
 
@@ -154,7 +151,6 @@ router.route('/:shelfId').put((req, res) => {
     }
 
     // Retrieve the existing Shelf and update
-    // TODO: Refresh the MongoDB
     Shelf.findByIdAndUpdate(shelfId, shelfUpdate, {
         new: true // Send the updated shelf data instead of original
     }, (mongoError, mongoResponse) => {
