@@ -26,8 +26,9 @@ app.use(express.json());
 app.use('/static', express.static('public/images/covers'));
 
 // Connect to MongoDB with Mongoose
-const uri = 'mongodb://localhost:27017/' + process.env.MONGO_DATABASE ? process.env.MONGO_DATABASE : 'shelf';
-mongoose.connect(uri, {
+const mongoDB = process.env.MONGO_DATABASE ? process.env.MONGO_DATABASE : 'shelf';
+const mongoURI = `mongodb://localhost:27017/${mongoDB}`;
+mongoose.connect(mongoURI, {
     useNewUrlParser: true,
     useCreateIndex: true
 });
