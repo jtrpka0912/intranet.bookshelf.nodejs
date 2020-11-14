@@ -1,5 +1,4 @@
-FROM node:lts-alpine
-# FROM node:lts - WORKS, but huge
+FROM node:14.15.0-alpine
 WORKDIR /home/nodejs
 
 #  add libraries; sudo so non-root user added downstream can get sudo
