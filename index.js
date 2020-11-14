@@ -14,7 +14,7 @@ const ebooksRouter = require('./routes/ebooks');
 const app = express();
 
 // Assign port number
-const port = process.env.PORT ? process.env.PORT : 3001;
+const port = process.env.PORT ? process.env.PORT : 3000;
 
 // Apply cors to express
 app.use(cors());
@@ -23,10 +23,10 @@ app.use(cors());
 app.use(express.json());
 
 // Serve the static content inside the public folder pointing to /static
-app.use('/' + process.env.VIRTUAL_PUBLIC_FOLDER, express.static('public/images/covers'));
+app.use('/static', express.static('public/images/covers'));
 
 // Connect to MongoDB with Mongoose
-const uri = process.env.MONGO_URI;
+const uri = 'mongodb://localhost:27017/' + process.env.MONGO_DATABASE ? process.env.MONGO_DATABASE : 'shelf';
 mongoose.connect(uri, {
     useNewUrlParser: true,
     useCreateIndex: true

@@ -252,7 +252,7 @@ const retrieveCoverImage = async (file) => {
             // public: The file path where the image will reside in the backend
             // static: The url path to find the image for the frontend
             const publicCoverArrayPath = ['public', 'images', 'covers'].concat(relativeCoverArrayPath);
-            const staticCoverArrayPath = [process.env.VIRTUAL_PUBLIC_FOLDER].concat(relativeCoverArrayPath);
+            const staticCoverArrayPath = ['static'].concat(relativeCoverArrayPath);
             // NOTE: Possible DRY method for making a public and static directory paths?
 
             // Step Four: Check if directories already exists. If not create it.
@@ -295,7 +295,7 @@ const retrieveCoverImage = async (file) => {
                 case '.epub':
                 default:
                     // Update the MongoDB document with a placeholder cover
-                    file.cover = [process.env.VIRTUAL_PUBLIC_FOLDER, '_placeholder', '_placeholder.png'];
+                    file.cover = ['static', '_placeholder', '_placeholder.png'];
                     await file.save();
 
                     break;
