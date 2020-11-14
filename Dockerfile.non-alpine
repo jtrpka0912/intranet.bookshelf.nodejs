@@ -1,0 +1,10 @@
+FROM node:lts
+WORKDIR /home/nodejs
+
+# Transfer package and install npm modules
+ADD package*.json ./
+RUN npm install --only=production
+
+# Transfer everything else and then start
+ADD . .
+CMD [ "npm", "start" ]
