@@ -2,7 +2,6 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-mongoose.set('useFindAndModify', false); // Remove use of deprecated method
 require('dotenv').config();
 
 // Routes
@@ -13,8 +12,12 @@ const ebooksRouter = require('./routes/ebooks');
 // Initialize express
 const app = express();
 
-// Assign port number
-const port = process.env.PORT ? process.env.PORT : 3000;
+// Retrieve ENV Variables
+const {
+    MONGO_HOST,
+    MONGO_PORT,
+    MONGO_DB
+} = process.env
 
 // Apply cors to express
 app.use(cors());
@@ -26,11 +29,12 @@ app.use(express.json());
 app.use('/static', express.static('public/images/covers'));
 
 // Connect to MongoDB with Mongoose
-const mongoDB = process.env.MONGO_DATABASE ? process.env.MONGO_DATABASE : 'shelf';
-const mongoURI = `mongodb://localhost:27017/${mongoDB}`;
+const mongoURI = `mongodb://${MONGO_HOST}:${MONGO_PORT}/${MONGO_DB}`;
 mongoose.connect(mongoURI, {
     useNewUrlParser: true,
-    useCreateIndex: true
+    useCreateIndex: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true,
 });
 
 // Connect to MongoDB
@@ -45,8 +49,8 @@ app.use('/api/v1/contents', contentsRouter);
 app.use('/api/v1/ebooks', ebooksRouter);
 
 // Connect node to a part
-app.listen(port, () => {
-    console.log(`Server is running on port: ${port}`);
+app.listen(3000, () => {
+    console.log('Server is running on port: 3000');
 });
 
 module.exports = {
