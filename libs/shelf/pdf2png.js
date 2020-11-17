@@ -68,6 +68,7 @@ const pdf2png = async (fromPath, toPath) => {
         // Loading file from file system into typed array.
         var pdfPath = fromPath;
         var data = new Uint8Array(fs.readFileSync(pdfPath));
+        console.log('Got the PDF data');
 
         // Load the PDF file.
         var loadingTask = pdfjsLib.getDocument({
@@ -103,7 +104,6 @@ const pdf2png = async (fromPath, toPath) => {
 
         // Convert the canvas to an image buffer.
         var image = canvasAndContext.canvas.toBuffer();
-
         fs.writeFile(toPath, image, function (error) {
             if (error) throw new Error(error);
         });

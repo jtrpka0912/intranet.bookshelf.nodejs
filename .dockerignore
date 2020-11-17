@@ -3,3 +3,4 @@ Dockerfile
 .git*
 .env
 test
+public

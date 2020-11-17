@@ -24,7 +24,8 @@ const pathStringToArray = (pathString) => {
  * @returns { string }
  */
 const pathArrayToString = (pathArray) => {
-    return pathArray.join(separator);
+    // Do need to prepend the separator to signify root directory
+    return separator + pathArray.join(separator);
 };
 
 /**

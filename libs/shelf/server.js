@@ -25,7 +25,8 @@ const removeFilesFolders = async (shelf) => {
 
         let rootStringPath = pathArrayToString(shelf.root);
 
-        await fs.promises.readdir(rootStringPath);
+        // Prepend with a slash to signify the root directory
+        await fs.promises.readdir('/' + rootStringPath);
 
         // Retrieve the folders
         const query = {
@@ -81,7 +82,8 @@ const retrieveFilesFolders = async (shelf, previousNode) => {
             rootStringPath = path.join(rootStringPath, previousNode);
         }
 
-        const nodes = await fs.promises.readdir(rootStringPath);
+        // Prepend with a slash to signal root directory
+        const nodes = await fs.promises.readdir('/' + rootStringPath);
 
         if(nodes.length > 0) {
             // Loop through the files and folders
@@ -205,7 +207,6 @@ const createFileToMongoDB = async (node, nodePath) => {
  * @param { File } file 
  */
 const retrieveCoverImage = async (file) => {
-    // console.info('Hi', file);
     try {
         if(!file) throw new Error('Missing file argument');
 
@@ -230,7 +231,7 @@ const retrieveCoverImage = async (file) => {
         }
 
         if(!isCoverValid) {
-            // Retrieve the file name information from the path
+            // Retrieve the filename information from the file path
             const fullFileName = file.path[file.path.length - 1]; // foo.bar
             const fileExtension = path.extname(fullFileName); // .bar
             
@@ -256,6 +257,7 @@ const retrieveCoverImage = async (file) => {
             // NOTE: Possible DRY method for making a public and static directory paths?
 
             // Step Four: Check if directories already exists. If not create it.
+            // Get the string version, but make sure it is relative.
             try {
                 // If it does not exist then it throws an error
                 // NOTE: Should I use try/catch to handle a falsey at this level?
@@ -279,6 +281,11 @@ const retrieveCoverImage = async (file) => {
             // Add the file name after creating directories
             publicCoverArrayPath.push(imageFilename + imageExtension);
             staticCoverArrayPath.push(imageFilename + imageExtension);
+
+            let publicCoverStringPath = pathArrayToString(publicCoverArrayPath);
+            if(publicCoverStringPath[0] === '/') {
+                publicCoverStringPath = publicCoverStringPath.slice(1);
+            }
             
             switch(fileExtension) {
                 case '.pdf':
@@ -287,7 +294,7 @@ const retrieveCoverImage = async (file) => {
                     await file.save();
 
                     // Allow the PDF first page to be converted to an image.
-                    await pdf2png(fileStringPath, pathArrayToString(publicCoverArrayPath));
+                    await pdf2png(fileStringPath, publicCoverStringPath);
 
                     break;
                 // TODO: Retrieve the first page for these files.

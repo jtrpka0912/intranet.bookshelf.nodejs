@@ -49,8 +49,9 @@ app.use('/api/v1/contents', contentsRouter);
 app.use('/api/v1/ebooks', ebooksRouter);
 
 // Connect node to a part
-app.listen(3000, () => {
-    console.log('Server is running on port: 3000');
+const port = process.env.NODE_PORT || 3000;
+app.listen(port, () => {
+    console.log(`Server is running on port: ${port}`);
 });
 
 module.exports = {
