@@ -40,7 +40,7 @@ mongoose.connect(mongoURI, {
 // Connect to MongoDB
 const connection = mongoose.connection;
 connection.once('open', () => {
-    console.info('\x1b[34m%s', 'MongoDB database connection established successfully.')
+    console.info('\x1b[34m%s\x1b[0m', 'MongoDB database connection established successfully.')
 });
 
 // Express Routes

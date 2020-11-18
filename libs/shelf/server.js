@@ -209,6 +209,7 @@ const createFileToMongoDB = async (node, nodePath) => {
 const retrieveCoverImage = async (file) => {
     try {
         if(!file) throw new Error('Missing file argument');
+        const projectRoot = process.env.PWD + '/';
 
         // Check if file exists in server and have it ready for conversion
         const fileStringPath = pathArrayToString(file.path); // /path/to/foo.bar
@@ -264,7 +265,7 @@ const retrieveCoverImage = async (file) => {
                 await fs.promises.access(pathArrayToString(publicCoverArrayPath), fs.constants.F_OK);
             } catch (err) {
                 // Create the directories
-                await fs.mkdir(pathArrayToString(publicCoverArrayPath), {
+                await fs.mkdir(projectRoot + pathArrayToString(publicCoverArrayPath), {
                     recursive: true
                 }, (err) => {
                     if(err) console.error('retrieveCoverImage error:', err);
@@ -294,7 +295,7 @@ const retrieveCoverImage = async (file) => {
                     await file.save();
 
                     // Allow the PDF first page to be converted to an image.
-                    await pdf2png(fileStringPath, publicCoverStringPath);
+                    await pdf2png(fileStringPath, projectRoot + publicCoverStringPath);
 
                     break;
                 // TODO: Retrieve the first page for these files.
