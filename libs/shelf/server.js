@@ -209,7 +209,7 @@ const createFileToMongoDB = async (node, nodePath) => {
 const retrieveCoverImage = async (file) => {
     try {
         if(!file) throw new Error('Missing file argument');
-        const projectRoot = process.env.PWD + '/';
+        const projectRoot = process.env.PWD;
 
         // Check if file exists in server and have it ready for conversion
         const fileStringPath = pathArrayToString(file.path); // /path/to/foo.bar
@@ -221,7 +221,7 @@ const retrieveCoverImage = async (file) => {
             try {
                 // If it does not exist then it throws an error
                 // NOTE: Should I use try/catch to handle a falsey at this level?
-                await fs.promises.access(pathArrayToString(file.cover), fs.constants.F_OK);
+                await fs.promises.access(projectRoot + pathArrayToString(file.cover), fs.constants.F_OK);
                 isCoverValid; // Cover is valid and exists
             } catch (err) {
                 // Cover no longer exists; reset the cover property.
@@ -259,17 +259,22 @@ const retrieveCoverImage = async (file) => {
 
             // Step Four: Check if directories already exists. If not create it.
             // Get the string version, but make sure it is relative.
+            const directoryPath = projectRoot + pathArrayToString(publicCoverArrayPath);
             try {
                 // If it does not exist then it throws an error
                 // NOTE: Should I use try/catch to handle a falsey at this level?
-                await fs.promises.access(pathArrayToString(publicCoverArrayPath), fs.constants.F_OK);
+                console.info('Directory path', directoryPath);
+                await fs.promises.access(directoryPath, fs.constants.F_OK);
+                console.info('Directory path found');
             } catch (err) {
                 // Create the directories
-                await fs.mkdir(projectRoot + pathArrayToString(publicCoverArrayPath), {
+                console.log('Directory path not found');
+                await fs.promises.mkdir(directoryPath, {
                     recursive: true
                 }, (err) => {
                     if(err) console.error('retrieveCoverImage error:', err);
                 });
+                console.log('Directories created!');
                 // Resume the cover process. Do not throw error!
             }
 
@@ -282,11 +287,6 @@ const retrieveCoverImage = async (file) => {
             // Add the file name after creating directories
             publicCoverArrayPath.push(imageFilename + imageExtension);
             staticCoverArrayPath.push(imageFilename + imageExtension);
-
-            let publicCoverStringPath = pathArrayToString(publicCoverArrayPath);
-            if(publicCoverStringPath[0] === '/') {
-                publicCoverStringPath = publicCoverStringPath.slice(1);
-            }
             
             switch(fileExtension) {
                 case '.pdf':
@@ -295,7 +295,8 @@ const retrieveCoverImage = async (file) => {
                     await file.save();
 
                     // Allow the PDF first page to be converted to an image.
-                    await pdf2png(fileStringPath, projectRoot + publicCoverStringPath);
+                    console.info('Image Path', projectRoot + pathArrayToString(publicCoverArrayPath));
+                    await pdf2png(fileStringPath, projectRoot + pathArrayToString(publicCoverArrayPath));
 
                     break;
                 // TODO: Retrieve the first page for these files.
