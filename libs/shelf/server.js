@@ -263,18 +263,14 @@ const retrieveCoverImage = async (file) => {
             try {
                 // If it does not exist then it throws an error
                 // NOTE: Should I use try/catch to handle a falsey at this level?
-                console.info('Directory path', directoryPath);
                 await fs.promises.access(directoryPath, fs.constants.F_OK);
-                console.info('Directory path found');
             } catch (err) {
                 // Create the directories
-                console.log('Directory path not found');
                 await fs.promises.mkdir(directoryPath, {
                     recursive: true
                 }, (err) => {
                     if(err) console.error('retrieveCoverImage error:', err);
                 });
-                console.log('Directories created!');
                 // Resume the cover process. Do not throw error!
             }
 
@@ -295,7 +291,6 @@ const retrieveCoverImage = async (file) => {
                     await file.save();
 
                     // Allow the PDF first page to be converted to an image.
-                    console.info('Image Path', projectRoot + pathArrayToString(publicCoverArrayPath));
                     await pdf2png(fileStringPath, projectRoot + pathArrayToString(publicCoverArrayPath));
 
                     break;
