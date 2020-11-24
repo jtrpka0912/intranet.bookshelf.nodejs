@@ -5,6 +5,9 @@ const { pathArrayToString } = require('../libs/helpers/routes');
 // Models
 const File = require('../models/file.model');
 
+// NOTE: https://stackoverflow.com/questions/7288814/download-a-file-from-nodejs-server-using-express
+// Basically, an endpoint to retrieve a file, from the server
+
 router.route('/:fileId/did-read').patch(async (req, res) => {
     try {
         const fileId = req.params.fileId;

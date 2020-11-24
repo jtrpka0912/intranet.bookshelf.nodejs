@@ -28,4 +28,11 @@ RUN npm install --only=production
 
 # Transfer everything else and then start
 ADD . .
+
+# Add a symlink to connect /mnt to public/files, but first create public/files
+RUN mkdir public
+RUN mkdir public/files
+RUN ln -s /mnt public/files/mnt
+
+# After container is running; run npm start
 CMD [ "npm", "start" ]

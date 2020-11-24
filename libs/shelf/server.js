@@ -252,9 +252,10 @@ const retrieveCoverImage = async (file) => {
 
             // Step Three: Create the public and static paths
             // public: The file path where the image will reside in the backend
-            // static: The url path to find the image for the frontend
+            // static: The url path to find the image for the frontend (/public/images/covers -> /covers)
             const publicCoverArrayPath = ['public', 'images', 'covers'].concat(relativeCoverArrayPath);
-            const staticCoverArrayPath = ['static'].concat(relativeCoverArrayPath);
+            // TODO: Adjust the covers for testing
+            const staticCoverArrayPath = ['covers'].concat(relativeCoverArrayPath);
             // NOTE: Possible DRY method for making a public and static directory paths?
 
             // Step Four: Check if directories already exists. If not create it.
@@ -263,18 +264,14 @@ const retrieveCoverImage = async (file) => {
             try {
                 // If it does not exist then it throws an error
                 // NOTE: Should I use try/catch to handle a falsey at this level?
-                console.info('Directory path', directoryPath);
                 await fs.promises.access(directoryPath, fs.constants.F_OK);
-                console.info('Directory path found');
             } catch (err) {
                 // Create the directories
-                console.log('Directory path not found');
                 await fs.promises.mkdir(directoryPath, {
                     recursive: true
                 }, (err) => {
                     if(err) console.error('retrieveCoverImage error:', err);
                 });
-                console.log('Directories created!');
                 // Resume the cover process. Do not throw error!
             }
 
@@ -295,7 +292,6 @@ const retrieveCoverImage = async (file) => {
                     await file.save();
 
                     // Allow the PDF first page to be converted to an image.
-                    console.info('Image Path', projectRoot + pathArrayToString(publicCoverArrayPath));
                     await pdf2png(fileStringPath, projectRoot + pathArrayToString(publicCoverArrayPath));
 
                     break;
@@ -304,7 +300,7 @@ const retrieveCoverImage = async (file) => {
                 case '.epub':
                 default:
                     // Update the MongoDB document with a placeholder cover
-                    file.cover = ['static', '_placeholder', '_placeholder.png'];
+                    file.cover = ['covers', '_placeholder', '_placeholder.png'];
                     await file.save();
 
                     break;

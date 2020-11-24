@@ -25,8 +25,11 @@ app.use(cors());
 // Express will request and receive JSON content
 app.use(express.json());
 
-// Serve the static content inside the public folder pointing to /static
-app.use('/static', express.static('public/images/covers'));
+// Serve the content inside the covers folder pointing to /covers
+app.use('/covers', express.static('public/images/covers'));
+
+// Create a static folder pointing to the files via symbolic link
+app.use('/files', express.static('public/files'));
 
 // Connect to MongoDB with Mongoose
 const mongoURI = `mongodb://${MONGO_HOST}:${MONGO_PORT}/${MONGO_DB}`;
