@@ -178,6 +178,8 @@ const createFileToMongoDB = async (node, nodePath) => {
             name: name,
             // Need to replace any back slashes with forward slashes
             path: pathStringToArray(nodePath.replace(/\\/g, '/')),
+            // This path is specific to be used to link for downloading.
+            download: pathStringToArray('/files' + nodePath.replace(/\\/g, '/'))
         }; // Add any other properties; like cover, after creation.
 
         // Then check if the file already exists

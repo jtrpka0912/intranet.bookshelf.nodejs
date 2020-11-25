@@ -66,6 +66,8 @@ router.route('/shelf/:shelfId').get((req, res) => {
                     // Convert to a JavaScript Object
                     file = file.toObject();
                     file.path = pathArrayToString(file.path);
+                    file.cover = pathArrayToString(file.cover);
+                    file.download = pathArrayToString(file.download);
 
                     return file;
                 });
@@ -142,6 +144,7 @@ router.route('/shelf/:shelfId/folder/:folderId').get((req, res) => {
                             // Convert to a JavaScript Object
                             file = file.toObject();
                             file.path = pathArrayToString(file.path);
+                            file.download = pathArrayToString(file.download);
                             file.cover = pathArrayToString(file.cover);
         
                             return file;

@@ -25,7 +25,13 @@ const fileSchema = new Schema({
         trim: true,
         minlength: 0
     },
-    // TODO: Add a new download path (string[])
+    download: {
+        type: [String], // Each folder will be an array item
+        required: true,
+        unique: false,
+        trim: true,
+        minlength: 0
+    },
     cover: {
         type: [String], // Each folder will be an array item
         required: false,
