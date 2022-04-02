@@ -27,6 +27,7 @@ router.route('/').get(async (req, res) => {
 
         res.json(updatedShelves);
     } catch (err) {
+        console.error(err);
         res.status(400).json({
             errorCode: 400,
             errorCodeMessage: 'Bad Request',
