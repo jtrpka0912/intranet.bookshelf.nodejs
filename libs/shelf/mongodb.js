@@ -48,9 +48,7 @@ const retrieveDirectories = async (shelf, currentFolder) => {
         }
 
         // Exec will make the Mongo query return a full Promise.
-        const directories = await Folder.find(query).exec();
-
-        return directories;
+        return await Folder.find(query).sort({ name: 1 }).exec();
     } catch (err) {
         throw err;
     }
@@ -65,7 +63,6 @@ const retrieveDirectories = async (shelf, currentFolder) => {
  * @returns { object[] }
  */
 const retrieveBreadcrumbs = async (shelf, currentFolder) => {
-    // console.log('*************************');
     try {
         if(!shelf) throw new Error('Shelf was missing in call.');
 
@@ -78,13 +75,9 @@ const retrieveBreadcrumbs = async (shelf, currentFolder) => {
             // let breadcrumbs = [shelf];
             let breadcrumbs = [];
 
-            // console.info('Paths', shelf.root, currentFolder.path);
             const lengthOfShelfRoot = shelf.root.length;
             const lengthOfCurrentFolder = currentFolder.path.length;
             const lengthDifference = lengthOfCurrentFolder - lengthOfShelfRoot;
-
-            // console.info('Shelf Path', shelf.root);
-            // console.info('Lengths', lengthOfShelfRoot, lengthOfCurrentFolder, lengthDifference);
 
             if(lengthDifference > 1) {
                 // Loop through the path of the current folder
@@ -94,11 +87,9 @@ const retrieveBreadcrumbs = async (shelf, currentFolder) => {
                     // console.info('X', x);
                     // Need to copy the array so the currentFolder.path doesn't get tampered.
                     const currentPath = currentFolder.path.slice();
-                    // console.info('Current Path', currentPath);
 
                     // Remove parts of the path by "popping" more items with each iteration
                     const iteratedFolderPath = currentPath.splice(0, x + 1);
-                    // console.info('Iterated Folder Path', iteratedFolderPath);
 
                     // Start constructing the MongoDB query
                     const sizeExpression = {
@@ -143,12 +134,8 @@ const retrieveBreadcrumbs = async (shelf, currentFolder) => {
                         $and: andExpressionsForPaths
                     };
 
-                    // console.info('Query', andExpressionsForPaths);
-
                     // Finally, find the folder with the same path, and then push it into the breadcrumbs.
                     const directory = await Folder.findOne(query).exec(); // Should only get one folder
-
-                    // console.info('Found directory', directory);
 
                     breadcrumbs.push(directory);
                 }
@@ -211,9 +198,7 @@ const retrieveFiles = async (shelf, currentFolder) => {
         }
 
         // Exec will make the Mongo query return a full Promise.
-        const files = await File.find(query).exec();
-
-        return files;
+        return await File.find(query).sort({ name: 1 }).exec();
     } catch(err) {
         throw err;
     }
